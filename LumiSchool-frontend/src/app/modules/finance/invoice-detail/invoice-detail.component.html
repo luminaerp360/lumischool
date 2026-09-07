@@ -1,0 +1,463 @@
+<div class="max-w-3xl mx-auto py-8 px-4">
+  <!-- Loading -->
+  <div *ngIf="loading" class="flex items-center justify-center py-16">
+    <div
+      class="animate-spin h-8 w-8 rounded-full border-4 border-indigo-500 border-t-transparent"
+    ></div>
+  </div>
+
+  <!-- Error -->
+  <div
+    *ngIf="error && !loading"
+    class="p-6 rounded-2xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400"
+  >
+    {{ error }}
+  </div>
+
+  <ng-container *ngIf="!loading && invoice">
+    <!-- Header -->
+    <div class="flex items-start gap-3 mb-6">
+      <button
+        (click)="back()"
+        class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 transition-colors flex-shrink-0 mt-1"
+      >
+        <svg
+          class="w-5 h-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M15 19l-7-7 7-7"
+          />
+        </svg>
+      </button>
+      <div class="flex-1">
+        <div class="flex flex-wrap items-center gap-3">
+          <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+            {{ invoice.invoiceNumber }}
+          </h1>
+          <span
+            class="px-3 py-1 rounded-full text-xs font-semibold"
+            [ngClass]="statusClass"
+          >
+            {{ invoice.status | titlecase }}
+          </span>
+        </div>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+          {{ studentName(invoice) }} &bull; {{ invoice.term }}
+          {{ invoice.academicYear }}
+        </p>
+      </div>
+      <div class="flex gap-2 flex-shrink-0">
+        <button
+          *ngIf="canDiscount()"
+          (click)="
+            showDiscountForm = !showDiscountForm; showPaymentForm = false
+          "
+          class="px-4 py-2 rounded-xl border border-gray-300 dark:border-gray-600 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+        >
+          Apply Discount
+        </button>
+        <button
+          *ngIf="canRecord()"
+          (click)="showPaymentForm = !showPaymentForm; showDiscountForm = false"
+          class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-sm font-medium text-white transition-colors"
+        >
+          Record Payment
+        </button>
+      </div>
+    </div>
+
+    <!-- Record Payment Form -->
+    <div
+      *ngIf="showPaymentForm"
+      class="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-2xl p-6 mb-6"
+    >
+      <h3 class="text-base font-semibold text-gray-900 dark:text-white mb-4">
+        Record Payment
+      </h3>
+      <form [formGroup]="paymentForm" (ngSubmit)="submitPayment()" novalidate>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label
+              class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1"
+              >Amount (KES) *</label
+            >
+            <input
+              formControlName="amount"
+              type="number"
+              min="1"
+              class="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+            <p
+              *ngIf="
+                paymentForm.get('amount')?.invalid &&
+                paymentForm.get('amount')?.touched
+              "
+              class="mt-1 text-xs text-red-500"
+            >
+              Enter a valid amount.
+            </p>
+          </div>
+
+          <div>
+            <label
+              class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1"
+              >Payment Method *</label
+            >
+            <select
+              formControlName="paymentMethod"
+              class="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              <option *ngFor="let m of paymentMethods" [value]="m.value">
+                {{ m.label }}
+              </option>
+            </select>
+          </div>
+
+          <div>
+            <label
+              class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1"
+              >Payment Date</label
+            >
+            <input
+              formControlName="paymentDate"
+              type="date"
+              class="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
+
+          <!-- M-Pesa fields -->
+          <ng-container *ngIf="selectedMethod === 'MPESA'">
+            <div>
+              <label
+                class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1"
+                >M-Pesa Transaction ID</label
+              >
+              <input
+                formControlName="mpesaTransactionId"
+                type="text"
+                placeholder="e.g. PBQ1234XYZ"
+                class="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+            </div>
+            <div>
+              <label
+                class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1"
+                >M-Pesa Phone Number</label
+              >
+              <input
+                formControlName="mpesaPhoneNumber"
+                type="text"
+                placeholder="e.g. 0712345678"
+                class="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+            </div>
+          </ng-container>
+
+          <!-- Bank fields -->
+          <div *ngIf="selectedMethod === 'BANK_TRANSFER'">
+            <label
+              class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1"
+              >Bank Reference</label
+            >
+            <input
+              formControlName="bankReference"
+              type="text"
+              placeholder="Bank reference number"
+              class="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
+
+          <!-- Cheque fields -->
+          <div *ngIf="selectedMethod === 'CHEQUE'">
+            <label
+              class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1"
+              >Cheque Number</label
+            >
+            <input
+              formControlName="chequeNumber"
+              type="text"
+              placeholder="Cheque number"
+              class="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
+        </div>
+
+        <div
+          *ngIf="paymentError"
+          class="mb-3 text-sm text-red-600 dark:text-red-400"
+        >
+          {{ paymentError }}
+        </div>
+
+        <div class="flex gap-3 justify-end">
+          <button
+            type="button"
+            (click)="showPaymentForm = false"
+            class="px-5 py-2 rounded-xl border border-gray-300 dark:border-gray-600 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-800 transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            [disabled]="savingPayment"
+            class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-sm font-medium text-white flex items-center gap-2 transition-colors"
+          >
+            <div
+              *ngIf="savingPayment"
+              class="animate-spin h-4 w-4 rounded-full border-2 border-white border-t-transparent"
+            ></div>
+            Save Payment
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Discount Form -->
+    <div
+      *ngIf="showDiscountForm"
+      class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-2xl p-6 mb-6"
+    >
+      <h3 class="text-base font-semibold text-gray-900 dark:text-white mb-4">
+        Apply Discount / Waiver
+      </h3>
+      <form [formGroup]="discountForm" (ngSubmit)="submitDiscount()" novalidate>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label
+              class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1"
+              >Discount Amount (KES) *</label
+            >
+            <input
+              formControlName="amount"
+              type="number"
+              min="0"
+              class="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
+          <div>
+            <label
+              class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1"
+              >Reason *</label
+            >
+            <input
+              formControlName="reason"
+              type="text"
+              placeholder="e.g. Bursary, Scholarship, Staff discount"
+              class="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
+        </div>
+        <div
+          *ngIf="discountError"
+          class="mb-3 text-sm text-red-600 dark:text-red-400"
+        >
+          {{ discountError }}
+        </div>
+        <div class="flex gap-3 justify-end">
+          <button
+            type="button"
+            (click)="showDiscountForm = false"
+            class="px-5 py-2 rounded-xl border border-gray-300 dark:border-gray-600 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-800 transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            [disabled]="savingDiscount"
+            class="px-5 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 disabled:opacity-60 text-sm font-medium text-white flex items-center gap-2 transition-colors"
+          >
+            <div
+              *ngIf="savingDiscount"
+              class="animate-spin h-4 w-4 rounded-full border-2 border-white border-t-transparent"
+            ></div>
+            Apply Discount
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Invoice Summary Cards -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+      <div
+        class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-4 text-center"
+      >
+        <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">
+          Total Billed
+        </p>
+        <p class="text-xl font-bold text-gray-900 dark:text-white">
+          {{ invoice.totalAmount | number }}
+        </p>
+        <p class="text-xs text-gray-400">KES</p>
+      </div>
+      <div
+        class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-4 text-center"
+      >
+        <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Paid</p>
+        <p class="text-xl font-bold text-green-600 dark:text-green-400">
+          {{ invoice.paidAmount | number }}
+        </p>
+        <p class="text-xs text-gray-400">KES</p>
+      </div>
+      <div
+        class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-4 text-center"
+      >
+        <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Balance</p>
+        <p class="text-xl font-bold text-red-600 dark:text-red-400">
+          {{ invoice.balance | number }}
+        </p>
+        <p class="text-xs text-gray-400">KES</p>
+      </div>
+      <div
+        class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-4 text-center"
+      >
+        <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Discount</p>
+        <p class="text-xl font-bold text-amber-600 dark:text-amber-400">
+          {{ invoice.discount | number }}
+        </p>
+        <p class="text-xs text-gray-400">KES</p>
+      </div>
+    </div>
+
+    <!-- Invoice Items -->
+    <div
+      class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6"
+    >
+      <h2 class="text-base font-semibold text-gray-900 dark:text-white mb-4">
+        Fee Breakdown
+      </h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr
+              class="text-xs text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700"
+            >
+              <th class="text-left pb-2 font-medium">Description</th>
+              <th class="text-left pb-2 font-medium">Category</th>
+              <th class="text-right pb-2 font-medium">Amount (KES)</th>
+              <th class="text-center pb-2 font-medium">Optional</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
+            <tr *ngFor="let item of invoice.items" class="py-2">
+              <td class="py-2 text-gray-900 dark:text-white">
+                {{ item.description }}
+              </td>
+              <td class="py-2 text-gray-500 dark:text-gray-400">
+                {{ item.category | titlecase }}
+              </td>
+              <td
+                class="py-2 text-right font-medium text-gray-900 dark:text-white"
+              >
+                {{ item.amount | number }}
+              </td>
+              <td class="py-2 text-center">
+                <span
+                  *ngIf="item.isOptional"
+                  class="px-2 py-0.5 rounded-full text-xs bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300"
+                  >Optional</span
+                >
+              </td>
+            </tr>
+          </tbody>
+          <tfoot class="border-t-2 border-gray-200 dark:border-gray-700">
+            <tr>
+              <td
+                colspan="2"
+                class="pt-3 font-semibold text-gray-900 dark:text-white"
+              >
+                Total
+              </td>
+              <td
+                class="pt-3 text-right font-bold text-gray-900 dark:text-white"
+              >
+                {{ invoice.totalAmount | number }}
+              </td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+      <div class="mt-3 text-xs text-gray-400">
+        Due date: {{ invoice.dueDate | date: "mediumDate" }}
+      </div>
+    </div>
+
+    <!-- Payment History -->
+    <div
+      class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6"
+    >
+      <h2 class="text-base font-semibold text-gray-900 dark:text-white mb-4">
+        Payment History
+      </h2>
+      <div
+        *ngIf="payments.length === 0"
+        class="text-sm text-gray-400 dark:text-gray-500 text-center py-8"
+      >
+        No payments recorded yet.
+      </div>
+      <div *ngIf="payments.length > 0" class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr
+              class="text-xs text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700"
+            >
+              <th class="text-left pb-2 font-medium">Receipt #</th>
+              <th class="text-left pb-2 font-medium">Method</th>
+              <th class="text-left pb-2 font-medium">Reference</th>
+              <th class="text-left pb-2 font-medium">Date</th>
+              <th class="text-right pb-2 font-medium">Amount (KES)</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
+            <tr *ngFor="let p of payments">
+              <td
+                class="py-2 font-mono text-xs text-gray-700 dark:text-gray-300"
+              >
+                {{ p.receiptNumber }}
+              </td>
+              <td class="py-2">
+                <span
+                  class="px-2 py-0.5 rounded-full text-xs font-medium"
+                  [ngClass]="methodClass(p.paymentMethod)"
+                >
+                  {{ methodLabel(p.paymentMethod) }}
+                </span>
+              </td>
+              <td class="py-2 text-xs text-gray-500 dark:text-gray-400">
+                <ng-container *ngIf="p.mpesaTransactionId">{{
+                  p.mpesaTransactionId
+                }}</ng-container>
+                <ng-container *ngIf="p.bankReference">{{
+                  p.bankReference
+                }}</ng-container>
+                <ng-container *ngIf="p.chequeNumber">{{
+                  p.chequeNumber
+                }}</ng-container>
+                <ng-container
+                  *ngIf="
+                    !p.mpesaTransactionId && !p.bankReference && !p.chequeNumber
+                  "
+                  >—</ng-container
+                >
+              </td>
+              <td class="py-2 text-gray-500 dark:text-gray-400">
+                {{ p.paymentDate | date: "mediumDate" }}
+              </td>
+              <td
+                class="py-2 text-right font-semibold text-green-600 dark:text-green-400"
+              >
+                {{ p.amount | number }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </ng-container>
+</div>

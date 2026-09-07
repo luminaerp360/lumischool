@@ -1,0 +1,7 @@
+.form-label {
+  @apply block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1;
+}
+
+.form-error {
+  @apply text-xs text-red-500 mt-1;
+}

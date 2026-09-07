@@ -1,0 +1,328 @@
+<div class="max-w-3xl mx-auto py-8 px-4">
+  <!-- Header -->
+  <div class="flex items-center gap-3 mb-6">
+    <button
+      (click)="cancel()"
+      class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 transition-colors"
+    >
+      <svg
+        class="w-5 h-5"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M15 19l-7-7 7-7"
+        />
+      </svg>
+    </button>
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+        {{ isEdit ? "Edit Fee Structure" : "Create Fee Structure" }}
+      </h1>
+      <p class="text-sm text-gray-500 dark:text-gray-400">
+        Define fees per term for a specific level/grade
+      </p>
+    </div>
+  </div>
+
+  <!-- Loading state -->
+  <div *ngIf="loadingData" class="flex items-center justify-center py-16">
+    <div
+      class="animate-spin h-8 w-8 rounded-full border-4 border-indigo-500 border-t-transparent"
+    ></div>
+  </div>
+
+  <form
+    *ngIf="!loadingData"
+    [formGroup]="form"
+    (ngSubmit)="submit()"
+    novalidate
+  >
+    <!-- Basic Info Card -->
+    <div
+      class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6"
+    >
+      <h2 class="text-base font-semibold text-gray-900 dark:text-white mb-4">
+        Fee Structure Details
+      </h2>
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <!-- Name -->
+        <div class="sm:col-span-2">
+          <label
+            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+          >
+            Structure Name <span class="text-red-500">*</span>
+          </label>
+          <input
+            formControlName="name"
+            type="text"
+            placeholder="e.g. Grade 8 Term 1 2025 Fees"
+            class="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+          <p
+            *ngIf="form.get('name')?.invalid && form.get('name')?.touched"
+            class="mt-1 text-xs text-red-500"
+          >
+            Name is required.
+          </p>
+        </div>
+
+        <!-- Academic Year -->
+        <div>
+          <label
+            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+          >
+            Academic Year <span class="text-red-500">*</span>
+          </label>
+          <select
+            formControlName="academicYear"
+            class="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          >
+            <option *ngFor="let y of academicYears" [value]="y">{{ y }}</option>
+          </select>
+        </div>
+
+        <!-- Term -->
+        <div>
+          <label
+            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+          >
+            Term <span class="text-red-500">*</span>
+          </label>
+          <select
+            formControlName="term"
+            class="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          >
+            <option *ngFor="let t of terms" [value]="t">{{ t }}</option>
+          </select>
+        </div>
+
+        <!-- Level -->
+        <div>
+          <label
+            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+          >
+            School Level <span class="text-red-500">*</span>
+          </label>
+          <select
+            formControlName="level"
+            class="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          >
+            <option *ngFor="let l of schoolLevels" [value]="l.value">
+              {{ l.label }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Grade (optional) -->
+        <div>
+          <label
+            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+          >
+            Specific Grade
+            <span class="text-gray-400 text-xs"
+              >(optional — leave blank to apply to all grades in level)</span
+            >
+          </label>
+          <input
+            formControlName="grade"
+            type="number"
+            min="1"
+            max="12"
+            placeholder="e.g. 8"
+            class="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Fee Items Card -->
+    <div
+      class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6"
+    >
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h2 class="text-base font-semibold text-gray-900 dark:text-white">
+            Fee Items
+          </h2>
+          <p class="text-xs text-gray-500 dark:text-gray-400">
+            Add all charges for this term
+          </p>
+        </div>
+        <button
+          type="button"
+          (click)="addItem()"
+          class="flex items-center gap-2 px-4 py-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 text-sm font-medium rounded-xl hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors"
+        >
+          <svg
+            class="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 4v16m8-8H4"
+            />
+          </svg>
+          Add Item
+        </button>
+      </div>
+
+      <div formArrayName="items" class="space-y-4">
+        <div
+          *ngFor="let ctrl of items.controls; let i = index"
+          [formGroupName]="i"
+          class="border border-gray-200 dark:border-gray-700 rounded-xl p-4 relative"
+        >
+          <!-- Remove button -->
+          <button
+            *ngIf="items.length > 1"
+            type="button"
+            (click)="removeItem(i)"
+            class="absolute top-3 right-3 text-gray-400 hover:text-red-500 transition-colors"
+          >
+            <svg
+              class="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+
+          <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <!-- Category -->
+            <div>
+              <label
+                class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1"
+                >Category</label
+              >
+              <select
+                formControlName="category"
+                class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              >
+                <option *ngFor="let c of feeCategories" [value]="c.value">
+                  {{ c.label }}
+                </option>
+              </select>
+            </div>
+
+            <!-- Description -->
+            <div>
+              <label
+                class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1"
+                >Description</label
+              >
+              <input
+                formControlName="description"
+                type="text"
+                placeholder="e.g. School Fees Term 1"
+                class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+            </div>
+
+            <!-- Amount -->
+            <div>
+              <label
+                class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1"
+                >Amount (KES)</label
+              >
+              <input
+                formControlName="amount"
+                type="number"
+                min="0"
+                step="100"
+                placeholder="0"
+                class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+            </div>
+          </div>
+
+          <!-- Optional checkbox -->
+          <div class="mt-2 flex items-center gap-2">
+            <input
+              formControlName="isOptional"
+              type="checkbox"
+              [id]="'optional-' + i"
+              class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+            />
+            <label
+              [for]="'optional-' + i"
+              class="text-xs text-gray-600 dark:text-gray-400"
+            >
+              Optional fee (student can opt out)
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Total -->
+      <div
+        class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 flex justify-between items-center"
+      >
+        <span class="text-sm font-medium text-gray-700 dark:text-gray-300"
+          >Total Amount</span
+        >
+        <span class="text-xl font-bold text-gray-900 dark:text-white">
+          KES {{ totalAmount | number }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Error -->
+    <div
+      *ngIf="error"
+      class="mb-4 flex items-center gap-3 p-4 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 text-sm"
+    >
+      <svg
+        class="w-5 h-5 flex-shrink-0"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
+      </svg>
+      {{ error }}
+    </div>
+
+    <!-- Actions -->
+    <div class="flex items-center gap-3 justify-end">
+      <button
+        type="button"
+        (click)="cancel()"
+        class="px-6 py-2.5 rounded-xl border border-gray-300 dark:border-gray-600 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+      >
+        Cancel
+      </button>
+      <button
+        type="submit"
+        [disabled]="loading"
+        class="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-sm font-medium text-white transition-colors flex items-center gap-2"
+      >
+        <div
+          *ngIf="loading"
+          class="animate-spin h-4 w-4 rounded-full border-2 border-white border-t-transparent"
+        ></div>
+        {{ isEdit ? "Save Changes" : "Create Fee Structure" }}
+      </button>
+    </div>
+  </form>
+</div>

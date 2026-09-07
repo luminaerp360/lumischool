@@ -1,0 +1,109 @@
+<div class="p-6">
+  <!-- Header -->
+  <div
+    class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4"
+  >
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Students</h1>
+      <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+        Manage student records and enrollment
+      </p>
+    </div>
+    <button (click)="addStudent()" class="btn-primary flex items-center gap-2">
+      <i class="fas fa-plus"></i> Add Student
+    </button>
+  </div>
+
+  <!-- Filters -->
+  <div class="card mb-6">
+    <div class="flex flex-col sm:flex-row gap-3">
+      <div class="flex-1">
+        <input
+          type="text"
+          [(ngModel)]="search"
+          (keyup.enter)="onSearch()"
+          placeholder="Search by name, admission number..."
+          class="form-input"
+        />
+      </div>
+      <select
+        [(ngModel)]="statusFilter"
+        (change)="onSearch()"
+        class="form-select sm:w-40"
+      >
+        <option value="">All Status</option>
+        <option value="ACTIVE">Active</option>
+        <option value="GRADUATED">Graduated</option>
+        <option value="SUSPENDED">Suspended</option>
+        <option value="TRANSFERRED">Transferred</option>
+      </select>
+      <select
+        [(ngModel)]="levelFilter"
+        (change)="onSearch()"
+        class="form-select sm:w-40"
+      >
+        <option value="">All Levels</option>
+        <option value="PRE_PRIMARY">Pre-Primary</option>
+        <option value="PRIMARY">Primary</option>
+        <option value="JSS">Junior Secondary</option>
+        <option value="SENIOR">Senior Secondary</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="flex justify-center py-12">
+    <div
+      class="animate-spin rounded-full h-8 w-8 border-b-2"
+      style="border-color: var(--accent-600)"
+    ></div>
+  </div>
+
+  <!-- Table -->
+  <div *ngIf="!loading" class="card overflow-hidden p-0">
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Adm No.</th>
+            <th>Name</th>
+            <th>Grade</th>
+            <th>Gender</th>
+            <th>Status</th>
+            <th>Boarding</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let s of students"
+            class="cursor-pointer"
+            (click)="viewStudent(s._id)"
+          >
+            <td class="font-medium">{{ s.admissionNumber }}</td>
+            <td>{{ getFullName(s) }}</td>
+            <td>Grade {{ s.currentGrade }}</td>
+            <td>{{ s.gender }}</td>
+            <td>
+              <span class="badge" [ngClass]="getStatusClass(s.status)">{{
+                s.status
+              }}</span>
+            </td>
+            <td>{{ s.boardingStatus === "BOARDER" ? "Boarder" : "Day" }}</td>
+            <td class="text-right">
+              <i class="fas fa-chevron-right text-gray-400"></i>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div
+      *ngIf="students.length === 0"
+      class="text-center py-12 text-gray-500 dark:text-gray-400"
+    >
+      <i class="fas fa-user-graduate text-4xl mb-3 opacity-30"></i>
+      <p>No students found</p>
+    </div>
+  </div>
+</div>

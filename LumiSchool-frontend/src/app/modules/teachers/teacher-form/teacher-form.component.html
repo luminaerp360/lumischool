@@ -1,0 +1,245 @@
+<div class="max-w-2xl mx-auto">
+  <button
+    (click)="cancel()"
+    class="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 mb-4 inline-flex items-center gap-1"
+  >
+    <i class="fas fa-arrow-left"></i> Back to Staff
+  </button>
+
+  <div
+    class="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-6"
+  >
+    <h1 class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-1">
+      {{ isEdit ? "Edit Staff Member" : "Add Staff Member" }}
+    </h1>
+    <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">
+      Kenya CBC school staff: Teachers, Principal, Bursar, Admin, or BOM members
+    </p>
+
+    <div *ngIf="loadingData" class="flex justify-center py-10">
+      <i class="fas fa-spinner fa-spin text-2xl text-gray-400"></i>
+    </div>
+
+    <form
+      *ngIf="!loadingData"
+      [formGroup]="form"
+      (ngSubmit)="submit()"
+      novalidate
+    >
+      <!-- Role Selection -->
+      <div class="mb-6">
+        <h2
+          class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3"
+        >
+          Staff Role
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <div
+            *ngFor="let r of staffRoles"
+            class="flex items-start gap-3 px-3 py-3 rounded-lg border cursor-pointer transition-colors"
+            [class.border-indigo-400]="form.value.role === r"
+            [class.bg-indigo-50]="form.value.role === r"
+            [class.border-gray-200]="form.value.role !== r"
+            [class.dark:border-slate-600]="form.value.role !== r"
+            (click)="form.patchValue({ role: r })"
+          >
+            <div
+              class="w-4 h-4 mt-0.5 rounded-full border-2 flex-shrink-0 transition-colors"
+              [class.bg-indigo-600]="form.value.role === r"
+              [class.border-indigo-600]="form.value.role === r"
+              [class.border-gray-300]="form.value.role !== r"
+            ></div>
+            <div>
+              <div class="flex items-center gap-2">
+                <i
+                  [class]="
+                    'fas ' +
+                    roleMeta[r].icon +
+                    ' text-xs text-gray-500 dark:text-gray-400'
+                  "
+                ></i>
+                <span
+                  class="text-sm font-semibold text-gray-800 dark:text-gray-100"
+                >
+                  {{ roleMeta[r].label }}
+                </span>
+              </div>
+              <p
+                class="text-xs text-gray-500 dark:text-gray-400 mt-0.5 leading-snug"
+              >
+                {{ roleMeta[r].hint }}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Personal Info -->
+      <div class="mb-6">
+        <h2
+          class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3"
+        >
+          Personal Information
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label class="form-label"
+              >First Name <span class="text-red-500">*</span></label
+            >
+            <input
+              formControlName="firstName"
+              type="text"
+              placeholder="e.g. Jane"
+              class="form-input"
+              [class.border-red-400]="
+                form.get('firstName')?.invalid && form.get('firstName')?.touched
+              "
+            />
+            <p
+              *ngIf="
+                form.get('firstName')?.invalid && form.get('firstName')?.touched
+              "
+              class="mt-1 text-xs text-red-500"
+            >
+              First name is required.
+            </p>
+          </div>
+          <div>
+            <label class="form-label"
+              >Last Name <span class="text-red-500">*</span></label
+            >
+            <input
+              formControlName="lastName"
+              type="text"
+              placeholder="e.g. Wanjiku"
+              class="form-input"
+              [class.border-red-400]="
+                form.get('lastName')?.invalid && form.get('lastName')?.touched
+              "
+            />
+            <p
+              *ngIf="
+                form.get('lastName')?.invalid && form.get('lastName')?.touched
+              "
+              class="mt-1 text-xs text-red-500"
+            >
+              Last name is required.
+            </p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="form-label"
+              >Email Address <span class="text-red-500">*</span></label
+            >
+            <input
+              formControlName="email"
+              type="email"
+              placeholder="e.g. jane.wanjiku@school.ac.ke"
+              class="form-input"
+              [class.border-red-400]="
+                form.get('email')?.invalid && form.get('email')?.touched
+              "
+            />
+            <p
+              *ngIf="form.get('email')?.invalid && form.get('email')?.touched"
+              class="mt-1 text-xs text-red-500"
+            >
+              Valid email is required.
+            </p>
+          </div>
+          <div>
+            <label class="form-label">Phone Number</label>
+            <input
+              formControlName="phone"
+              type="tel"
+              placeholder="e.g. 0712 345 678"
+              class="form-input"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Account -->
+      <div class="mb-6">
+        <h2
+          class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3"
+        >
+          Account
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="form-label">
+              Password
+              <span *ngIf="!isEdit" class="text-red-500">*</span>
+              <span *ngIf="isEdit" class="text-xs font-normal text-gray-400"
+                >(leave blank to keep current)</span
+              >
+            </label>
+            <input
+              formControlName="password"
+              type="password"
+              placeholder="Min 8 chars · must have UPPER, lower &amp; number"
+              class="form-input"
+              [class.border-red-400]="
+                form.get('password')?.invalid && form.get('password')?.touched
+              "
+            />
+            <p
+              *ngIf="
+                form.get('password')?.invalid && form.get('password')?.touched
+              "
+              class="mt-1 text-xs text-red-500"
+            >
+              Password must be at least 8 characters with uppercase, lowercase
+              and a number.
+            </p>
+          </div>
+          <div class="flex items-center gap-3 pt-6">
+            <input
+              formControlName="isActive"
+              id="isActive"
+              type="checkbox"
+              class="w-4 h-4 rounded"
+            />
+            <label
+              for="isActive"
+              class="text-sm text-gray-700 dark:text-gray-300"
+              >Account Active</label
+            >
+          </div>
+        </div>
+      </div>
+
+      <!-- Error -->
+      <div
+        *ngIf="error"
+        class="mb-4 px-4 py-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 text-sm text-red-700 dark:text-red-400"
+      >
+        <i class="fas fa-exclamation-circle mr-2"></i>{{ error }}
+      </div>
+
+      <!-- Actions -->
+      <div class="flex gap-3">
+        <button
+          type="submit"
+          [disabled]="loading"
+          class="btn-primary flex items-center gap-2"
+        >
+          <i *ngIf="loading" class="fas fa-spinner fa-spin"></i>
+          {{
+            loading
+              ? "Saving..."
+              : isEdit
+                ? "Update Staff Member"
+                : "Add Staff Member"
+          }}
+        </button>
+        <button type="button" (click)="cancel()" class="btn-secondary">
+          Cancel
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

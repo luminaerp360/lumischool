@@ -1,0 +1,150 @@
+<div>
+  <div class="flex items-center justify-between mb-6 flex-wrap gap-3">
+    <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">
+      Staff Directory
+    </h1>
+    <button (click)="addStaff()" class="btn-primary flex items-center gap-2">
+      <i class="fas fa-user-plus"></i> Add Staff
+    </button>
+  </div>
+
+  <!-- Role Tabs -->
+  <div class="flex gap-2 flex-wrap mb-4">
+    <button
+      *ngFor="let tab of roleTabs"
+      (click)="selectTab(tab.value)"
+      class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors border"
+      [class.border-transparent]="filterRole === tab.value"
+      [class.text-white]="filterRole === tab.value"
+      [class.border-gray-200]="filterRole !== tab.value"
+      [class.dark:border-slate-600]="filterRole !== tab.value"
+      [class.text-gray-600]="filterRole !== tab.value"
+      [class.dark:text-gray-400]="filterRole !== tab.value"
+      [class.hover:bg-gray-100]="filterRole !== tab.value"
+      [class.dark:hover:bg-slate-700]="filterRole !== tab.value"
+      [style.background-color]="
+        filterRole === tab.value ? 'var(--accent-600)' : 'transparent'
+      "
+    >
+      <i [class]="'fas ' + tab.icon + ' text-xs'"></i>
+      {{ tab.label }}
+    </button>
+  </div>
+
+  <!-- Search -->
+  <div class="mb-4">
+    <input
+      type="text"
+      [(ngModel)]="search"
+      (ngModelChange)="load()"
+      placeholder="Search by name or email..."
+      class="form-input max-w-sm"
+    />
+  </div>
+
+  <div *ngIf="loading" class="flex justify-center py-20">
+    <i class="fas fa-spinner fa-spin text-2xl text-gray-400"></i>
+  </div>
+
+  <!-- Staff Grid -->
+  <div
+    *ngIf="!loading && staff.length"
+    class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
+  >
+    <div
+      *ngFor="let u of staff"
+      (click)="view(u._id)"
+      class="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-5 cursor-pointer hover:shadow-md transition-shadow group"
+    >
+      <!-- Avatar + Badge -->
+      <div class="flex items-start justify-between mb-4">
+        <div
+          class="w-12 h-12 rounded-xl flex items-center justify-center text-lg font-bold text-white flex-shrink-0"
+          style="
+            background: linear-gradient(
+              135deg,
+              var(--accent-600),
+              var(--accent-400, #818cf8)
+            );
+          "
+        >
+          {{ initials(u) }}
+        </div>
+        <span
+          class="badge text-xs"
+          [ngClass]="u.isActive ? 'badge-active' : 'badge-draft'"
+        >
+          {{ u.isActive ? "Active" : "Inactive" }}
+        </span>
+      </div>
+
+      <!-- Name + Role -->
+      <h3
+        class="text-sm font-semibold text-gray-800 dark:text-gray-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors"
+      >
+        {{ fullName(u) }}
+      </h3>
+      <span
+        class="badge text-xs mt-1 inline-block"
+        [ngClass]="roleClass(u.role)"
+      >
+        {{ roleLabel(u.role) }}
+      </span>
+
+      <!-- Contact -->
+      <div class="mt-3 space-y-1 text-xs text-gray-500 dark:text-gray-400">
+        <div class="flex items-center gap-1.5 truncate">
+          <i class="fas fa-envelope w-3"></i>
+          <span class="truncate">{{ u.email }}</span>
+        </div>
+        <div *ngIf="u.phone" class="flex items-center gap-1.5">
+          <i class="fas fa-phone w-3"></i>
+          <span>{{ u.phone }}</span>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div
+        class="flex gap-2 mt-4 pt-3 border-t border-gray-100 dark:border-slate-700"
+      >
+        <button
+          (click)="view(u._id); $event.stopPropagation()"
+          class="flex-1 text-xs font-medium py-1.5 rounded-lg text-center hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
+          style="color: var(--accent-600)"
+        >
+          View
+        </button>
+        <button
+          (click)="edit(u._id, $event)"
+          class="flex-1 text-xs font-medium py-1.5 rounded-lg text-center text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
+        >
+          Edit
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div
+    *ngIf="!loading && !staff.length"
+    class="flex flex-col items-center py-20 text-gray-400 dark:text-gray-500"
+  >
+    <i class="fas fa-users text-4xl mb-4"></i>
+    <p class="text-base font-medium">No staff found</p>
+    <p class="text-sm mt-1">
+      {{
+        filterRole === "TEACHER"
+          ? "No teachers added yet."
+          : filterRole === "SCHOOL_ADMIN"
+            ? "No admin / BOM members added yet."
+            : "No staff in this category yet."
+      }}
+    </p>
+    <button
+      (click)="addStaff()"
+      class="btn-primary mt-4 flex items-center gap-2"
+    >
+      <i class="fas fa-plus"></i> Add Staff Member
+    </button>
+  </div>
+</div>

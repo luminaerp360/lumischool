@@ -1,0 +1,242 @@
+<div class="p-6 max-w-2xl mx-auto">
+  <!-- Header -->
+  <div class="flex items-center gap-4 mb-6">
+    <button
+      (click)="cancel()"
+      class="p-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
+    >
+      <i class="fas fa-arrow-left"></i>
+    </button>
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+        {{ isEditMode ? "Edit Guardian" : "Add Guardian" }}
+      </h1>
+      <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+        {{
+          isEditMode
+            ? "Update guardian information"
+            : "Register a new parent or guardian"
+        }}
+      </p>
+    </div>
+  </div>
+
+  <!-- Loading skeleton -->
+  <div *ngIf="loadingGuardian" class="card animate-pulse space-y-4">
+    <div class="h-4 bg-gray-200 dark:bg-slate-700 rounded w-1/3"></div>
+    <div class="h-10 bg-gray-200 dark:bg-slate-700 rounded"></div>
+    <div class="h-10 bg-gray-200 dark:bg-slate-700 rounded"></div>
+  </div>
+
+  <form
+    *ngIf="!loadingGuardian"
+    [formGroup]="form"
+    (ngSubmit)="submit()"
+    novalidate
+  >
+    <!-- Error banner -->
+    <div
+      *ngIf="error"
+      class="mb-4 p-3 rounded-lg bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-sm"
+    >
+      <i class="fas fa-exclamation-circle mr-2"></i>{{ error }}
+    </div>
+
+    <!-- Personal Info -->
+    <div class="card mb-5 space-y-5">
+      <h2
+        class="text-base font-semibold text-gray-800 dark:text-gray-100 border-b border-gray-200 dark:border-slate-700 pb-3"
+      >
+        Personal Information
+      </h2>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <div>
+          <label class="form-label"
+            >First Name <span class="text-red-500">*</span></label
+          >
+          <input
+            type="text"
+            formControlName="firstName"
+            class="form-input"
+            [class.border-red-500]="isInvalid('firstName')"
+            placeholder="First name"
+          />
+          <p *ngIf="isInvalid('firstName')" class="form-error">
+            First name is required
+          </p>
+        </div>
+
+        <div>
+          <label class="form-label">Middle Name</label>
+          <input
+            type="text"
+            formControlName="middleName"
+            class="form-input"
+            placeholder="Middle name (optional)"
+          />
+        </div>
+
+        <div>
+          <label class="form-label"
+            >Last Name <span class="text-red-500">*</span></label
+          >
+          <input
+            type="text"
+            formControlName="lastName"
+            class="form-input"
+            [class.border-red-500]="isInvalid('lastName')"
+            placeholder="Last name"
+          />
+          <p *ngIf="isInvalid('lastName')" class="form-error">
+            Last name is required
+          </p>
+        </div>
+
+        <div>
+          <label class="form-label">National ID Number</label>
+          <input
+            type="text"
+            formControlName="idNumber"
+            class="form-input"
+            placeholder="e.g. 12345678"
+          />
+        </div>
+
+        <div>
+          <label class="form-label">Occupation</label>
+          <input
+            type="text"
+            formControlName="occupation"
+            class="form-input"
+            placeholder="e.g. Farmer, Teacher"
+          />
+        </div>
+
+        <div>
+          <label class="form-label">Relationship to Student</label>
+          <select formControlName="relationship" class="form-select">
+            <option *ngFor="let r of relationships" [value]="r">
+              {{ r | titlecase }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Primary guardian toggle -->
+      <div class="flex items-center gap-3 pt-1">
+        <input
+          id="isPrimary"
+          type="checkbox"
+          formControlName="isPrimaryGuardian"
+          class="w-4 h-4 rounded accent-primary"
+        />
+        <label
+          for="isPrimary"
+          class="text-sm text-gray-700 dark:text-gray-300 cursor-pointer"
+          >Mark as primary guardian</label
+        >
+      </div>
+    </div>
+
+    <!-- Contact Info -->
+    <div class="card mb-5 space-y-5">
+      <h2
+        class="text-base font-semibold text-gray-800 dark:text-gray-100 border-b border-gray-200 dark:border-slate-700 pb-3"
+      >
+        Contact Information
+      </h2>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <div>
+          <label class="form-label"
+            >Phone Number <span class="text-red-500">*</span></label
+          >
+          <input
+            type="tel"
+            formControlName="phone"
+            class="form-input"
+            [class.border-red-500]="isInvalid('phone')"
+            placeholder="+254..."
+          />
+          <p *ngIf="isInvalid('phone')" class="form-error">
+            Phone number is required
+          </p>
+        </div>
+
+        <div>
+          <label class="form-label">Alternate Phone</label>
+          <input
+            type="tel"
+            formControlName="alternatePhone"
+            class="form-input"
+            placeholder="+254... (optional)"
+          />
+        </div>
+
+        <div>
+          <label class="form-label">Email Address</label>
+          <input
+            type="email"
+            formControlName="email"
+            class="form-input"
+            [class.border-red-500]="isInvalid('email')"
+            placeholder="email@example.com"
+          />
+          <p *ngIf="isInvalid('email')" class="form-error">
+            Enter a valid email address
+          </p>
+        </div>
+
+        <div>
+          <label class="form-label">County</label>
+          <input
+            type="text"
+            formControlName="county"
+            class="form-input"
+            placeholder="e.g. Nairobi"
+          />
+        </div>
+
+        <div class="sm:col-span-2">
+          <label class="form-label">Physical Address</label>
+          <textarea
+            formControlName="address"
+            class="form-input min-h-[70px] resize-y"
+            placeholder="Street, estate, or P.O. Box..."
+          ></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex justify-end gap-3">
+      <button
+        type="button"
+        (click)="cancel()"
+        class="btn-secondary"
+        [disabled]="loading"
+      >
+        Cancel
+      </button>
+      <button
+        type="submit"
+        class="btn-primary flex items-center gap-2"
+        [disabled]="loading"
+      >
+        <span
+          *ngIf="loading"
+          class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"
+        ></span>
+        <i
+          *ngIf="!loading"
+          class="fas"
+          [ngClass]="isEditMode ? 'fa-save' : 'fa-user-plus'"
+        ></i>
+        {{
+          loading ? "Saving..." : isEditMode ? "Save Changes" : "Add Guardian"
+        }}
+      </button>
+    </div>
+  </form>
+</div>

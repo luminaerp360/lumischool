@@ -1,0 +1,5 @@
+export enum CbcTrack {
+  STEM = "STEM",
+  SOCIAL_SCIENCES = "SOCIAL_SCIENCES",
+  ARTS_AND_SPORTS = "ARTS_AND_SPORTS",
+}

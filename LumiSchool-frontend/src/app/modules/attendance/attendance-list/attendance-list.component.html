@@ -1,0 +1,71 @@
+<div>
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">
+      Attendance
+    </h1>
+  </div>
+
+  <!-- Filters -->
+  <div class="flex flex-wrap gap-3 mb-4">
+    <input
+      type="date"
+      [(ngModel)]="selectedDate"
+      (ngModelChange)="load()"
+      class="form-input w-auto"
+    />
+    <select
+      [(ngModel)]="selectedClassId"
+      (ngModelChange)="load()"
+      class="form-select w-auto"
+    >
+      <option value="">All Classes</option>
+      <option *ngFor="let c of classes" [value]="c._id">{{ c.name }}</option>
+    </select>
+  </div>
+
+  <div *ngIf="loading" class="flex items-center justify-center py-20">
+    <i class="fas fa-spinner fa-spin text-2xl text-gray-400"></i>
+  </div>
+
+  <div
+    *ngIf="!loading"
+    class="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 overflow-hidden"
+  >
+    <div class="table-container overflow-x-auto">
+      <table>
+        <thead>
+          <tr>
+            <th>Student</th>
+            <th>Class</th>
+            <th>Date</th>
+            <th>Session</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of records">
+            <td class="font-medium text-gray-800 dark:text-gray-100">
+              {{ r.studentId }}
+            </td>
+            <td>{{ r.classId }}</td>
+            <td>{{ r.date | date: "mediumDate" }}</td>
+            <td>{{ r.session }}</td>
+            <td>
+              <span class="badge" [ngClass]="getStatusClass(r.status)">{{
+                r.status
+              }}</span>
+            </td>
+          </tr>
+          <tr *ngIf="!records.length">
+            <td
+              colspan="5"
+              class="text-center py-8 text-gray-500 dark:text-gray-400"
+            >
+              No attendance records found
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

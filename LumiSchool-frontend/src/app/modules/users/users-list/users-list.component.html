@@ -1,0 +1,308 @@
+<div class="space-y-6">
+  <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Users</h1>
+      <p class="text-sm text-gray-500 dark:text-gray-400">
+        Manage staff, teachers, and other system users.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+      <div class="relative min-w-0 sm:min-w-[260px]">
+        <i
+          class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-xs text-gray-400"
+        ></i>
+        <input
+          type="text"
+          [(ngModel)]="search"
+          (keyup.enter)="onSearch()"
+          placeholder="Search users"
+          class="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-3 text-sm text-gray-900 outline-none transition-colors dark:border-slate-700 dark:bg-slate-800 dark:text-gray-100"
+        />
+      </div>
+      <button
+        (click)="openCreate()"
+        class="inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium text-white"
+        [style.background-color]="themeService.accent"
+      >
+        <i class="fas fa-user-plus text-xs"></i> New User
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="flex items-center justify-center py-20">
+    <i
+      class="fas fa-spinner fa-spin text-2xl"
+      [style.color]="themeService.accent"
+    ></i>
+  </div>
+
+  <!-- Desktop Table -->
+  <div
+    *ngIf="!loading && users.length"
+    class="hidden overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800 lg:block"
+  >
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
+        <thead class="bg-gray-50 dark:bg-slate-900/60">
+          <tr>
+            <th
+              class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400"
+            >
+              User
+            </th>
+            <th
+              class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400"
+            >
+              Role
+            </th>
+            <th
+              class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400"
+            >
+              Status
+            </th>
+            <th
+              class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400"
+            >
+              Actions
+            </th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200 dark:divide-slate-700">
+          <tr *ngFor="let user of users; trackBy: trackByUser">
+            <td class="px-4 py-4">
+              <div class="flex items-center gap-3">
+                <div
+                  class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl text-sm font-semibold text-white"
+                  [style.background-color]="themeService.accent"
+                >
+                  {{ userName(user).charAt(0).toUpperCase() || "?" }}
+                </div>
+                <div>
+                  <p
+                    class="text-sm font-semibold text-gray-900 dark:text-gray-100"
+                  >
+                    {{ userName(user) }}
+                  </p>
+                  <p class="text-sm text-gray-500 dark:text-gray-400">
+                    {{ user.email }}
+                  </p>
+                </div>
+              </div>
+            </td>
+            <td class="px-4 py-4">
+              <span
+                class="rounded-full px-2.5 py-1 text-xs font-medium"
+                [ngClass]="getRoleClasses(user.role)"
+                >{{ user.role }}</span
+              >
+            </td>
+            <td class="px-4 py-4">
+              <span
+                *ngIf="user.isActive"
+                class="rounded-full bg-green-100 px-2.5 py-1 text-xs font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                >Active</span
+              >
+              <span
+                *ngIf="!user.isActive"
+                class="rounded-full bg-red-100 px-2.5 py-1 text-xs font-medium text-red-700 dark:bg-red-900/30 dark:text-red-400"
+                >Inactive</span
+              >
+            </td>
+            <td class="px-4 py-4">
+              <div class="flex justify-end gap-2">
+                <button
+                  (click)="openEdit(user)"
+                  class="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-gray-300 text-gray-600 hover:bg-gray-50 dark:border-slate-600 dark:text-gray-300 dark:hover:bg-slate-700"
+                  title="Edit"
+                >
+                  <i class="fas fa-pen text-xs"></i>
+                </button>
+                <button
+                  (click)="deleteUser(user._id)"
+                  class="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-red-300 text-red-600 hover:bg-red-50 dark:border-red-900/70 dark:text-red-400 dark:hover:bg-red-950/30"
+                  title="Delete"
+                >
+                  <i class="fas fa-trash text-xs"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Mobile Cards -->
+  <div
+    *ngIf="!loading && users.length"
+    class="grid grid-cols-1 gap-4 lg:hidden"
+  >
+    <article
+      *ngFor="let user of users; trackBy: trackByUser"
+      class="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-800"
+    >
+      <div class="flex items-start justify-between">
+        <div class="flex items-center gap-3">
+          <div
+            class="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl text-sm font-semibold text-white"
+            [style.background-color]="themeService.accent"
+          >
+            {{ userName(user).charAt(0).toUpperCase() || "?" }}
+          </div>
+          <div>
+            <h2
+              class="text-base font-semibold text-gray-900 dark:text-gray-100"
+            >
+              {{ userName(user) }}
+            </h2>
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+              {{ user.email }}
+            </p>
+            <div class="flex gap-2 mt-1">
+              <span
+                class="rounded-full px-2.5 py-1 text-xs font-medium"
+                [ngClass]="getRoleClasses(user.role)"
+                >{{ user.role }}</span
+              >
+            </div>
+          </div>
+        </div>
+        <div class="flex gap-2">
+          <button
+            (click)="openEdit(user)"
+            class="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-gray-300 text-gray-600 dark:border-slate-600 dark:text-gray-300"
+            title="Edit"
+          >
+            <i class="fas fa-pen text-xs"></i>
+          </button>
+          <button
+            (click)="deleteUser(user._id)"
+            class="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-red-300 text-red-600 dark:border-red-900/70 dark:text-red-400"
+            title="Delete"
+          >
+            <i class="fas fa-trash text-xs"></i>
+          </button>
+        </div>
+      </div>
+    </article>
+  </div>
+
+  <div
+    *ngIf="!loading && !users.length"
+    class="rounded-2xl border border-dashed border-gray-300 bg-white px-6 py-14 text-center text-gray-500 dark:border-slate-700 dark:bg-slate-800 dark:text-gray-400"
+  >
+    <i class="fas fa-user-friends mb-3 block text-3xl"></i>
+    <p>No users found.</p>
+  </div>
+
+  <!-- User Form Modal -->
+  <div
+    *ngIf="showUserForm"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+  >
+    <div
+      class="w-full max-w-lg rounded-2xl border border-gray-200 bg-white p-6 shadow-xl dark:border-slate-700 dark:bg-slate-800 max-h-[90vh] overflow-y-auto"
+    >
+      <div class="flex items-start justify-between gap-4 mb-6">
+        <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
+          {{ editingUser ? "Edit User" : "Create User" }}
+        </h2>
+        <button
+          (click)="showUserForm = false"
+          class="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-gray-300 text-gray-500 dark:border-slate-600 dark:text-gray-300"
+        >
+          <i class="fas fa-times text-xs"></i>
+        </button>
+      </div>
+
+      <div class="grid gap-4 md:grid-cols-2">
+        <div>
+          <label class="form-label">First Name *</label>
+          <input
+            type="text"
+            [(ngModel)]="userForm.firstName"
+            class="form-input"
+            placeholder="e.g. Jane"
+          />
+        </div>
+        <div>
+          <label class="form-label">Last Name *</label>
+          <input
+            type="text"
+            [(ngModel)]="userForm.lastName"
+            class="form-input"
+            placeholder="e.g. Wanjiku"
+          />
+        </div>
+        <div>
+          <label class="form-label">Email *</label>
+          <input type="email" [(ngModel)]="userForm.email" class="form-input" />
+        </div>
+        <div>
+          <label class="form-label">Phone</label>
+          <input type="text" [(ngModel)]="userForm.phone" class="form-input" />
+        </div>
+        <div>
+          <label class="form-label">Role *</label>
+          <select [(ngModel)]="userForm.role" class="form-select">
+            <option *ngFor="let role of roles" [value]="role">
+              {{ role }}
+            </option>
+          </select>
+        </div>
+        <div class="md:col-span-2">
+          <label class="form-label">{{
+            editingUser ? "New Password" : "Password *"
+          }}</label>
+          <input
+            type="password"
+            [(ngModel)]="userForm.password"
+            class="form-input"
+          />
+          <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+            {{
+              editingUser
+                ? "Leave blank to keep current password."
+                : "Set the user password."
+            }}
+          </p>
+        </div>
+      </div>
+
+      <div class="mt-4 flex items-center gap-2">
+        <input
+          type="checkbox"
+          [(ngModel)]="userForm.isActive"
+          id="user-active"
+          class="rounded border-gray-300 dark:border-slate-600"
+        />
+        <label
+          for="user-active"
+          class="text-sm text-gray-700 dark:text-gray-300"
+          >User can access the app</label
+        >
+      </div>
+
+      <div class="mt-6 flex justify-end gap-3">
+        <button (click)="showUserForm = false" class="btn-secondary">
+          Cancel
+        </button>
+        <button
+          (click)="saveUser()"
+          [disabled]="savingUser"
+          class="btn-primary"
+          [class.opacity-50]="savingUser"
+        >
+          {{
+            savingUser
+              ? "Saving..."
+              : editingUser
+                ? "Update User"
+                : "Create User"
+          }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

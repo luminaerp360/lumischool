@@ -1,0 +1,237 @@
+<div class="p-6">
+  <button (click)="goBack()" class="btn-secondary mb-4 flex items-center gap-2">
+    <i class="fas fa-arrow-left"></i> Back to Students
+  </button>
+
+  <div *ngIf="loading" class="flex justify-center py-12">
+    <div
+      class="animate-spin rounded-full h-8 w-8 border-b-2"
+      style="border-color: var(--accent-600)"
+    ></div>
+  </div>
+
+  <div *ngIf="student && !loading">
+    <div class="card mb-6">
+      <div class="flex items-start justify-between">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+            {{ getFullName() }}
+          </h1>
+          <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            Admission: {{ student.admissionNumber }}
+            <span *ngIf="student.upiNumber"> &middot; UPI: {{ student.upiNumber }}</span>
+            <span *ngIf="student.nemisNumber"> &middot; NEMIS: {{ student.nemisNumber }}</span>
+          </p>
+        </div>
+        <div class="flex items-center gap-2">
+          <span
+            class="badge"
+            [ngClass]="
+              student.status === 'ACTIVE' ? 'badge-active' : 'badge-draft'
+            "
+            >{{ student.status }}</span
+          >
+          <button
+            (click)="editStudent()"
+            class="btn-primary flex items-center gap-2"
+          >
+            <i class="fas fa-edit"></i> Edit
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Personal Info -->
+      <div class="card">
+        <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
+          Personal Information
+        </h3>
+        <div class="space-y-3 text-sm">
+          <div class="flex justify-between">
+            <span class="text-gray-500 dark:text-gray-400">Gender</span
+            ><span class="text-gray-900 dark:text-white">{{ student.gender }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500 dark:text-gray-400">Date of Birth</span
+            ><span class="text-gray-900 dark:text-white">{{ student.dateOfBirth | date: "mediumDate" }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500 dark:text-gray-400">Nationality</span
+            ><span class="text-gray-900 dark:text-white">{{ student.nationality || "-" }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500 dark:text-gray-400">Religion</span
+            ><span class="text-gray-900 dark:text-white">{{ student.religion || "-" }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500 dark:text-gray-400">NHIF No.</span
+            ><span class="text-gray-900 dark:text-white">{{ student.nhifNumber || "-" }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500 dark:text-gray-400">Birth Cert No.</span
+            ><span class="text-gray-900 dark:text-white">{{ student.birthCertificateNumber || "-" }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Academic Info -->
+      <div class="card">
+        <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
+          Academic Information
+        </h3>
+        <div class="space-y-3 text-sm">
+          <div class="flex justify-between">
+            <span class="text-gray-500 dark:text-gray-400">Level</span
+            ><span class="text-gray-900 dark:text-white">{{ student.currentLevel }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500 dark:text-gray-400">Grade</span
+            ><span class="text-gray-900 dark:text-white">Grade {{ student.currentGrade }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500 dark:text-gray-400">CBC Track</span
+            ><span class="text-gray-900 dark:text-white">{{ student.cbcTrack || "-" }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500 dark:text-gray-400">Boarding</span
+            ><span class="text-gray-900 dark:text-white">{{ student.boardingStatus === "BOARDER" ? "Boarder" : "Day Scholar" }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500 dark:text-gray-400">Admission Date</span
+            ><span class="text-gray-900 dark:text-white">{{ student.admissionDate | date: "mediumDate" }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500 dark:text-gray-400">Previous School</span
+            ><span class="text-gray-900 dark:text-white">{{ student.previousSchool || "-" }}</span>
+          </div>
+          <div *ngIf="student.lastPromotionAcademicYear" class="flex justify-between">
+            <span class="text-gray-500 dark:text-gray-400">Last Promoted</span
+            ><span class="text-gray-900 dark:text-white">{{ student.lastPromotionAcademicYear }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Location -->
+      <div class="card">
+        <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
+          Location
+        </h3>
+        <div class="space-y-3 text-sm">
+          <div class="flex justify-between">
+            <span class="text-gray-500 dark:text-gray-400">County</span
+            ><span class="text-gray-900 dark:text-white">{{ student.county || "-" }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500 dark:text-gray-400">Sub-County</span
+            ><span class="text-gray-900 dark:text-white">{{ student.subCounty || "-" }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500 dark:text-gray-400">Constituency</span
+            ><span class="text-gray-900 dark:text-white">{{ student.constituency || "-" }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500 dark:text-gray-400">Ward</span
+            ><span class="text-gray-900 dark:text-white">{{ student.ward || "-" }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500 dark:text-gray-400">Village</span
+            ><span class="text-gray-900 dark:text-white">{{ student.village || "-" }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500 dark:text-gray-400">Postal Address</span
+            ><span class="text-gray-900 dark:text-white">{{ student.postalAddress || "-" }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Medical -->
+      <div class="card">
+        <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
+          Medical
+        </h3>
+        <div class="space-y-3 text-sm">
+          <div class="flex justify-between">
+            <span class="text-gray-500 dark:text-gray-400">Blood Group</span
+            ><span class="text-gray-900 dark:text-white">{{ student.medicalInfo?.bloodGroup || "-" }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500 dark:text-gray-400">Chronic Illness</span
+            ><span class="text-gray-900 dark:text-white">{{ student.medicalInfo?.chronicIllness || "-" }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500 dark:text-gray-400">Allergies</span
+            ><span class="text-gray-900 dark:text-white">{{ (student.medicalInfo?.allergies || []).join(", ") || "-" }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500 dark:text-gray-400">Conditions</span
+            ><span class="text-gray-900 dark:text-white">{{ (student.medicalInfo?.conditions || []).join(", ") || "-" }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500 dark:text-gray-400">Emergency Contact</span
+            ><span class="text-gray-900 dark:text-white">{{ student.medicalInfo?.emergencyContactName || "-" }} {{ student.medicalInfo?.emergencyContact ? '(' + student.medicalInfo?.emergencyContact + ')' : '' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Household -->
+      <div class="card">
+        <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
+          Household
+        </h3>
+        <div class="space-y-3 text-sm">
+          <div class="flex justify-between">
+            <span class="text-gray-500 dark:text-gray-400">Siblings</span
+            ><span class="text-gray-900 dark:text-white">{{ student.householdInfo?.siblingCount ?? "-" }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500 dark:text-gray-400">Birth Order</span
+            ><span class="text-gray-900 dark:text-white">{{ student.householdInfo?.birthOrder ?? "-" }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500 dark:text-gray-400">Occupation</span
+            ><span class="text-gray-900 dark:text-white">{{ student.householdInfo?.parentOccupation || "-" }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500 dark:text-gray-400">Income</span
+            ><span class="text-gray-900 dark:text-white">{{ student.householdInfo?.parentIncomeBracket || "-" }}</span>
+          </div>
+          <div *ngIf="student.householdInfo?.isOrphan" class="text-red-600 dark:text-red-400 font-medium">
+            <i class="fas fa-exclamation-triangle mr-1"></i> Double Orphan
+          </div>
+          <div *ngIf="student.householdInfo?.isPartialOrphan" class="text-amber-600 dark:text-amber-400 font-medium">
+            <i class="fas fa-exclamation-circle mr-1"></i> Partial Orphan
+          </div>
+          <div *ngIf="student.householdInfo?.isSingleParent" class="text-blue-600 dark:text-blue-400 font-medium">
+            Single Parent Household
+          </div>
+        </div>
+      </div>
+
+      <!-- Other -->
+      <div class="card">
+        <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
+          Additional Info
+        </h3>
+        <div class="space-y-3 text-sm">
+          <div class="flex justify-between">
+            <span class="text-gray-500 dark:text-gray-400">Special Needs</span
+            ><span class="text-gray-900 dark:text-white">{{ student.specialNeedsCategory || "NONE" }}<span *ngIf="student.specialNeeds"> - {{ student.specialNeeds }}</span></span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500 dark:text-gray-400">Feeding Program</span
+            ><span class="text-gray-900 dark:text-white">{{ student.feedingProgram || "NONE" }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500 dark:text-gray-400">Bursary</span
+            ><span class="text-gray-900 dark:text-white">{{ student.bursaryStatus || "N/A" }}<span *ngIf="student.bursarySource"> ({{ student.bursarySource }})</span></span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500 dark:text-gray-400">Transport</span
+            ><span class="text-gray-900 dark:text-white">{{ student.transport?.needsTransport ? student.transport?.route + ' - ' + student.transport?.pickupPoint : "No" }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

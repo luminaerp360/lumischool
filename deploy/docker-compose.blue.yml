@@ -1,0 +1,60 @@
+version: "3.8"
+
+# ─────────────────────────────────────────────
+# BLUE stack  (backend: host:9001 → container:3400)
+#             (frontend: host:9021 → container:80)
+# ─────────────────────────────────────────────
+
+services:
+  backend-blue:
+    build:
+      context: ../LumiSchool-backend
+      dockerfile: Dockerfile
+    image: lumischool-backend:blue
+    container_name: lumischool-backend-blue
+    ports:
+      - "127.0.0.1:9001:3400"
+    env_file:
+      - ../LumiSchool-backend/.env
+    environment:
+      NODE_ENV: production
+      FRONTEND_URL: https://ed.lumina360.tech
+      REDIS_URL: redis://lumischool-redis:6379
+    networks:
+      - lumischool-net
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "const net=require('net');const c=net.connect(3400,'127.0.0.1',()=>{c.end();process.exit(0)});c.on('error',()=>process.exit(1));",
+        ]
+      interval: 10s
+      timeout: 5s
+      start_period: 35s
+      retries: 5
+
+  frontend-blue:
+    build:
+      context: ../LumiSchool-frontend
+      dockerfile: Dockerfile
+    image: lumischool-frontend:blue
+    container_name: lumischool-frontend-blue
+    ports:
+      - "127.0.0.1:9021:80"
+    networks:
+      - lumischool-net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:80/"]
+      interval: 10s
+      timeout: 5s
+      start_period: 15s
+      retries: 5
+
+networks:
+  lumischool-net:
+    name: lumischool-net
+    external: true

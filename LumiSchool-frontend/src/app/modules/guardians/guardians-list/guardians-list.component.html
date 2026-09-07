@@ -1,0 +1,74 @@
+<div class="p-6">
+  <div
+    class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4"
+  >
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+        Guardians
+      </h1>
+      <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+        Parents and guardians directory
+      </p>
+    </div>
+    <button (click)="addGuardian()" class="btn-primary flex items-center gap-2">
+      <i class="fas fa-plus"></i> Add Guardian
+    </button>
+  </div>
+
+  <div class="card mb-6">
+    <input
+      type="text"
+      [(ngModel)]="search"
+      (keyup.enter)="load()"
+      placeholder="Search by name, phone..."
+      class="form-input"
+    />
+  </div>
+
+  <div *ngIf="loading" class="flex justify-center py-12">
+    <div
+      class="animate-spin rounded-full h-8 w-8 border-b-2"
+      style="border-color: var(--accent-600)"
+    ></div>
+  </div>
+
+  <div *ngIf="!loading" class="card overflow-hidden p-0">
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Phone</th>
+            <th>Email</th>
+            <th>Relationship</th>
+            <th>Students</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let g of guardians"
+            class="cursor-pointer"
+            (click)="view(g._id)"
+          >
+            <td class="font-medium">{{ getFullName(g) }}</td>
+            <td>{{ g.phone }}</td>
+            <td>{{ g.email || "-" }}</td>
+            <td>{{ g.relationship }}</td>
+            <td>{{ g.studentIds.length || 0 }}</td>
+            <td class="text-right">
+              <i class="fas fa-chevron-right text-gray-400"></i>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div
+      *ngIf="guardians.length === 0"
+      class="text-center py-12 text-gray-500 dark:text-gray-400"
+    >
+      <i class="fas fa-users text-4xl mb-3 opacity-30"></i>
+      <p>No guardians found</p>
+    </div>
+  </div>
+</div>

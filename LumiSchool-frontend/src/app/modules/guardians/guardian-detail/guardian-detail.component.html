@@ -1,0 +1,95 @@
+<div>
+  <button
+    (click)="goBack()"
+    class="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 mb-4 inline-flex items-center gap-1"
+  >
+    <i class="fas fa-arrow-left"></i> Back to Guardians
+  </button>
+
+  <div *ngIf="loading" class="flex items-center justify-center py-20">
+    <i class="fas fa-spinner fa-spin text-2xl text-gray-400"></i>
+  </div>
+
+  <div *ngIf="!loading && guardian">
+    <div class="flex items-center justify-between mb-6">
+      <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">
+        {{ getFullName(guardian) }}
+      </h1>
+      <button
+        (click)="editGuardian()"
+        class="btn-primary flex items-center gap-2"
+      >
+        <i class="fas fa-edit"></i> Edit
+      </button>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- Personal Info -->
+      <div
+        class="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-6"
+      >
+        <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">
+          Personal Information
+        </h2>
+        <div class="space-y-3">
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-500 dark:text-gray-400">Phone</span>
+            <span class="text-gray-800 dark:text-gray-100">{{
+              guardian.phone
+            }}</span>
+          </div>
+          <div *ngIf="guardian.email" class="flex justify-between text-sm">
+            <span class="text-gray-500 dark:text-gray-400">Email</span>
+            <span class="text-gray-800 dark:text-gray-100">{{
+              guardian.email
+            }}</span>
+          </div>
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-500 dark:text-gray-400">Relationship</span>
+            <span class="text-gray-800 dark:text-gray-100 capitalize">{{
+              guardian.relationship
+            }}</span>
+          </div>
+          <div *ngIf="guardian.occupation" class="flex justify-between text-sm">
+            <span class="text-gray-500 dark:text-gray-400">Occupation</span>
+            <span class="text-gray-800 dark:text-gray-100">{{
+              guardian.occupation
+            }}</span>
+          </div>
+          <div *ngIf="guardian.address" class="flex justify-between text-sm">
+            <span class="text-gray-500 dark:text-gray-400">Address</span>
+            <span class="text-gray-800 dark:text-gray-100">{{
+              guardian.address
+            }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Linked Students -->
+      <div
+        class="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-6"
+      >
+        <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">
+          Linked Students
+        </h2>
+        <div
+          *ngIf="guardian.studentIds.length; else noStudents"
+          class="space-y-2"
+        >
+          <div
+            *ngFor="let sid of linkedStudents"
+            class="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-50 dark:bg-slate-700 text-sm text-gray-700 dark:text-gray-300"
+          >
+            <i class="fas fa-user-graduate text-xs text-gray-400"></i>
+            <span>{{ studentName(sid) }}</span>
+          </div>
+        </div>
+        <ng-template #noStudents>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            No students linked.
+          </p>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+</div>

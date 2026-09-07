@@ -1,0 +1,546 @@
+<div class="py-6 px-4 max-w-7xl mx-auto">
+  <!-- Header -->
+  <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+        Academics
+      </h1>
+      <p class="text-sm text-gray-500 dark:text-gray-400">
+        Subjects &amp; teacher assignments
+      </p>
+    </div>
+    <button
+      *ngIf="tab === 'subjects'"
+      (click)="addSubject()"
+      class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-sm font-medium text-white transition-colors"
+    >
+      <svg
+        class="w-4 h-4"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M12 4v16m8-8H4"
+        />
+      </svg>
+      New Subject
+    </button>
+    <button
+      *ngIf="tab === 'assignments'"
+      (click)="openAssignModal()"
+      class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-sm font-medium text-white transition-colors"
+    >
+      <svg
+        class="w-4 h-4"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M12 4v16m8-8H4"
+        />
+      </svg>
+      Assign Teacher
+    </button>
+  </div>
+
+  <!-- Tabs -->
+  <div
+    class="flex gap-1 bg-gray-100 dark:bg-gray-800 rounded-xl p-1 w-fit mb-6"
+  >
+    <button
+      (click)="switchTab('subjects')"
+      class="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+      [ngClass]="
+        tab === 'subjects'
+          ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
+          : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+      "
+    >
+      Subjects
+    </button>
+    <button
+      (click)="switchTab('assignments')"
+      class="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+      [ngClass]="
+        tab === 'assignments'
+          ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
+          : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+      "
+    >
+      Teaching Assignments
+    </button>
+  </div>
+
+  <!-- ═══════════════ SUBJECTS TAB ═══════════════ -->
+  <ng-container *ngIf="tab === 'subjects'">
+    <!-- Filters -->
+    <div class="flex flex-wrap gap-3 mb-4">
+      <input
+        type="text"
+        [(ngModel)]="search"
+        (ngModelChange)="loadSubjects()"
+        placeholder="Search subjects..."
+        class="rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 w-56"
+      />
+      <select
+        [(ngModel)]="filterCategory"
+        (ngModelChange)="loadSubjects()"
+        class="rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+      >
+        <option *ngFor="let c of categories" [value]="c.value">
+          {{ c.label }}
+        </option>
+      </select>
+      <select
+        [(ngModel)]="filterLevel"
+        (ngModelChange)="loadSubjects()"
+        class="rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+      >
+        <option *ngFor="let l of levels" [value]="l.value">
+          {{ l.label }}
+        </option>
+      </select>
+    </div>
+
+    <div *ngIf="subjectsLoading" class="flex items-center justify-center py-16">
+      <div
+        class="animate-spin h-8 w-8 rounded-full border-4 border-indigo-500 border-t-transparent"
+      ></div>
+    </div>
+
+    <div
+      *ngIf="!subjectsLoading"
+      class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden"
+    >
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr
+              class="bg-gray-50 dark:bg-gray-700/50 text-gray-500 dark:text-gray-400 text-xs uppercase"
+            >
+              <th class="px-4 py-3 text-left font-semibold">Code</th>
+              <th class="px-4 py-3 text-left font-semibold">Name</th>
+              <th class="px-4 py-3 text-left font-semibold">Category</th>
+              <th class="px-4 py-3 text-left font-semibold">CBC Levels</th>
+              <th class="px-4 py-3 text-left font-semibold">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
+            <tr
+              *ngFor="let s of subjects"
+              class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors"
+            >
+              <td
+                class="px-4 py-3 font-mono text-xs font-semibold text-gray-600 dark:text-gray-300"
+              >
+                {{ s.code }}
+              </td>
+              <td class="px-4 py-3 font-medium text-gray-900 dark:text-white">
+                {{ s.name }}
+              </td>
+              <td class="px-4 py-3">
+                <span
+                  class="px-2 py-0.5 rounded-full text-xs font-medium"
+                  [ngClass]="getCategoryClass(s.category)"
+                >
+                  {{ s.category | titlecase }}
+                </span>
+              </td>
+              <td class="px-4 py-3">
+                <div class="flex flex-wrap gap-1">
+                  <span
+                    *ngFor="let lvl of s.applicableLevels"
+                    class="text-xs px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300"
+                  >
+                    {{ levelLabel(lvl) }}
+                  </span>
+                  <span
+                    *ngIf="!s.applicableLevels.length"
+                    class="text-gray-400 text-xs"
+                    >—</span
+                  >
+                </div>
+              </td>
+              <td class="px-4 py-3">
+                <button
+                  (click)="editSubject(s._id, $event)"
+                  class="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:underline"
+                >
+                  Edit
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="!subjects.length">
+              <td
+                colspan="5"
+                class="px-4 py-12 text-center text-gray-400 dark:text-gray-500"
+              >
+                No subjects found.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- ═══════════════ TEACHING ASSIGNMENTS TAB ═══════════════ -->
+  <ng-container *ngIf="tab === 'assignments'">
+    <!-- Info card -->
+    <div
+      class="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-2xl p-4 mb-5 flex gap-3"
+    >
+      <svg
+        class="w-5 h-5 text-indigo-500 flex-shrink-0 mt-0.5"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
+      </svg>
+      <p class="text-sm text-indigo-700 dark:text-indigo-300">
+        Assign each teacher to the specific subject, class and stream they
+        teach. A teacher can record exam results <strong>only</strong> for
+        students in their assigned class/stream. Example:
+        <em>Ms. Wanjiru → Mathematics → Grade 9 East</em> and
+        <em>Ms. Wanjiru → Mathematics → Grade 9 West</em>.
+      </p>
+    </div>
+
+    <!-- Filters row -->
+    <div class="flex flex-wrap gap-3 mb-4">
+      <select
+        [(ngModel)]="filterAssignClass"
+        (change)="loadAssignments()"
+        class="rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+      >
+        <option value="">All Classes</option>
+        <option *ngFor="let c of classes" [value]="c._id">{{ c.name }}</option>
+      </select>
+      <input
+        type="text"
+        [(ngModel)]="filterAssignYear"
+        (ngModelChange)="loadAssignments()"
+        placeholder="Year e.g. 2025"
+        class="rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 w-36"
+      />
+    </div>
+
+    <div
+      *ngIf="assignmentsLoading"
+      class="flex items-center justify-center py-16"
+    >
+      <div
+        class="animate-spin h-8 w-8 rounded-full border-4 border-indigo-500 border-t-transparent"
+      ></div>
+    </div>
+
+    <div
+      *ngIf="!assignmentsLoading"
+      class="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden"
+    >
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr
+              class="bg-gray-50 dark:bg-gray-700/50 text-gray-500 dark:text-gray-400 text-xs uppercase"
+            >
+              <th class="px-4 py-3 text-left font-semibold">Teacher</th>
+              <th class="px-4 py-3 text-left font-semibold">Subject</th>
+              <th class="px-4 py-3 text-left font-semibold">Class</th>
+              <th class="px-4 py-3 text-left font-semibold">Stream</th>
+              <th class="px-4 py-3 text-left font-semibold">Year</th>
+              <th class="px-4 py-3 text-left font-semibold">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
+            <tr
+              *ngFor="let a of assignments"
+              class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors"
+            >
+              <td class="px-4 py-3">
+                <div class="flex items-center gap-2">
+                  <div
+                    class="h-7 w-7 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-xs font-bold text-indigo-700 dark:text-indigo-300 flex-shrink-0"
+                  >
+                    {{ teacherName(a).charAt(0) }}
+                  </div>
+                  <span class="font-medium text-gray-900 dark:text-white">{{
+                    teacherName(a)
+                  }}</span>
+                </div>
+              </td>
+              <td class="px-4 py-3">
+                <span class="font-medium text-gray-800 dark:text-gray-100">{{
+                  subjectName(a)
+                }}</span>
+                <span
+                  *ngIf="subjectCode(a)"
+                  class="ml-1.5 text-xs text-gray-400 dark:text-gray-500 font-mono"
+                  >({{ subjectCode(a) }})</span
+                >
+              </td>
+              <td class="px-4 py-3 text-gray-700 dark:text-gray-300">
+                {{ className(a) }}
+              </td>
+              <td class="px-4 py-3">
+                <span
+                  class="px-2 py-0.5 rounded-full text-xs font-medium"
+                  [ngClass]="
+                    a.streamId
+                      ? 'bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-300'
+                      : 'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400'
+                  "
+                >
+                  {{ streamName(a) }}
+                </span>
+              </td>
+              <td class="px-4 py-3 text-gray-600 dark:text-gray-400">
+                {{ a.academicYear }}
+              </td>
+              <td class="px-4 py-3">
+                <button
+                  (click)="deleteAssignment(a)"
+                  class="text-sm text-red-600 dark:text-red-400 hover:underline font-medium"
+                >
+                  Remove
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="!assignments.length">
+              <td
+                colspan="6"
+                class="px-4 py-12 text-center text-gray-400 dark:text-gray-500"
+              >
+                No teaching assignments yet. Click "Assign Teacher" to get
+                started.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </ng-container>
+</div>
+
+<!-- ═══════════════ ASSIGN TEACHER MODAL ═══════════════ -->
+<div
+  *ngIf="showAssignModal"
+  class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+>
+  <div
+    class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 w-full max-w-md p-6 max-h-[90vh] overflow-y-auto"
+  >
+    <div class="flex items-center justify-between mb-5">
+      <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+        Assign Teacher to Subject
+      </h3>
+      <button
+        (click)="showAssignModal = false"
+        class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+      >
+        <svg
+          class="w-5 h-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+      </button>
+    </div>
+
+    <form
+      [formGroup]="assignForm"
+      (ngSubmit)="submitAssignment()"
+      novalidate
+      class="space-y-4"
+    >
+      <!-- Teacher -->
+      <div>
+        <label
+          class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1"
+          >Teacher *</label
+        >
+        <select
+          formControlName="teacherId"
+          class="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        >
+          <option value="">
+            {{ teachersLoading ? "Loading..." : "Select teacher" }}
+          </option>
+          <option *ngFor="let t of teachers" [value]="t._id">
+            {{ t.firstName }} {{ t.lastName }}
+          </option>
+        </select>
+        <p
+          *ngIf="
+            assignForm.get('teacherId')?.invalid &&
+            assignForm.get('teacherId')?.touched
+          "
+          class="mt-1 text-xs text-red-500"
+        >
+          Please select a teacher.
+        </p>
+      </div>
+
+      <!-- Subject -->
+      <div>
+        <label
+          class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1"
+          >Subject *</label
+        >
+        <select
+          formControlName="subjectId"
+          class="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        >
+          <option value="">Select subject</option>
+          <option *ngFor="let s of allSubjects" [value]="s._id">
+            {{ s.name }} ({{ s.code }})
+          </option>
+        </select>
+        <p
+          *ngIf="
+            assignForm.get('subjectId')?.invalid &&
+            assignForm.get('subjectId')?.touched
+          "
+          class="mt-1 text-xs text-red-500"
+        >
+          Please select a subject.
+        </p>
+      </div>
+
+      <!-- Class -->
+      <div>
+        <label
+          class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1"
+          >Class *</label
+        >
+        <select
+          formControlName="classId"
+          class="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        >
+          <option value="">
+            {{ classesLoading ? "Loading..." : "Select class" }}
+          </option>
+          <option *ngFor="let c of classes" [value]="c._id">
+            {{ c.name }}
+          </option>
+        </select>
+        <p
+          *ngIf="
+            assignForm.get('classId')?.invalid &&
+            assignForm.get('classId')?.touched
+          "
+          class="mt-1 text-xs text-red-500"
+        >
+          Please select a class.
+        </p>
+      </div>
+
+      <!-- Stream -->
+      <div>
+        <label
+          class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1"
+        >
+          Stream
+          <span class="text-gray-400 font-normal ml-1"
+            >(leave blank = all streams)</span
+          >
+        </label>
+        <select
+          formControlName="streamId"
+          class="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-60"
+          [attr.disabled]="
+            !assignForm.get('classId')?.value || streamsLoading ? '' : null
+          "
+        >
+          <option value="">
+            {{
+              !assignForm.get("classId")?.value
+                ? "Select a class first"
+                : streamsLoading
+                  ? "Loading streams..."
+                  : "All streams"
+            }}
+          </option>
+          <option *ngFor="let s of streams" [value]="s._id">
+            {{ s.name }}
+          </option>
+        </select>
+        <p
+          *ngIf="streams.length > 0"
+          class="mt-1 text-xs text-gray-400 dark:text-gray-500"
+        >
+          Add one assignment per stream to assign to specific streams only.
+        </p>
+      </div>
+
+      <!-- Academic Year -->
+      <div>
+        <label
+          class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1"
+          >Academic Year *</label
+        >
+        <input
+          formControlName="academicYear"
+          type="text"
+          placeholder="e.g. 2025"
+          class="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        />
+        <p
+          *ngIf="
+            assignForm.get('academicYear')?.invalid &&
+            assignForm.get('academicYear')?.touched
+          "
+          class="mt-1 text-xs text-red-500"
+        >
+          Academic year is required.
+        </p>
+      </div>
+
+      <div *ngIf="assignError" class="text-sm text-red-600 dark:text-red-400">
+        {{ assignError }}
+      </div>
+
+      <div class="flex gap-3 justify-end pt-2">
+        <button
+          type="button"
+          (click)="showAssignModal = false"
+          class="px-5 py-2 rounded-xl border border-gray-300 dark:border-gray-600 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          [disabled]="savingAssign"
+          class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-sm font-medium text-white flex items-center gap-2 transition-colors"
+        >
+          <div
+            *ngIf="savingAssign"
+            class="animate-spin h-4 w-4 rounded-full border-2 border-white border-t-transparent"
+          ></div>
+          Save Assignment
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

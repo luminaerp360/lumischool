@@ -1,0 +1,125 @@
+<div>
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">
+      Examinations
+    </h1>
+    <button (click)="createExam()" class="btn-primary flex items-center gap-2">
+      <i class="fas fa-plus"></i> Create Exam
+    </button>
+  </div>
+
+  <!-- Filters -->
+  <div class="flex flex-wrap gap-3 mb-4">
+    <input
+      type="text"
+      [(ngModel)]="search"
+      (ngModelChange)="load()"
+      placeholder="Search exams..."
+      class="form-input max-w-xs"
+    />
+    <select
+      [(ngModel)]="filterType"
+      (ngModelChange)="load()"
+      class="form-input w-44"
+    >
+      <option *ngFor="let t of examTypes" [value]="t.value">
+        {{ t.label }}
+      </option>
+    </select>
+    <select
+      [(ngModel)]="filterTerm"
+      (ngModelChange)="load()"
+      class="form-input w-36"
+    >
+      <option value="">All Terms</option>
+      <option *ngFor="let t of terms.slice(1)" [value]="t">{{ t }}</option>
+    </select>
+    <select
+      [(ngModel)]="filterYear"
+      (ngModelChange)="load()"
+      class="form-input w-32"
+    >
+      <option value="">All Years</option>
+      <option *ngFor="let y of academicYears.slice(1)" [value]="y">
+        {{ y }}
+      </option>
+    </select>
+  </div>
+
+  <div *ngIf="loading" class="flex items-center justify-center py-20">
+    <i class="fas fa-spinner fa-spin text-2xl text-gray-400"></i>
+  </div>
+
+  <div
+    *ngIf="!loading"
+    class="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 overflow-hidden"
+  >
+    <div class="table-container overflow-x-auto">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Term</th>
+            <th>Year</th>
+            <th>Marks</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let e of exams"
+            class="cursor-pointer"
+            (click)="view(e._id)"
+          >
+            <td class="font-medium text-gray-800 dark:text-gray-100">
+              {{ e.name }}
+            </td>
+            <td>
+              <span class="badge text-xs" [ngClass]="typeClass(e.type)">{{
+                typeLabel(e.type)
+              }}</span>
+            </td>
+            <td class="text-gray-600 dark:text-gray-300">{{ e.term }}</td>
+            <td class="text-gray-600 dark:text-gray-300">
+              {{ e.academicYear }}
+            </td>
+            <td class="text-gray-600 dark:text-gray-300">{{ e.totalMarks }}</td>
+            <td>
+              <span
+                class="badge text-xs"
+                [ngClass]="e.isPublished ? 'badge-active' : 'badge-draft'"
+              >
+                {{ e.isPublished ? "Published" : "Draft" }}
+              </span>
+            </td>
+            <td class="flex items-center gap-3">
+              <button
+                (click)="view(e._id); $event.stopPropagation()"
+                class="text-sm font-medium hover:underline"
+                style="color: var(--accent-600)"
+              >
+                View
+              </button>
+              <button
+                (click)="edit(e._id, $event)"
+                class="text-sm font-medium text-gray-500 dark:text-gray-400 hover:underline"
+              >
+                Edit
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="!exams.length">
+            <td
+              colspan="7"
+              class="text-center py-8 text-gray-500 dark:text-gray-400"
+            >
+              No exams found
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

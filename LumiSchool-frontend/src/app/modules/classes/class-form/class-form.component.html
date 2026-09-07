@@ -1,0 +1,231 @@
+<div class="p-6 max-w-2xl mx-auto">
+  <div class="flex items-center gap-4 mb-6">
+    <button
+      (click)="cancel()"
+      class="p-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
+    >
+      <i class="fas fa-arrow-left"></i>
+    </button>
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+        {{ isEditMode ? "Edit Class" : "Create Class" }}
+      </h1>
+      <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+        {{
+          isEditMode
+            ? "Update class details"
+            : "Set up a new class for the current academic year"
+        }}
+      </p>
+    </div>
+  </div>
+
+  <div *ngIf="loadingClass" class="card animate-pulse space-y-4">
+    <div class="h-4 bg-gray-200 dark:bg-slate-700 rounded w-1/3"></div>
+    <div class="h-10 bg-gray-200 dark:bg-slate-700 rounded"></div>
+    <div class="h-10 bg-gray-200 dark:bg-slate-700 rounded"></div>
+  </div>
+
+  <form
+    *ngIf="!loadingClass"
+    [formGroup]="form"
+    (ngSubmit)="submit()"
+    novalidate
+  >
+    <div
+      *ngIf="error"
+      class="mb-4 p-3 rounded-lg bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-sm"
+    >
+      <i class="fas fa-exclamation-circle mr-2"></i>{{ error }}
+    </div>
+
+    <div class="card space-y-5">
+      <h2
+        class="text-base font-semibold text-gray-800 dark:text-gray-100 border-b border-gray-200 dark:border-slate-700 pb-3"
+      >
+        Basic Details
+      </h2>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <div class="sm:col-span-2">
+          <label class="form-label">Class Name <span class="text-red-500">*</span></label>
+          <input
+            type="text"
+            formControlName="name"
+            class="form-input"
+            [class.border-red-500]="isInvalid('name')"
+            placeholder="e.g. Grade 1 East, Form 1"
+          />
+          <p *ngIf="isInvalid('name')" class="form-error">Class name is required</p>
+        </div>
+
+        <div>
+          <label class="form-label">School Level <span class="text-red-500">*</span></label>
+          <select
+            formControlName="level"
+            class="form-select"
+            [class.border-red-500]="isInvalid('level')"
+          >
+            <option value="">Select level</option>
+            <option *ngFor="let l of levels" [value]="l.value">{{ l.label }}</option>
+          </select>
+          <p *ngIf="isInvalid('level')" class="form-error">Level is required</p>
+        </div>
+
+        <div>
+          <label class="form-label">Grade <span class="text-red-500">*</span></label>
+          <select
+            formControlName="grade"
+            class="form-select"
+            [class.border-red-500]="isInvalid('grade')"
+            [disabled]="!form.get('level')?.value"
+          >
+            <option value="">Select grade</option>
+            <option *ngFor="let g of gradesForLevel" [value]="g">Grade {{ g }}</option>
+          </select>
+          <p *ngIf="isInvalid('grade')" class="form-error">Grade is required</p>
+          <p *ngIf="!form.get('level')?.value" class="text-xs text-gray-400 mt-1">
+            Select a level first
+          </p>
+        </div>
+
+        <div>
+          <label class="form-label">Academic Year <span class="text-red-500">*</span></label>
+          <select
+            formControlName="academicYear"
+            class="form-select"
+            [class.border-red-500]="isInvalid('academicYear')"
+          >
+            <option *ngFor="let y of academicYearOptions" [value]="y">{{ y }}</option>
+          </select>
+          <p *ngIf="isInvalid('academicYear')" class="form-error">Academic year is required</p>
+        </div>
+
+        <div>
+          <label class="form-label">Capacity <span class="text-red-500">*</span></label>
+          <input
+            type="number"
+            formControlName="capacity"
+            class="form-input"
+            [class.border-red-500]="isInvalid('capacity')"
+            min="1"
+          />
+          <p *ngIf="isInvalid('capacity')" class="form-error">Capacity must be at least 1</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card space-y-5 mt-4">
+      <h2
+        class="text-base font-semibold text-gray-800 dark:text-gray-100 border-b border-gray-200 dark:border-slate-700 pb-3"
+      >
+        Teachers & Location
+      </h2>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <div>
+          <label class="form-label">Class Teacher</label>
+          <select formControlName="classTeacherId" class="form-select">
+            <option value="">Not assigned</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="form-label">Assistant Teacher</label>
+          <select formControlName="assistantTeacherId" class="form-select">
+            <option value="">Not assigned</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="form-label">Room</label>
+          <input
+            type="text"
+            formControlName="room"
+            class="form-input"
+            placeholder="e.g. Room 5A"
+          />
+        </div>
+
+        <div>
+          <label class="form-label">Block</label>
+          <input
+            type="text"
+            formControlName="block"
+            class="form-input"
+            placeholder="e.g. New Block, Main Building"
+          />
+        </div>
+      </div>
+    </div>
+
+    <div class="card space-y-5 mt-4">
+      <h2
+        class="text-base font-semibold text-gray-800 dark:text-gray-100 border-b border-gray-200 dark:border-slate-700 pb-3"
+      >
+        Classification
+      </h2>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <div>
+          <label class="form-label">Category</label>
+          <select formControlName="category" class="form-select">
+            <option *ngFor="let c of categories" [value]="c.value">{{ c.label }}</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="form-label">CBC Track</label>
+          <select formControlName="cbcTrack" class="form-select">
+            <option *ngFor="let t of cbcTracks" [value]="t.value">{{ t.label }}</option>
+          </select>
+        </div>
+
+        <div class="sm:col-span-2 flex flex-wrap gap-6 pt-2">
+          <label class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+            <input type="checkbox" formControlName="isExamCenter" class="rounded" />
+            KNEC Exam Center
+          </label>
+          <label class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+            <input type="checkbox" formControlName="isMultiGrade" class="rounded" />
+            Multi-Grade Class
+          </label>
+        </div>
+
+        <div *ngIf="isEditMode">
+          <label class="form-label">Status</label>
+          <select formControlName="status" class="form-select">
+            <option *ngFor="let s of statuses" [value]="s.value">{{ s.label }}</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex justify-end gap-3 mt-6">
+      <button
+        type="button"
+        (click)="cancel()"
+        class="btn-secondary"
+        [disabled]="loading"
+      >
+        Cancel
+      </button>
+      <button
+        type="submit"
+        class="btn-primary flex items-center gap-2"
+        [disabled]="loading"
+      >
+        <span
+          *ngIf="loading"
+          class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"
+        ></span>
+        <i
+          *ngIf="!loading"
+          class="fas"
+          [ngClass]="isEditMode ? 'fa-save' : 'fa-chalkboard'"
+        ></i>
+        {{ loading ? "Saving..." : isEditMode ? "Save Changes" : "Create Class" }}
+      </button>
+    </div>
+  </form>
+</div>

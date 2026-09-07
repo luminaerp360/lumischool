@@ -1,0 +1,266 @@
+<div>
+  <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6">
+    Dashboard
+  </h1>
+
+  <!-- Active Organization Banner -->
+  <div
+    *ngIf="activeTenant"
+    class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-2xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-5 py-4 shadow-sm"
+  >
+    <div class="flex min-w-0 items-center gap-3">
+      <div
+        class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl text-sm font-bold text-white"
+        [style.background-color]="themeService.accent"
+      >
+        {{ activeTenant.name.charAt(0).toUpperCase() }}
+      </div>
+      <div class="min-w-0">
+        <p
+          class="truncate text-sm font-semibold text-gray-900 dark:text-gray-100"
+        >
+          {{ activeTenant.name }}
+        </p>
+        <p class="text-xs text-gray-500 dark:text-gray-400">
+          All data on this page is scoped to this school
+        </p>
+      </div>
+    </div>
+    <div class="flex flex-wrap items-center gap-2">
+      <span
+        class="rounded-full bg-gray-100 dark:bg-slate-700 px-2.5 py-1 text-xs font-medium text-gray-600 dark:text-gray-300 capitalize"
+      >
+        {{ activeTenant.plan }}
+      </span>
+      <span
+        *ngIf="tenantCount > 1"
+        class="rounded-full bg-blue-50 dark:bg-blue-900/20 px-2.5 py-1 text-xs font-medium text-blue-600 dark:text-blue-400"
+      >
+        {{ tenantCount }} schools — switch via top nav
+      </span>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="flex items-center justify-center py-20">
+    <i
+      class="fas fa-spinner fa-spin text-2xl"
+      [style.color]="themeService.accent"
+    ></i>
+  </div>
+
+  <div *ngIf="!loading && stats">
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <!-- Students -->
+      <div
+        class="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-5"
+      >
+        <div class="flex items-center justify-between mb-3">
+          <div
+            class="w-10 h-10 rounded-lg flex items-center justify-center bg-blue-100 dark:bg-blue-900/30"
+          >
+            <i
+              class="fas fa-user-graduate text-blue-600 dark:text-blue-400"
+            ></i>
+          </div>
+        </div>
+        <p class="text-2xl font-bold text-gray-800 dark:text-gray-100">
+          {{ stats.students.total }}
+        </p>
+        <p class="text-sm text-gray-500 dark:text-gray-400">Total Students</p>
+        <div class="flex gap-3 mt-2 text-xs text-gray-500 dark:text-gray-400">
+          <span
+            ><i class="fas fa-check-circle text-green-500 mr-1"></i
+            >{{ stats.students.active }} active</span
+          >
+          <span
+            ><i class="fas fa-male text-blue-500 mr-1"></i
+            >{{ stats.students.byGender.male }} M</span
+          >
+          <span
+            ><i class="fas fa-female text-pink-500 mr-1"></i
+            >{{ stats.students.byGender.female }} F</span
+          >
+        </div>
+      </div>
+
+      <!-- Classes -->
+      <div
+        class="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-5"
+      >
+        <div class="flex items-center justify-between mb-3">
+          <div
+            class="w-10 h-10 rounded-lg flex items-center justify-center bg-green-100 dark:bg-green-900/30"
+          >
+            <i class="fas fa-chalkboard text-green-600 dark:text-green-400"></i>
+          </div>
+        </div>
+        <p class="text-2xl font-bold text-gray-800 dark:text-gray-100">
+          {{ stats.classes.total }}
+        </p>
+        <p class="text-sm text-gray-500 dark:text-gray-400">Total Classes</p>
+        <div class="flex gap-3 mt-2 text-xs text-gray-500 dark:text-gray-400">
+          <span
+            ><i class="fas fa-stream text-green-500 mr-1"></i
+            >{{ stats.classes.streams }} streams</span
+          >
+        </div>
+      </div>
+
+      <!-- Staff -->
+      <div
+        class="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-5"
+      >
+        <div class="flex items-center justify-between mb-3">
+          <div
+            class="w-10 h-10 rounded-lg flex items-center justify-center bg-purple-100 dark:bg-purple-900/30"
+          >
+            <i
+              class="fas fa-users-cog text-purple-600 dark:text-purple-400"
+            ></i>
+          </div>
+        </div>
+        <p class="text-2xl font-bold text-gray-800 dark:text-gray-100">
+          {{ stats.staff.total }}
+        </p>
+        <p class="text-sm text-gray-500 dark:text-gray-400">Total Staff</p>
+        <div class="flex gap-3 mt-2 text-xs text-gray-500 dark:text-gray-400">
+          <span
+            ><i class="fas fa-chalkboard-teacher text-purple-500 mr-1"></i
+            >{{ stats.staff.teachers }} teachers</span
+          >
+        </div>
+      </div>
+
+      <!-- Fee Collection -->
+      <div
+        class="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-5"
+      >
+        <div class="flex items-center justify-between mb-3">
+          <div
+            class="w-10 h-10 rounded-lg flex items-center justify-center bg-emerald-100 dark:bg-emerald-900/30"
+          >
+            <i
+              class="fas fa-money-bill-wave text-emerald-600 dark:text-emerald-400"
+            ></i>
+          </div>
+          <span
+            class="text-xs font-medium px-2 py-1 rounded-full bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400"
+          >
+            {{ stats.finance.collectionRate | number: "1.0-0" }}% collected
+          </span>
+        </div>
+        <p class="text-2xl font-bold text-gray-800 dark:text-gray-100">
+          KES {{ stats.finance.collected | number }}
+        </p>
+        <p class="text-sm text-gray-500 dark:text-gray-400">Fees Collected</p>
+        <div class="flex gap-3 mt-2 text-xs text-gray-500 dark:text-gray-400">
+          <span>Outstanding: KES {{ stats.finance.outstanding | number }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Second Row -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <!-- Attendance -->
+      <div
+        class="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-5"
+      >
+        <h3 class="text-sm font-semibold text-gray-800 dark:text-gray-100 mb-4">
+          <i
+            class="fas fa-clipboard-check mr-2"
+            [style.color]="themeService.accent"
+          ></i
+          >Attendance Overview
+        </h3>
+        <div class="space-y-3">
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-500 dark:text-gray-400">Today's Rate</span>
+            <span class="font-medium text-green-600 dark:text-green-400"
+              >{{ stats.attendance.todayRate | number: "1.0-1" }}%</span
+            >
+          </div>
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-500 dark:text-gray-400">Weekly Average</span>
+            <span class="font-medium text-blue-600 dark:text-blue-400"
+              >{{ stats.attendance.weeklyRate | number: "1.0-1" }}%</span
+            >
+          </div>
+        </div>
+      </div>
+
+      <!-- Guardians -->
+      <div
+        class="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-5"
+      >
+        <h3 class="text-sm font-semibold text-gray-800 dark:text-gray-100 mb-4">
+          <i class="fas fa-users mr-2" [style.color]="themeService.accent"></i
+          >Guardians
+        </h3>
+        <div class="space-y-3">
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-500 dark:text-gray-400"
+              >Total Registered</span
+            >
+            <span class="font-bold text-gray-800 dark:text-gray-100">{{
+              stats.guardians.total
+            }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div
+        class="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-5"
+      >
+        <h3 class="text-sm font-semibold text-gray-800 dark:text-gray-100 mb-4">
+          <i class="fas fa-bolt mr-2" [style.color]="themeService.accent"></i
+          >Quick Actions
+        </h3>
+        <div class="space-y-2">
+          <a
+            routerLink="/students"
+            class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-300 transition-colors"
+          >
+            <i
+              class="fas fa-user-graduate text-xs"
+              [style.color]="themeService.accent"
+            ></i>
+            View Students
+          </a>
+          <a
+            routerLink="/attendance"
+            class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-300 transition-colors"
+          >
+            <i
+              class="fas fa-clipboard-check text-xs"
+              [style.color]="themeService.accent"
+            ></i>
+            Mark Attendance
+          </a>
+          <a
+            routerLink="/finance"
+            class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-300 transition-colors"
+          >
+            <i
+              class="fas fa-money-bill text-xs"
+              [style.color]="themeService.accent"
+            ></i>
+            View Finance
+          </a>
+          <a
+            routerLink="/reports"
+            class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-300 transition-colors"
+          >
+            <i
+              class="fas fa-chart-bar text-xs"
+              [style.color]="themeService.accent"
+            ></i>
+            View Reports
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

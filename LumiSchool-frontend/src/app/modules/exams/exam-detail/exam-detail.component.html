@@ -1,0 +1,319 @@
+<div>
+  <button
+    (click)="goBack()"
+    class="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 mb-4 inline-flex items-center gap-1"
+  >
+    <i class="fas fa-arrow-left"></i> Back to Exams
+  </button>
+
+  <div *ngIf="loading" class="flex justify-center py-20">
+    <i class="fas fa-spinner fa-spin text-2xl text-gray-400"></i>
+  </div>
+
+  <div *ngIf="!loading && exam">
+    <!-- Header -->
+    <div class="flex items-start justify-between mb-6 gap-4 flex-wrap">
+      <div>
+        <div class="flex items-center gap-3 mb-1 flex-wrap">
+          <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">
+            {{ exam.name }}
+          </h1>
+          <span
+            *ngIf="typeMeta"
+            class="badge text-xs"
+            [ngClass]="typeMeta.color"
+          >
+            {{ typeMeta.label }}
+          </span>
+          <span
+            class="badge text-xs"
+            [ngClass]="exam.isPublished ? 'badge-active' : 'badge-draft'"
+          >
+            {{ exam.isPublished ? "Published" : "Draft" }}
+          </span>
+        </div>
+        <p class="text-sm text-gray-500 dark:text-gray-400">
+          {{ exam.academicYear }} · {{ exam.term }}
+        </p>
+      </div>
+      <div class="flex gap-2">
+        <button
+          *ngIf="!exam.isPublished"
+          (click)="publish()"
+          [disabled]="publishing"
+          class="btn-primary flex items-center gap-2"
+        >
+          <i *ngIf="publishing" class="fas fa-spinner fa-spin"></i>
+          <i *ngIf="!publishing" class="fas fa-paper-plane"></i>
+          {{ publishing ? "Publishing..." : "Publish Results" }}
+        </button>
+        <button
+          (click)="editExam()"
+          class="btn-secondary flex items-center gap-2"
+        >
+          <i class="fas fa-edit"></i> Edit
+        </button>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- Exam Details -->
+      <div
+        class="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-6"
+      >
+        <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">
+          Exam Details
+        </h2>
+        <div class="space-y-3 text-sm">
+          <div class="flex justify-between">
+            <span class="text-gray-500 dark:text-gray-400">Type</span>
+            <span class="badge text-xs" [ngClass]="typeMeta?.color">{{
+              typeMeta?.label
+            }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500 dark:text-gray-400">Academic Year</span>
+            <span class="text-gray-800 dark:text-gray-100">{{
+              exam.academicYear
+            }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500 dark:text-gray-400">Term</span>
+            <span class="text-gray-800 dark:text-gray-100">{{
+              exam.term
+            }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500 dark:text-gray-400">Total Marks</span>
+            <span class="text-gray-800 dark:text-gray-100 font-semibold">{{
+              exam.totalMarks
+            }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500 dark:text-gray-400">Start Date</span>
+            <span class="text-gray-800 dark:text-gray-100">{{
+              formatDate(exam.startDate)
+            }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500 dark:text-gray-400">End Date</span>
+            <span class="text-gray-800 dark:text-gray-100">{{
+              formatDate(exam.endDate)
+            }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500 dark:text-gray-400">Status</span>
+            <span
+              class="badge text-xs"
+              [ngClass]="exam.isPublished ? 'badge-active' : 'badge-draft'"
+            >
+              {{ exam.isPublished ? "Published" : "Draft" }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Classes -->
+      <div
+        class="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-6"
+      >
+        <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">
+          Classes ({{ exam.classIds.length }})
+        </h2>
+        <div
+          *ngIf="exam.classIds.length; else noClasses"
+          class="flex flex-wrap gap-2"
+        >
+          <span
+            *ngFor="let cid of exam.classIds"
+            class="px-2.5 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400"
+          >
+            {{ className(cid) }}
+          </span>
+        </div>
+        <ng-template #noClasses>
+          <p class="text-sm text-gray-400">No classes assigned.</p>
+        </ng-template>
+
+        <h2
+          class="text-lg font-semibold text-gray-800 dark:text-gray-100 mt-6 mb-4"
+        >
+          Subjects ({{ exam.subjectIds.length }})
+        </h2>
+        <div
+          *ngIf="exam.subjectIds.length; else noSubjects"
+          class="flex flex-wrap gap-2"
+        >
+          <span
+            *ngFor="let sid of exam.subjectIds"
+            class="px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+          >
+            {{ subjectName(sid) }}
+          </span>
+        </div>
+        <ng-template #noSubjects>
+          <p class="text-sm text-gray-400">No subjects assigned.</p>
+        </ng-template>
+      </div>
+    </div>
+
+    <!-- Grading Guide -->
+    <div
+      class="mt-6 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-6"
+    >
+      <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">
+        Kenya Grading Guide
+      </h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 text-sm">
+        <!-- CBC -->
+        <div>
+          <h3
+            class="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-3"
+          >
+            CBC — Pre-Primary · Primary · Junior Secondary (Grade 1–9)
+          </h3>
+          <div class="space-y-2">
+            <div
+              class="flex items-center justify-between p-2 rounded-lg bg-green-50 dark:bg-green-900/20"
+            >
+              <div class="flex items-center gap-2">
+                <span
+                  class="font-mono font-bold text-green-700 dark:text-green-400 w-8"
+                  >EE</span
+                >
+                <span class="text-gray-700 dark:text-gray-300"
+                  >Exceeding Expectations</span
+                >
+              </div>
+              <span class="text-xs text-gray-500">80 – 100%</span>
+            </div>
+            <div
+              class="flex items-center justify-between p-2 rounded-lg bg-blue-50 dark:bg-blue-900/20"
+            >
+              <div class="flex items-center gap-2">
+                <span
+                  class="font-mono font-bold text-blue-700 dark:text-blue-400 w-8"
+                  >ME</span
+                >
+                <span class="text-gray-700 dark:text-gray-300"
+                  >Meeting Expectations</span
+                >
+              </div>
+              <span class="text-xs text-gray-500">60 – 79%</span>
+            </div>
+            <div
+              class="flex items-center justify-between p-2 rounded-lg bg-yellow-50 dark:bg-yellow-900/20"
+            >
+              <div class="flex items-center gap-2">
+                <span
+                  class="font-mono font-bold text-yellow-700 dark:text-yellow-400 w-8"
+                  >AE</span
+                >
+                <span class="text-gray-700 dark:text-gray-300"
+                  >Approaching Expectations</span
+                >
+              </div>
+              <span class="text-xs text-gray-500">40 – 59%</span>
+            </div>
+            <div
+              class="flex items-center justify-between p-2 rounded-lg bg-red-50 dark:bg-red-900/20"
+            >
+              <div class="flex items-center gap-2">
+                <span
+                  class="font-mono font-bold text-red-700 dark:text-red-400 w-8"
+                  >BE</span
+                >
+                <span class="text-gray-700 dark:text-gray-300"
+                  >Below Expectations</span
+                >
+              </div>
+              <span class="text-xs text-gray-500">0 – 39%</span>
+            </div>
+          </div>
+        </div>
+        <!-- KCSE -->
+        <div>
+          <h3
+            class="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-3"
+          >
+            KCSE — Senior Secondary (Grade 10–12)
+          </h3>
+          <div class="grid grid-cols-2 gap-1 text-xs">
+            <div
+              class="flex justify-between p-1.5 rounded bg-gray-50 dark:bg-slate-700"
+            >
+              <span class="font-mono font-bold">A</span
+              ><span class="text-gray-500">80–100 · 12 pts</span>
+            </div>
+            <div
+              class="flex justify-between p-1.5 rounded bg-gray-50 dark:bg-slate-700"
+            >
+              <span class="font-mono font-bold">A-</span
+              ><span class="text-gray-500">75–79 · 11 pts</span>
+            </div>
+            <div
+              class="flex justify-between p-1.5 rounded bg-gray-50 dark:bg-slate-700"
+            >
+              <span class="font-mono font-bold">B+</span
+              ><span class="text-gray-500">70–74 · 10 pts</span>
+            </div>
+            <div
+              class="flex justify-between p-1.5 rounded bg-gray-50 dark:bg-slate-700"
+            >
+              <span class="font-mono font-bold">B</span
+              ><span class="text-gray-500">65–69 · 9 pts</span>
+            </div>
+            <div
+              class="flex justify-between p-1.5 rounded bg-gray-50 dark:bg-slate-700"
+            >
+              <span class="font-mono font-bold">B-</span
+              ><span class="text-gray-500">60–64 · 8 pts</span>
+            </div>
+            <div
+              class="flex justify-between p-1.5 rounded bg-gray-50 dark:bg-slate-700"
+            >
+              <span class="font-mono font-bold">C+</span
+              ><span class="text-gray-500">55–59 · 7 pts</span>
+            </div>
+            <div
+              class="flex justify-between p-1.5 rounded bg-gray-50 dark:bg-slate-700"
+            >
+              <span class="font-mono font-bold">C</span
+              ><span class="text-gray-500">50–54 · 6 pts</span>
+            </div>
+            <div
+              class="flex justify-between p-1.5 rounded bg-gray-50 dark:bg-slate-700"
+            >
+              <span class="font-mono font-bold">C-</span
+              ><span class="text-gray-500">45–49 · 5 pts</span>
+            </div>
+            <div
+              class="flex justify-between p-1.5 rounded bg-gray-50 dark:bg-slate-700"
+            >
+              <span class="font-mono font-bold">D+</span
+              ><span class="text-gray-500">40–44 · 4 pts</span>
+            </div>
+            <div
+              class="flex justify-between p-1.5 rounded bg-gray-50 dark:bg-slate-700"
+            >
+              <span class="font-mono font-bold">D</span
+              ><span class="text-gray-500">35–39 · 3 pts</span>
+            </div>
+            <div
+              class="flex justify-between p-1.5 rounded bg-gray-50 dark:bg-slate-700"
+            >
+              <span class="font-mono font-bold">D-</span
+              ><span class="text-gray-500">30–34 · 2 pts</span>
+            </div>
+            <div
+              class="flex justify-between p-1.5 rounded bg-gray-50 dark:bg-slate-700"
+            >
+              <span class="font-mono font-bold">E</span
+              ><span class="text-gray-500">0–29 · 1 pt</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

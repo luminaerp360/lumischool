@@ -1,0 +1,75 @@
+<div>
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Classes</h1>
+    <button (click)="addClass()" class="btn-primary flex items-center gap-2">
+      <i class="fas fa-plus"></i> Create Class
+    </button>
+  </div>
+
+  <!-- Search -->
+  <div class="mb-4">
+    <input
+      type="text"
+      [(ngModel)]="search"
+      (ngModelChange)="load()"
+      placeholder="Search classes..."
+      class="form-input max-w-md"
+    />
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="flex items-center justify-center py-20">
+    <i class="fas fa-spinner fa-spin text-2xl text-gray-400"></i>
+  </div>
+
+  <!-- Table -->
+  <div
+    *ngIf="!loading"
+    class="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 overflow-hidden"
+  >
+    <div class="table-container overflow-x-auto">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Level</th>
+            <th>Streams</th>
+            <th>Class Teacher</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let c of classes"
+            class="cursor-pointer"
+            (click)="view(c._id)"
+          >
+            <td class="font-medium text-gray-800 dark:text-gray-100">
+              {{ c.name }}
+            </td>
+            <td>{{ c.level }}</td>
+            <td>{{ c.streamIds.length || 0 }}</td>
+            <td>{{ teacherName(c.classTeacherId) }}</td>
+            <td>
+              <button
+                (click)="view(c._id); $event.stopPropagation()"
+                class="text-sm font-medium hover:underline"
+                style="color: var(--accent-600)"
+              >
+                View
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="!classes.length">
+            <td
+              colspan="5"
+              class="text-center py-8 text-gray-500 dark:text-gray-400"
+            >
+              No classes found
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
