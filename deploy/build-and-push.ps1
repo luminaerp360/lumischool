@@ -59,8 +59,13 @@ try {
 
 # GHCR image names must be lowercased
 $OrgLower = $Org.ToLower()
-$BackendImage = "ghcr.io/$OrgLower/lumischool-backend"
-$FrontendImage = "ghcr.io/$OrgLower/lumischool-frontend"
+$BackendRepo = "ghcr.io/$OrgLower/lumischool-backend"
+$FrontendRepo = "ghcr.io/$OrgLower/lumischool-frontend"
+
+$BackendTagged = "${BackendRepo}:${Tag}"
+$BackendLatest = "${BackendRepo}:latest"
+$FrontendTagged = "${FrontendRepo}:${Tag}"
+$FrontendLatest = "${FrontendRepo}:latest"
 
 Write-Host "==========================================================" -ForegroundColor Magenta
 Write-Host "  LumiSchool Local Build & Push to GHCR" -ForegroundColor Magenta
@@ -72,11 +77,11 @@ Write-Host "==========================================================" -Foregro
 
 # ── 1. Backend ─────────────────────────────────────────────────────────────
 if ($Target -eq "both" -or $Target -eq "backend") {
-    Write-Step "Building Backend image ($BackendImage:$Tag) for linux/amd64..."
+    Write-Step "Building Backend image ($BackendTagged) for linux/amd64..."
     
-    $tags = @("-t", "$BackendImage:$Tag")
+    $tags = @("-t", $BackendTagged)
     if ($Tag -ne "latest") {
-        $tags += @("-t", "$BackendImage:latest")
+        $tags += @("-t", $BackendLatest)
     }
 
     $buildArgs = @(
@@ -94,26 +99,26 @@ if ($Target -eq "both" -or $Target -eq "backend") {
     }
     Write-Success "Backend built successfully."
 
-    Write-Step "Pushing Backend image to GitHub Container Registry ($BackendImage)..."
-    & docker push "$BackendImage:$Tag"
+    Write-Step "Pushing Backend image to GitHub Container Registry ($BackendTagged)..."
+    & docker push $BackendTagged
     if ($LASTEXITCODE -ne 0) {
-        Write-Err "Failed to push $BackendImage:$Tag. Did you run 'docker login ghcr.io'?"
+        Write-Err "Failed to push $BackendTagged. Did you run 'docker login ghcr.io'?"
         exit 1
     }
 
     if ($Tag -ne "latest") {
-        & docker push "$BackendImage:latest"
+        & docker push $BackendLatest
     }
     Write-Success "Backend pushed to GHCR."
 }
 
 # ── 2. Frontend ────────────────────────────────────────────────────────────
 if ($Target -eq "both" -or $Target -eq "frontend") {
-    Write-Step "Building Frontend image ($FrontendImage:$Tag) for linux/amd64..."
+    Write-Step "Building Frontend image ($FrontendTagged) for linux/amd64..."
 
-    $tags = @("-t", "$FrontendImage:$Tag")
+    $tags = @("-t", $FrontendTagged)
     if ($Tag -ne "latest") {
-        $tags += @("-t", "$FrontendImage:latest")
+        $tags += @("-t", $FrontendLatest)
     }
 
     $buildArgs = @(
@@ -131,15 +136,15 @@ if ($Target -eq "both" -or $Target -eq "frontend") {
     }
     Write-Success "Frontend built successfully."
 
-    Write-Step "Pushing Frontend image to GitHub Container Registry ($FrontendImage)..."
-    & docker push "$FrontendImage:$Tag"
+    Write-Step "Pushing Frontend image to GitHub Container Registry ($FrontendTagged)..."
+    & docker push $FrontendTagged
     if ($LASTEXITCODE -ne 0) {
-        Write-Err "Failed to push $FrontendImage:$Tag. Did you run 'docker login ghcr.io'?"
+        Write-Err "Failed to push $FrontendTagged. Did you run 'docker login ghcr.io'?"
         exit 1
     }
 
     if ($Tag -ne "latest") {
-        & docker push "$FrontendImage:latest"
+        & docker push $FrontendLatest
     }
     Write-Success "Frontend pushed to GHCR."
 }
