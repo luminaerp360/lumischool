@@ -1,109 +1,318 @@
-<div class="p-6">
-  <!-- Header -->
-  <div
-    class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4"
-  >
+<div class="space-y-6 max-w-7xl mx-auto">
+  <!-- ── 1. Page Header ── -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
     <div>
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Students</h1>
-      <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-        Manage student records and enrollment
+      <div class="flex items-center gap-2.5">
+        <h1 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+          Learner Registry
+        </h1>
+        <span
+          class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold shadow-2xs"
+          [style.background-color]="themeService.accent + '20'"
+          [style.color]="themeService.accent"
+        >
+          {{ total }} Enrolled
+        </span>
+      </div>
+      <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+        Manage student admissions, CBC grade assignments, and learner profiles
       </p>
     </div>
-    <button (click)="addStudent()" class="btn-primary flex items-center gap-2">
-      <i class="fas fa-plus"></i> Add Student
-    </button>
+
+    <div class="flex items-center gap-2.5">
+      <button
+        (click)="addStudent()"
+        class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-white shadow-sm hover:shadow-md transition-all duration-200 transform hover:-translate-y-0.5 cursor-pointer"
+        [style.background]="'linear-gradient(135deg, ' + themeService.accent + ', #047857)'"
+      >
+        <i class="fas fa-user-plus text-xs"></i>
+        <span>New Admission</span>
+      </button>
+    </div>
   </div>
 
-  <!-- Filters -->
-  <div class="card mb-6">
-    <div class="flex flex-col sm:flex-row gap-3">
-      <div class="flex-1">
+  <!-- ── 2. Top Summary Stat Badges ── -->
+  <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+    <div class="p-3.5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 shadow-2xs flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center flex-shrink-0">
+        <i class="fas fa-users text-sm"></i>
+      </div>
+      <div>
+        <p class="text-[11px] font-semibold text-slate-400 dark:text-slate-500">Total Learners</p>
+        <p class="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white">{{ total }}</p>
+      </div>
+    </div>
+
+    <div class="p-3.5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 shadow-2xs flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center flex-shrink-0">
+        <i class="fas fa-user-check text-sm"></i>
+      </div>
+      <div>
+        <p class="text-[11px] font-semibold text-slate-400 dark:text-slate-500">Active Status</p>
+        <p class="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white">{{ getActiveCount() }}</p>
+      </div>
+    </div>
+
+    <div class="p-3.5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 shadow-2xs flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400 flex items-center justify-center flex-shrink-0">
+        <i class="fas fa-bed text-sm"></i>
+      </div>
+      <div>
+        <p class="text-[11px] font-semibold text-slate-400 dark:text-slate-500">Boarders</p>
+        <p class="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white">{{ getBoarderCount() }}</p>
+      </div>
+    </div>
+
+    <div class="p-3.5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 shadow-2xs flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 flex items-center justify-center flex-shrink-0">
+        <i class="fas fa-sun text-sm"></i>
+      </div>
+      <div>
+        <p class="text-[11px] font-semibold text-slate-400 dark:text-slate-500">Day Scholars</p>
+        <p class="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white">{{ students.length - getBoarderCount() }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 3. Search & Filters Card ── -->
+  <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 p-4 shadow-2xs">
+    <div class="flex flex-col md:flex-row gap-3">
+      <!-- Search Input -->
+      <div class="relative flex-1">
+        <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
         <input
           type="text"
           [(ngModel)]="search"
           (keyup.enter)="onSearch()"
-          placeholder="Search by name, admission number..."
-          class="form-input"
+          placeholder="Search by student name, admission number, UPI, or NEMIS..."
+          class="w-full pl-9 pr-4 py-2 bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-700 rounded-xl text-xs sm:text-sm text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-accent-500/20 focus:border-accent-500 transition-all"
         />
       </div>
-      <select
-        [(ngModel)]="statusFilter"
-        (change)="onSearch()"
-        class="form-select sm:w-40"
-      >
-        <option value="">All Status</option>
-        <option value="ACTIVE">Active</option>
-        <option value="GRADUATED">Graduated</option>
-        <option value="SUSPENDED">Suspended</option>
-        <option value="TRANSFERRED">Transferred</option>
-      </select>
-      <select
-        [(ngModel)]="levelFilter"
-        (change)="onSearch()"
-        class="form-select sm:w-40"
-      >
-        <option value="">All Levels</option>
-        <option value="PRE_PRIMARY">Pre-Primary</option>
-        <option value="PRIMARY">Primary</option>
-        <option value="JSS">Junior Secondary</option>
-        <option value="SENIOR">Senior Secondary</option>
-      </select>
+
+      <!-- Status Filter -->
+      <div class="w-full sm:w-44">
+        <select
+          [(ngModel)]="statusFilter"
+          (change)="onSearch()"
+          class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-700 rounded-xl text-xs sm:text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-accent-500/20 focus:border-accent-500 transition-all cursor-pointer"
+        >
+          <option value="">All Statuses</option>
+          <option value="ACTIVE">Active</option>
+          <option value="GRADUATED">Graduated</option>
+          <option value="SUSPENDED">Suspended</option>
+          <option value="TRANSFERRED">Transferred</option>
+          <option value="EXPELLED">Expelled</option>
+          <option value="DROPPED_OUT">Dropped Out</option>
+        </select>
+      </div>
+
+      <!-- Level Filter -->
+      <div class="w-full sm:w-48">
+        <select
+          [(ngModel)]="levelFilter"
+          (change)="onSearch()"
+          class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-700 rounded-xl text-xs sm:text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-accent-500/20 focus:border-accent-500 transition-all cursor-pointer"
+        >
+          <option value="">All Academic Levels</option>
+          <option value="PRE_PRIMARY">Pre-Primary (PP1 - PP2)</option>
+          <option value="PRIMARY">Primary (Grade 1 - 6)</option>
+          <option value="JSS">Junior Secondary (Grade 7 - 9)</option>
+          <option value="SENIOR">Senior Secondary (Grade 10 - 12)</option>
+        </select>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center gap-2">
+        <button
+          (click)="onSearch()"
+          class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-white bg-slate-800 dark:bg-slate-700 hover:bg-slate-900 dark:hover:bg-slate-600 transition-colors shadow-2xs"
+        >
+          Filter
+        </button>
+        <button
+          *ngIf="search || statusFilter || levelFilter"
+          (click)="clearFilters()"
+          class="px-3 py-2 rounded-xl text-xs font-semibold text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+          title="Reset filters"
+        >
+          <i class="fas fa-undo"></i>
+        </button>
+      </div>
     </div>
   </div>
 
-  <!-- Loading -->
-  <div *ngIf="loading" class="flex justify-center py-12">
-    <div
-      class="animate-spin rounded-full h-8 w-8 border-b-2"
-      style="border-color: var(--accent-600)"
-    ></div>
+  <!-- ── 4. Loading Shimmer ── -->
+  <div *ngIf="loading" class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 p-6 space-y-4 animate-pulse">
+    <div *ngFor="let item of [1, 2, 3, 4, 5]" class="flex items-center gap-4">
+      <div class="w-10 h-10 rounded-xl bg-slate-200 dark:bg-slate-700 flex-shrink-0"></div>
+      <div class="flex-1 space-y-2">
+        <div class="h-4 bg-slate-200 dark:bg-slate-700 rounded w-1/3"></div>
+        <div class="h-3 bg-slate-100 dark:bg-slate-800 rounded w-1/4"></div>
+      </div>
+      <div class="w-20 h-6 rounded-full bg-slate-200 dark:bg-slate-700"></div>
+    </div>
   </div>
 
-  <!-- Table -->
-  <div *ngIf="!loading" class="card overflow-hidden p-0">
-    <div class="table-container">
-      <table>
+  <!-- ── 5. Students Table Card ── -->
+  <div *ngIf="!loading" class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-2xs overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse">
         <thead>
-          <tr>
-            <th>Adm No.</th>
-            <th>Name</th>
-            <th>Grade</th>
-            <th>Gender</th>
-            <th>Status</th>
-            <th>Boarding</th>
-            <th></th>
+          <tr class="border-b border-slate-200/80 dark:border-slate-700/80 bg-slate-50/70 dark:bg-slate-900/40 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            <th class="py-3.5 px-4 sm:px-5">Student Learner</th>
+            <th class="py-3.5 px-4">Adm & Identifiers</th>
+            <th class="py-3.5 px-4">CBC Grade / Level</th>
+            <th class="py-3.5 px-4">Gender</th>
+            <th class="py-3.5 px-4">Boarding</th>
+            <th class="py-3.5 px-4">Status</th>
+            <th class="py-3.5 px-4 sm:px-5 text-right">Actions</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody class="divide-y divide-slate-100 dark:divide-slate-700/60 text-xs sm:text-sm">
           <tr
             *ngFor="let s of students"
-            class="cursor-pointer"
             (click)="viewStudent(s._id)"
+            class="hover:bg-slate-50/80 dark:hover:bg-slate-700/40 transition-colors cursor-pointer group"
           >
-            <td class="font-medium">{{ s.admissionNumber }}</td>
-            <td>{{ getFullName(s) }}</td>
-            <td>Grade {{ s.currentGrade }}</td>
-            <td>{{ s.gender }}</td>
-            <td>
-              <span class="badge" [ngClass]="getStatusClass(s.status)">{{
-                s.status
-              }}</span>
+            <!-- Student Name & Avatar -->
+            <td class="py-3.5 px-4 sm:px-5">
+              <div class="flex items-center gap-3">
+                <div
+                  class="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs flex-shrink-0 shadow-2xs text-white"
+                  [ngClass]="{
+                    'bg-blue-600': s.gender === 'MALE',
+                    'bg-pink-600': s.gender === 'FEMALE',
+                    'bg-slate-600': s.gender !== 'MALE' && s.gender !== 'FEMALE'
+                  }"
+                >
+                  {{ getInitials(s) }}
+                </div>
+                <div class="min-w-0">
+                  <p class="font-bold text-slate-800 dark:text-slate-100 group-hover:text-accent-600 dark:group-hover:text-accent-400 transition-colors truncate">
+                    {{ getFullName(s) }}
+                  </p>
+                  <p class="text-[11px] text-slate-400 dark:text-slate-500 truncate">
+                    {{ s.nationality || 'Kenyan' }}
+                  </p>
+                </div>
+              </div>
             </td>
-            <td>{{ s.boardingStatus === "BOARDER" ? "Boarder" : "Day" }}</td>
-            <td class="text-right">
-              <i class="fas fa-chevron-right text-gray-400"></i>
+
+            <!-- Admission & UPI -->
+            <td class="py-3.5 px-4">
+              <p class="font-semibold text-slate-700 dark:text-slate-200">{{ s.admissionNumber }}</p>
+              <div class="flex items-center gap-1.5 mt-0.5" *ngIf="s.upiNumber || s.nemisNumber">
+                <span *ngIf="s.upiNumber" class="text-[10px] px-1.5 py-0.2 rounded bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 font-mono">
+                  UPI: {{ s.upiNumber }}
+                </span>
+              </div>
+            </td>
+
+            <!-- Grade & Level -->
+            <td class="py-3.5 px-4">
+              <span class="inline-block px-2.5 py-0.5 rounded-lg text-xs font-semibold border" [ngClass]="getLevelBadge(s.currentLevel).class">
+                Grade {{ s.currentGrade }}
+              </span>
+              <p class="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">
+                {{ getLevelBadge(s.currentLevel).label }}
+              </p>
+            </td>
+
+            <!-- Gender -->
+            <td class="py-3.5 px-4">
+              <span class="font-medium text-slate-600 dark:text-slate-300">
+                <i class="fas mr-1" [class.fa-mars]="s.gender === 'MALE'" [class.text-blue-500]="s.gender === 'MALE'" [class.fa-venus]="s.gender === 'FEMALE'" [class.text-pink-500]="s.gender === 'FEMALE'"></i>
+                {{ s.gender }}
+              </span>
+            </td>
+
+            <!-- Boarding -->
+            <td class="py-3.5 px-4">
+              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium bg-slate-100 dark:bg-slate-700/60 text-slate-600 dark:text-slate-300">
+                <i class="fas text-[10px]" [class.fa-bed]="s.boardingStatus === 'BOARDER'" [class.fa-walking]="s.boardingStatus !== 'BOARDER'"></i>
+                {{ s.boardingStatus === 'BOARDER' ? 'Boarder' : 'Day' }}
+              </span>
+            </td>
+
+            <!-- Status -->
+            <td class="py-3.5 px-4">
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold" [ngClass]="getStatusClass(s.status)">
+                <span class="w-1.5 h-1.5 rounded-full bg-current"></span>
+                {{ s.status }}
+              </span>
+            </td>
+
+            <!-- Actions -->
+            <td class="py-3.5 px-4 sm:px-5 text-right">
+              <div class="flex items-center justify-end gap-1.5" (click)="$event.stopPropagation()">
+                <button
+                  (click)="viewStudent(s._id)"
+                  class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+                  title="View Profile"
+                >
+                  <i class="fas fa-eye text-xs"></i>
+                </button>
+                <button
+                  (click)="editStudent(s._id, $event)"
+                  class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+                  title="Edit Learner"
+                >
+                  <i class="fas fa-edit text-xs"></i>
+                </button>
+              </div>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
 
+    <!-- Empty State -->
+    <div *ngIf="students.length === 0" class="text-center py-16 px-4">
+      <div class="w-16 h-16 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center mx-auto mb-3 shadow-2xs">
+        <i class="fas fa-user-graduate text-2xl opacity-60"></i>
+      </div>
+      <h3 class="text-base font-bold text-slate-800 dark:text-slate-200">No students found</h3>
+      <p class="text-xs text-slate-400 dark:text-slate-500 mt-1 max-w-sm mx-auto">
+        No learner matches the current filter criteria or none have been enrolled yet.
+      </p>
+      <button
+        (click)="addStudent()"
+        class="mt-4 px-4 py-2 rounded-xl text-xs font-semibold text-white inline-flex items-center gap-1.5 shadow-sm"
+        [style.background]="'linear-gradient(135deg, ' + themeService.accent + ', #047857)'"
+      >
+        <i class="fas fa-plus text-xs"></i> Add Student
+      </button>
+    </div>
+
+    <!-- ── 6. Pagination Footer ── -->
     <div
-      *ngIf="students.length === 0"
-      class="text-center py-12 text-gray-500 dark:text-gray-400"
+      *ngIf="students.length > 0"
+      class="px-4 sm:px-6 py-3.5 border-t border-slate-200/80 dark:border-slate-700/80 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 bg-slate-50/50 dark:bg-slate-900/30"
     >
-      <i class="fas fa-user-graduate text-4xl mb-3 opacity-30"></i>
-      <p>No students found</p>
+      <div>
+        Showing <span class="font-bold text-slate-700 dark:text-slate-200">{{ students.length }}</span> of
+        <span class="font-bold text-slate-700 dark:text-slate-200">{{ total }}</span> learners
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button
+          (click)="prevPage()"
+          [disabled]="page <= 1"
+          class="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed font-medium transition-colors"
+        >
+          Previous
+        </button>
+        <span class="px-2 font-semibold text-slate-700 dark:text-slate-300">
+          Page {{ page }} of {{ totalPages }}
+        </span>
+        <button
+          (click)="nextPage()"
+          [disabled]="page >= totalPages"
+          class="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed font-medium transition-colors"
+        >
+          Next
+        </button>
+      </div>
     </div>
   </div>
 </div>

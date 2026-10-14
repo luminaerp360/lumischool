@@ -26,6 +26,64 @@ export class StudentFormComponent implements OnInit {
     | "household"
     | "other" = "basic";
 
+  readonly tabList: Array<{
+    key: "basic" | "academic" | "location" | "medical" | "household" | "other";
+    label: string;
+    sublabel: string;
+    icon: string;
+  }> = [
+    { key: "basic", label: "Identity & Bio", sublabel: "Names & Identity", icon: "fa-user" },
+    { key: "academic", label: "Academic & CBC", sublabel: "Grade & Level", icon: "fa-graduation-cap" },
+    { key: "location", label: "Location & SNE", sublabel: "Address & Needs", icon: "fa-map-marker-alt" },
+    { key: "medical", label: "Medical & Health", sublabel: "Vitals & Vaccines", icon: "fa-heartbeat" },
+    { key: "household", label: "Household", sublabel: "Family Status", icon: "fa-home" },
+    { key: "other", label: "Services & Welfare", sublabel: "Meals & Transit", icon: "fa-bus" },
+  ];
+
+  get activeTabIndex(): number {
+    return this.tabList.findIndex((t) => t.key === this.activeTab);
+  }
+
+  get isFirstTab(): boolean {
+    return this.activeTabIndex === 0;
+  }
+
+  get isLastTab(): boolean {
+    return this.activeTabIndex === this.tabList.length - 1;
+  }
+
+  nextTab(): void {
+    const idx = this.activeTabIndex;
+    if (idx < this.tabList.length - 1) {
+      this.activeTab = this.tabList[idx + 1].key;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  prevTab(): void {
+    const idx = this.activeTabIndex;
+    if (idx > 0) {
+      this.activeTab = this.tabList[idx - 1].key;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  isTabValid(key: string): boolean {
+    if (key === 'basic') {
+      const fn = this.form?.get('firstName');
+      const ln = this.form?.get('lastName');
+      const dob = this.form?.get('dateOfBirth');
+      const gen = this.form?.get('gender');
+      return !!(fn?.valid && ln?.valid && dob?.valid && gen?.valid);
+    }
+    if (key === 'academic') {
+      const lvl = this.form?.get('currentLevel');
+      const grd = this.form?.get('currentGrade');
+      return !!(lvl?.valid && grd?.valid);
+    }
+    return true;
+  }
+
   readonly levels = [
     { value: "PRE_PRIMARY", label: "Pre-Primary", grades: [1, 2] },
     { value: "PRIMARY", label: "Primary", grades: [1, 2, 3, 4, 5, 6] },

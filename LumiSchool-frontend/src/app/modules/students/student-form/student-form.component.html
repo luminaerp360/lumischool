@@ -1,325 +1,389 @@
-<div class="p-6 max-w-4xl mx-auto">
-  <!-- Header -->
-  <div class="flex items-center gap-4 mb-6">
-    <button
-      (click)="cancel()"
-      class="p-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
-    >
-      <i class="fas fa-arrow-left"></i>
-    </button>
-    <div>
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
-        {{ isEditMode ? "Edit Student" : "Add New Student" }}
-      </h1>
-      <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-        {{
-          isEditMode
-            ? "Update student information"
-            : "Register a new student in the system"
-        }}
-      </p>
+<div class="space-y-6 pb-16 max-w-5xl mx-auto">
+  <!-- Top Navigation & Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-slate-800/90 p-5 sm:p-6 rounded-2xl sm:rounded-3xl border border-slate-200/80 dark:border-slate-700/80 shadow-xs">
+    <div class="flex items-center gap-3.5">
+      <button
+        type="button"
+        (click)="cancel()"
+        class="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 flex items-center justify-center transition-all duration-150 cursor-pointer"
+        title="Go back"
+      >
+        <i class="fas fa-arrow-left text-sm"></i>
+      </button>
+      <div>
+        <div class="flex items-center gap-2">
+          <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+            {{ isEditMode ? "Edit Student Profile" : "Register New Student" }}
+          </h1>
+          <span
+            class="px-2.5 py-0.5 rounded-full text-xs font-semibold"
+            [ngClass]="isEditMode ? 'bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300' : 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-300'"
+          >
+            {{ isEditMode ? 'Editing' : 'New Admission' }}
+          </span>
+        </div>
+        <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+          {{ isEditMode ? 'Update CBC curriculum track, personal and academic details' : 'Complete the multi-section CBC learner registration dossier' }}
+        </p>
+      </div>
+    </div>
+
+    <!-- Quick Save on Top for quick edits -->
+    <div class="flex items-center gap-2.5 self-end sm:self-auto">
+      <button
+        type="button"
+        (click)="cancel()"
+        class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700/80 hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer"
+      >
+        Cancel
+      </button>
+      <button
+        type="button"
+        (click)="submit()"
+        [disabled]="loading"
+        class="px-4.5 py-2 rounded-xl text-xs sm:text-sm font-semibold text-white shadow-sm flex items-center gap-2 transition cursor-pointer hover:opacity-95 disabled:opacity-50"
+        [style.backgroundColor]="'var(--accent-600)'"
+      >
+        <span *ngIf="loading" class="animate-spin rounded-full h-3.5 w-3.5 border-2 border-white/30 border-t-white"></span>
+        <i *ngIf="!loading" class="fas fa-save text-xs"></i>
+        <span>{{ loading ? 'Saving...' : (isEditMode ? 'Save Changes' : 'Register Student') }}</span>
+      </button>
     </div>
   </div>
 
-  <!-- Loading skeleton (edit mode) -->
-  <div *ngIf="loadingStudent" class="card animate-pulse space-y-4">
-    <div class="h-4 bg-gray-200 dark:bg-slate-700 rounded w-1/3"></div>
-    <div class="h-10 bg-gray-200 dark:bg-slate-700 rounded"></div>
-    <div class="h-10 bg-gray-200 dark:bg-slate-700 rounded"></div>
-    <div class="h-10 bg-gray-200 dark:bg-slate-700 rounded"></div>
+  <!-- Loading State (Edit Mode) -->
+  <div *ngIf="loadingStudent" class="form-card animate-pulse space-y-5">
+    <div class="h-6 bg-slate-200 dark:bg-slate-700 rounded-lg w-1/4"></div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div class="h-11 bg-slate-200 dark:bg-slate-700 rounded-xl"></div>
+      <div class="h-11 bg-slate-200 dark:bg-slate-700 rounded-xl"></div>
+      <div class="h-11 bg-slate-200 dark:bg-slate-700 rounded-xl"></div>
+      <div class="h-11 bg-slate-200 dark:bg-slate-700 rounded-xl"></div>
+    </div>
   </div>
 
+  <!-- Form Wrapper -->
   <form
     *ngIf="!loadingStudent"
     [formGroup]="form"
     (ngSubmit)="submit()"
     novalidate
+    class="space-y-6"
   >
-    <!-- Error banner -->
+    <!-- Error Alert Banner -->
     <div
       *ngIf="error"
-      class="mb-4 p-3 rounded-lg bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-sm"
+      class="p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 text-rose-800 dark:text-rose-200 text-sm flex items-start gap-3 shadow-xs"
     >
-      <i class="fas fa-exclamation-circle mr-2"></i>{{ error }}
+      <i class="fas fa-circle-exclamation text-rose-500 mt-0.5 text-base"></i>
+      <div>
+        <div class="font-semibold">Unable to save student records</div>
+        <div class="text-xs mt-0.5 text-rose-700 dark:text-rose-300">{{ error }}</div>
+      </div>
     </div>
 
-    <!-- Tab navigation -->
-    <div
-      class="flex border-b border-gray-200 dark:border-slate-700 mb-6 overflow-x-auto"
-    >
-      <button
-        type="button"
-        *ngFor="
-          let tab of [
-            { key: 'basic', label: 'Basic Info', icon: 'fa-user' },
-            { key: 'academic', label: 'Academic', icon: 'fa-graduation-cap' },
-            { key: 'location', label: 'Location', icon: 'fa-map-marker-alt' },
-            { key: 'medical', label: 'Medical', icon: 'fa-heartbeat' },
-            { key: 'household', label: 'Household', icon: 'fa-home' },
-            { key: 'other', label: 'Other', icon: 'fa-ellipsis-h' },
-          ]
-        "
-        (click)="activeTab = $any(tab.key)"
-        class="flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap border-b-2 transition-colors"
-        [ngClass]="
-          activeTab === tab.key
-            ? 'border-accent-600 text-accent-600'
-            : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700'
-        "
-        [style.borderColor]="activeTab === tab.key ? 'var(--accent-600)' : ''"
-        [style.color]="activeTab === tab.key ? 'var(--accent-600)' : ''"
-      >
-        <i class="fas" [ngClass]="tab.icon"></i>
-        {{ tab.label }}
-      </button>
+    <!-- Step Wizard / Segmented Tabs Bar -->
+    <div class="bg-white dark:bg-slate-800/90 rounded-2xl sm:rounded-3xl border border-slate-200/80 dark:border-slate-700/80 p-2 sm:p-3 shadow-xs">
+      <div class="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar">
+        <button
+          type="button"
+          *ngFor="let tab of tabList; let idx = index"
+          (click)="activeTab = tab.key"
+          class="flex-1 min-w-[130px] sm:min-w-0 p-2.5 sm:p-3 rounded-xl sm:rounded-2xl text-left transition-all duration-200 relative cursor-pointer"
+          [ngClass]="activeTab === tab.key ? 'bg-slate-100 dark:bg-slate-700/80 ring-2' : 'hover:bg-slate-50 dark:hover:bg-slate-800/60'"
+          [style.--tw-ring-color]="activeTab === tab.key ? 'var(--accent-500)' : 'transparent'"
+        >
+          <div class="flex items-center gap-2">
+            <span
+              class="w-6 h-6 rounded-lg text-xs font-bold flex items-center justify-center transition-colors"
+              [ngClass]="activeTab === tab.key ? 'text-white' : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300'"
+              [style.backgroundColor]="activeTab === tab.key ? 'var(--accent-600)' : ''"
+            >
+              <i *ngIf="isTabValid(tab.key) && idx < activeTabIndex" class="fas fa-check text-[10px]"></i>
+              <span *ngIf="!isTabValid(tab.key) || idx >= activeTabIndex">{{ idx + 1 }}</span>
+            </span>
+            <span
+              class="text-xs font-bold truncate transition-colors"
+              [ngClass]="activeTab === tab.key ? 'text-slate-900 dark:text-white' : 'text-slate-600 dark:text-slate-400'"
+            >
+              {{ tab.label }}
+            </span>
+          </div>
+          <div class="text-[10px] text-slate-500 dark:text-slate-400 mt-1 truncate pl-8 hidden md:block">
+            {{ tab.sublabel }}
+          </div>
+        </button>
+      </div>
+
+      <!-- Step Progress Bar -->
+      <div class="mt-2.5 mx-1 h-1.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+        <div
+          class="h-full transition-all duration-300 rounded-full"
+          [style.backgroundColor]="'var(--accent-600)'"
+          [style.width.%]="((activeTabIndex + 1) / tabList.length) * 100"
+        ></div>
+      </div>
     </div>
 
-    <!-- ── Tab: Basic Info ── -->
-    <div *ngIf="activeTab === 'basic'" class="card space-y-5">
-      <h2
-        class="text-base font-semibold text-gray-800 dark:text-gray-100 border-b border-gray-200 dark:border-slate-700 pb-3"
-      >
-        Personal Information
-      </h2>
-
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- TAB 1: BASIC INFORMATION & IDENTITY                        -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <div *ngIf="activeTab === 'basic'" class="form-card space-y-6">
+      <div class="flex items-center gap-3 pb-4 border-b border-slate-100 dark:border-slate-700/80">
+        <div class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300 flex items-center justify-center">
+          <i class="fas fa-user text-lg"></i>
+        </div>
         <div>
-          <label class="form-label">Admission Number</label>
-          <input
-            type="text"
-            formControlName="admissionNumber"
-            class="form-input"
-            placeholder="Leave empty for auto-generated"
-          />
-          <p class="text-xs text-gray-400 mt-1">
-            Auto-generated from your school's format if left empty
-          </p>
+          <h2 class="text-base font-bold text-slate-900 dark:text-white">Learner Identity & Legal Identifiers</h2>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Official government identifiers, legal names, and birth metrics</p>
+        </div>
+      </div>
+
+      <!-- Government Registrations -->
+      <div>
+        <h3 class="text-xs font-bold tracking-wider uppercase text-slate-600 dark:text-slate-400 mb-3 flex items-center gap-1.5">
+          <i class="fas fa-id-card text-[11px] text-slate-500"></i> Government & System Registry
+        </h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div>
+            <label class="form-label">
+              <span>Admission Number</span>
+              <span class="text-[10px] text-slate-500 lowercase">optional</span>
+            </label>
+            <input
+              type="text"
+              formControlName="admissionNumber"
+              class="form-input font-mono"
+              placeholder="Auto-generated if blank (e.g. ADM-2026-004)"
+            />
+            <p class="text-[11px] text-slate-500 mt-1">Leaves room for school numbering sequence</p>
+          </div>
+
+          <div>
+            <label class="form-label">
+              <span>UPI / KEMIS Number</span>
+              <span class="text-[10px] text-slate-500 lowercase">KEMIS</span>
+            </label>
+            <input
+              type="text"
+              formControlName="upiNumber"
+              class="form-input font-mono"
+              placeholder="e.g. KE982341829"
+            />
+          </div>
+
+          <div>
+            <label class="form-label">
+              <span>NEMIS Identifier</span>
+              <span class="text-[10px] text-slate-500 lowercase">MoE</span>
+            </label>
+            <input
+              type="text"
+              formControlName="nemisNumber"
+              class="form-input font-mono"
+              placeholder="e.g. NEMIS-109248"
+            />
+          </div>
+
+          <div>
+            <label class="form-label">Birth Certificate No.</label>
+            <input
+              type="text"
+              formControlName="birthCertificateNumber"
+              class="form-input font-mono"
+              placeholder="Entry number / B-Cert"
+            />
+          </div>
+
+          <div>
+            <label class="form-label">NHIF / SHA Number</label>
+            <input
+              type="text"
+              formControlName="nhifNumber"
+              class="form-input font-mono"
+              placeholder="Health insurance card ref"
+            />
+          </div>
+
+          <div>
+            <label class="form-label">Student Photo URL</label>
+            <input
+              type="url"
+              formControlName="photo"
+              class="form-input text-xs"
+              placeholder="https://images.unsplash.com/..."
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Legal Full Name & Biological Data -->
+      <div class="pt-4 border-t border-slate-100 dark:border-slate-700/80">
+        <h3 class="text-xs font-bold tracking-wider uppercase text-slate-600 dark:text-slate-400 mb-3 flex items-center gap-1.5">
+          <i class="fas fa-signature text-[11px] text-slate-500"></i> Full Name & Biodata
+        </h3>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <label class="form-label">First Name <span class="text-rose-500">*</span></label>
+            <input
+              type="text"
+              formControlName="firstName"
+              class="form-input"
+              [class.border-rose-400]="isInvalid('firstName')"
+              placeholder="e.g. Brian"
+            />
+            <p *ngIf="isInvalid('firstName')" class="form-error">
+              <i class="fas fa-circle-exclamation text-[10px]"></i> First name is required
+            </p>
+          </div>
+
+          <div>
+            <label class="form-label">Middle Name</label>
+            <input
+              type="text"
+              formControlName="middleName"
+              class="form-input"
+              placeholder="e.g. Mwangi"
+            />
+          </div>
+
+          <div>
+            <label class="form-label">Last Name <span class="text-rose-500">*</span></label>
+            <input
+              type="text"
+              formControlName="lastName"
+              class="form-input"
+              [class.border-rose-400]="isInvalid('lastName')"
+              placeholder="e.g. Kamau"
+            />
+            <p *ngIf="isInvalid('lastName')" class="form-error">
+              <i class="fas fa-circle-exclamation text-[10px]"></i> Last name is required
+            </p>
+          </div>
         </div>
 
-        <div>
-          <label class="form-label">UPI Number</label>
-          <input
-            type="text"
-            formControlName="upiNumber"
-            class="form-input"
-            placeholder="KEMIS unique identifier (e.g. KE123456789)"
-          />
-        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
+          <div>
+            <label class="form-label">Date of Birth <span class="text-rose-500">*</span></label>
+            <input
+              type="date"
+              formControlName="dateOfBirth"
+              class="form-input"
+              [class.border-rose-400]="isInvalid('dateOfBirth')"
+            />
+            <p *ngIf="isInvalid('dateOfBirth')" class="form-error">
+              <i class="fas fa-circle-exclamation text-[10px]"></i> Date of birth required
+            </p>
+          </div>
 
-        <div>
-          <label class="form-label">NEMIS Number</label>
-          <input
-            type="text"
-            formControlName="nemisNumber"
-            class="form-input"
-            placeholder="NEMIS identifier"
-          />
-        </div>
+          <div>
+            <label class="form-label">Gender <span class="text-rose-500">*</span></label>
+            <select
+              formControlName="gender"
+              class="form-select"
+              [class.border-rose-400]="isInvalid('gender')"
+            >
+              <option value="">Select gender</option>
+              <option value="MALE">Male</option>
+              <option value="FEMALE">Female</option>
+              <option value="OTHER">Other</option>
+            </select>
+            <p *ngIf="isInvalid('gender')" class="form-error">
+              <i class="fas fa-circle-exclamation text-[10px]"></i> Gender is required
+            </p>
+          </div>
 
-        <div>
-          <label class="form-label">Birth Certificate No.</label>
-          <input
-            type="text"
-            formControlName="birthCertificateNumber"
-            class="form-input"
-            placeholder="Birth certificate entry number"
-          />
-        </div>
+          <div>
+            <label class="form-label">Nationality</label>
+            <input
+              type="text"
+              formControlName="nationality"
+              class="form-input"
+              placeholder="e.g. Kenyan"
+            />
+          </div>
 
-        <div>
-          <label class="form-label">NHIF Number</label>
-          <input
-            type="text"
-            formControlName="nhifNumber"
-            class="form-input"
-            placeholder="NHIF health insurance number"
-          />
-        </div>
-
-        <div></div>
-
-        <div>
-          <label class="form-label"
-            >First Name <span class="text-red-500">*</span></label
-          >
-          <input
-            type="text"
-            formControlName="firstName"
-            class="form-input"
-            [class.border-red-500]="isInvalid('firstName')"
-            placeholder="First name"
-          />
-          <p *ngIf="isInvalid('firstName')" class="form-error">
-            First name is required
-          </p>
-        </div>
-
-        <div>
-          <label class="form-label">Middle Name</label>
-          <input
-            type="text"
-            formControlName="middleName"
-            class="form-input"
-            placeholder="Middle name (optional)"
-          />
-        </div>
-
-        <div>
-          <label class="form-label"
-            >Last Name <span class="text-red-500">*</span></label
-          >
-          <input
-            type="text"
-            formControlName="lastName"
-            class="form-input"
-            [class.border-red-500]="isInvalid('lastName')"
-            placeholder="Last name"
-          />
-          <p *ngIf="isInvalid('lastName')" class="form-error">
-            Last name is required
-          </p>
-        </div>
-
-        <div>
-          <label class="form-label"
-            >Date of Birth <span class="text-red-500">*</span></label
-          >
-          <input
-            type="date"
-            formControlName="dateOfBirth"
-            class="form-input"
-            [class.border-red-500]="isInvalid('dateOfBirth')"
-          />
-          <p *ngIf="isInvalid('dateOfBirth')" class="form-error">
-            Date of birth is required
-          </p>
-        </div>
-
-        <div>
-          <label class="form-label"
-            >Gender <span class="text-red-500">*</span></label
-          >
-          <select
-            formControlName="gender"
-            class="form-select"
-            [class.border-red-500]="isInvalid('gender')"
-          >
-            <option value="">Select gender</option>
-            <option value="MALE">Male</option>
-            <option value="FEMALE">Female</option>
-            <option value="OTHER">Other</option>
-          </select>
-          <p *ngIf="isInvalid('gender')" class="form-error">
-            Gender is required
-          </p>
-        </div>
-
-        <div>
-          <label class="form-label">Nationality</label>
-          <input
-            type="text"
-            formControlName="nationality"
-            class="form-input"
-            placeholder="e.g. Kenyan"
-          />
-        </div>
-
-        <div>
-          <label class="form-label">Religion</label>
-          <input
-            type="text"
-            formControlName="religion"
-            class="form-input"
-            placeholder="e.g. Christianity"
-          />
-        </div>
-
-        <div class="sm:col-span-2">
-          <label class="form-label">Photo URL</label>
-          <input
-            type="url"
-            formControlName="photo"
-            class="form-input"
-            placeholder="https://..."
-          />
+          <div>
+            <label class="form-label">Religion</label>
+            <input
+              type="text"
+              formControlName="religion"
+              class="form-input"
+              placeholder="e.g. Christian, Muslim"
+            />
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- ── Tab: Academic Info ── -->
-    <div *ngIf="activeTab === 'academic'" class="card space-y-5">
-      <h2
-        class="text-base font-semibold text-gray-800 dark:text-gray-100 border-b border-gray-200 dark:border-slate-700 pb-3"
-      >
-        Academic Information
-      </h2>
-
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- TAB 2: ACADEMIC & CBC PLACEMENT                            -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <div *ngIf="activeTab === 'academic'" class="form-card space-y-6">
+      <div class="flex items-center gap-3 pb-4 border-b border-slate-100 dark:border-slate-700/80">
+        <div class="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-900/40 text-purple-600 dark:text-purple-300 flex items-center justify-center">
+          <i class="fas fa-graduation-cap text-lg"></i>
+        </div>
         <div>
-          <label class="form-label"
-            >School Level <span class="text-red-500">*</span></label
-          >
+          <h2 class="text-base font-bold text-slate-900 dark:text-white">Academic Placement & CBC Curriculum</h2>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Class allocation, CBC Pathway tracks, and admission history</p>
+        </div>
+      </div>
+
+      <!-- Core Class & Level -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div>
+          <label class="form-label">Education Level <span class="text-rose-500">*</span></label>
           <select
             formControlName="currentLevel"
             class="form-select"
-            [class.border-red-500]="isInvalid('currentLevel')"
+            [class.border-rose-400]="isInvalid('currentLevel')"
           >
             <option value="">Select level</option>
-            <option *ngFor="let l of levels" [value]="l.value">
-              {{ l.label }}
-            </option>
+            <option *ngFor="let l of levels" [value]="l.value">{{ l.label }}</option>
           </select>
           <p *ngIf="isInvalid('currentLevel')" class="form-error">
-            School level is required
+            <i class="fas fa-circle-exclamation text-[10px]"></i> Education level is required
           </p>
         </div>
 
         <div>
-          <label class="form-label"
-            >Grade <span class="text-red-500">*</span></label
-          >
+          <label class="form-label">Grade / Year <span class="text-rose-500">*</span></label>
           <select
             formControlName="currentGrade"
             class="form-select"
-            [class.border-red-500]="isInvalid('currentGrade')"
+            [class.border-rose-400]="isInvalid('currentGrade')"
             [disabled]="!form.get('currentLevel')?.value"
           >
             <option value="">Select grade</option>
-            <option *ngFor="let g of gradesForLevel" [value]="g">
-              Grade {{ g }}
-            </option>
+            <option *ngFor="let g of gradesForLevel" [value]="g">Grade {{ g }}</option>
           </select>
           <p *ngIf="isInvalid('currentGrade')" class="form-error">
-            Grade is required
+            <i class="fas fa-circle-exclamation text-[10px]"></i> Grade is required
           </p>
-          <p
-            *ngIf="!form.get('currentLevel')?.value"
-            class="text-xs text-gray-400 mt-1"
-          >
-            Select a level first
+          <p *ngIf="!form.get('currentLevel')?.value" class="text-[11px] text-slate-500 mt-1">
+            Pick a school level first
           </p>
         </div>
 
         <div>
-          <label class="form-label">Class</label>
+          <label class="form-label">Class / Stream</label>
           <select formControlName="currentClassId" class="form-select">
-            <option value="">No class assigned</option>
-            <option *ngFor="let c of classes" [value]="c._id">
-              {{ c.name }}
-            </option>
+            <option value="">No stream assigned yet</option>
+            <option *ngFor="let c of classes" [value]="c._id">{{ c.name }}</option>
           </select>
         </div>
+      </div>
 
+      <!-- CBC Track & Boarding -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-slate-100 dark:border-slate-700/80">
         <div>
-          <label class="form-label">CBC Track</label>
+          <label class="form-label">CBC Senior Track</label>
           <select formControlName="cbcTrack" class="form-select">
-            <option *ngFor="let t of cbcTracks" [value]="t.value">
-              {{ t.label }}
-            </option>
+            <option *ngFor="let t of cbcTracks" [value]="t.value">{{ t.label }}</option>
           </select>
-          <p class="text-xs text-gray-400 mt-1">
-            Required for Senior Secondary students
-          </p>
+          <p class="text-[11px] text-slate-500 mt-1">Applicable to Senior School (Grade 10-12)</p>
         </div>
 
         <div>
@@ -331,77 +395,92 @@
         </div>
 
         <div>
-          <label class="form-label">Admission Date</label>
+          <label class="form-label">Date of Admission</label>
           <input
             type="date"
             formControlName="admissionDate"
             class="form-input"
           />
         </div>
+      </div>
 
-        <div>
-          <label class="form-label">Previous School</label>
-          <input
-            type="text"
-            formControlName="previousSchool"
-            class="form-input"
-            placeholder="Name of previous school"
-          />
-        </div>
+      <!-- Prior Schooling & Transfers -->
+      <div class="pt-4 border-t border-slate-100 dark:border-slate-700/80">
+        <h3 class="text-xs font-bold tracking-wider uppercase text-slate-600 dark:text-slate-400 mb-3 flex items-center gap-1.5">
+          <i class="fas fa-history text-[11px] text-slate-500"></i> Transfer & Prior School History
+        </h3>
 
-        <div>
-          <label class="form-label">Previous School Level</label>
-          <select formControlName="previousSchoolLevel" class="form-select">
-            <option value="">N/A</option>
-            <option *ngFor="let l of levels" [value]="l.value">
-              {{ l.label }}
-            </option>
-          </select>
-        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="sm:col-span-2">
+            <label class="form-label">Previous School Name</label>
+            <input
+              type="text"
+              formControlName="previousSchool"
+              class="form-input"
+              placeholder="e.g. St. Jude Academy"
+            />
+          </div>
 
-        <div>
-          <label class="form-label">Previous Grade</label>
-          <input
-            type="text"
-            formControlName="previousSchoolGrade"
-            class="form-input"
-            placeholder="e.g. Grade 5"
-          />
-        </div>
+          <div>
+            <label class="form-label">Prior Level</label>
+            <select formControlName="previousSchoolLevel" class="form-select">
+              <option value="">N/A</option>
+              <option *ngFor="let l of levels" [value]="l.value">{{ l.label }}</option>
+            </select>
+          </div>
 
-        <div>
-          <label class="form-label">Transfer Letter Ref</label>
-          <input
-            type="text"
-            formControlName="transferLetterRef"
-            class="form-input"
-            placeholder="Reference number"
-          />
-        </div>
+          <div>
+            <label class="form-label">Prior Grade</label>
+            <input
+              type="text"
+              formControlName="previousSchoolGrade"
+              class="form-input"
+              placeholder="e.g. Grade 4"
+            />
+          </div>
 
-        <div *ngIf="isEditMode" class="sm:col-span-2">
-          <label class="form-label">Status</label>
-          <select formControlName="status" class="form-select">
-            <option value="ACTIVE">Active</option>
-            <option value="GRADUATED">Graduated</option>
-            <option value="TRANSFERRED">Transferred</option>
-            <option value="SUSPENDED">Suspended</option>
-            <option value="EXPELLED">Expelled</option>
-            <option value="DROPPED_OUT">Dropped Out</option>
-          </select>
+          <div class="sm:col-span-2">
+            <label class="form-label">Transfer Clearance Letter Ref</label>
+            <input
+              type="text"
+              formControlName="transferLetterRef"
+              class="form-input font-mono"
+              placeholder="e.g. TR-2025/0912"
+            />
+          </div>
+
+          <!-- Status toggle if editing -->
+          <div *ngIf="isEditMode" class="sm:col-span-2">
+            <label class="form-label">Enrollment Status</label>
+            <select formControlName="status" class="form-select font-semibold">
+              <option value="ACTIVE">Active (Enrolled)</option>
+              <option value="GRADUATED">Graduated</option>
+              <option value="TRANSFERRED">Transferred Out</option>
+              <option value="SUSPENDED">Suspended</option>
+              <option value="EXPELLED">Expelled</option>
+              <option value="DROPPED_OUT">Dropped Out</option>
+            </select>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- ── Tab: Location ── -->
-    <div *ngIf="activeTab === 'location'" class="card space-y-5">
-      <h2
-        class="text-base font-semibold text-gray-800 dark:text-gray-100 border-b border-gray-200 dark:border-slate-700 pb-3"
-      >
-        Location & Special Needs
-      </h2>
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- TAB 3: LOCATION & SPECIAL EDUCATIONAL NEEDS               -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <div *ngIf="activeTab === 'location'" class="form-card space-y-6">
+      <div class="flex items-center gap-3 pb-4 border-b border-slate-100 dark:border-slate-700/80">
+        <div class="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-900/40 text-amber-600 dark:text-amber-300 flex items-center justify-center">
+          <i class="fas fa-map-location-dot text-lg"></i>
+        </div>
+        <div>
+          <h2 class="text-base font-bold text-slate-900 dark:text-white">Geographical Location & Special Needs (SNE)</h2>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Administrative boundary records and customized learning accommodations</p>
+        </div>
+      </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+      <!-- County and Ward Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <div>
           <label class="form-label">County</label>
           <input
@@ -428,7 +507,7 @@
             type="text"
             formControlName="constituency"
             class="form-input"
-            placeholder="e.g. Kasarani"
+            placeholder="e.g. Westlands"
           />
         </div>
 
@@ -438,17 +517,17 @@
             type="text"
             formControlName="ward"
             class="form-input"
-            placeholder="e.g. Githurai"
+            placeholder="e.g. Parklands/Highridge"
           />
         </div>
 
         <div>
-          <label class="form-label">Village / Estate</label>
+          <label class="form-label">Estate / Village</label>
           <input
             type="text"
             formControlName="village"
             class="form-input"
-            placeholder="e.g. Kahawa Sukari"
+            placeholder="e.g. Highridge Estate"
           />
         </div>
 
@@ -457,46 +536,58 @@
           <input
             type="text"
             formControlName="postalAddress"
-            class="form-input"
-            placeholder="e.g. P.O Box 1234-00100"
+            class="form-input font-mono"
+            placeholder="e.g. P.O. Box 45012-00100"
           />
         </div>
+      </div>
 
-        <div class="sm:col-span-2">
-          <label class="form-label">Special Needs Category</label>
-          <select formControlName="specialNeedsCategory" class="form-select">
-            <option
-              *ngFor="let c of specialNeedsCategories"
-              [value]="c.value"
-            >
-              {{ c.label }}
-            </option>
-          </select>
-        </div>
+      <!-- Special Educational Needs -->
+      <div class="pt-4 border-t border-slate-100 dark:border-slate-700/80">
+        <h3 class="text-xs font-bold tracking-wider uppercase text-slate-600 dark:text-slate-400 mb-3 flex items-center gap-1.5">
+          <i class="fas fa-hand-holding-heart text-[11px] text-slate-500"></i> Special Educational Needs (SNE)
+        </h3>
 
-        <div class="sm:col-span-2">
-          <label class="form-label">Special Needs Description</label>
-          <textarea
-            formControlName="specialNeeds"
-            class="form-input min-h-[80px] resize-y"
-            placeholder="Describe any special educational needs or disabilities..."
-          ></textarea>
+        <div class="space-y-4">
+          <div>
+            <label class="form-label">SNE Category</label>
+            <select formControlName="specialNeedsCategory" class="form-select">
+              <option *ngFor="let c of specialNeedsCategories" [value]="c.value">{{ c.label }}</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="form-label">Accommodations & Special Needs Notes</label>
+            <textarea
+              formControlName="specialNeeds"
+              rows="3"
+              class="form-input resize-y"
+              placeholder="Describe classroom accommodations, assistive equipment, or specialized educator support needed..."
+            ></textarea>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- ── Tab: Medical Info ── -->
-    <div *ngIf="activeTab === 'medical'" class="card space-y-5">
-      <h2
-        class="text-base font-semibold text-gray-800 dark:text-gray-100 border-b border-gray-200 dark:border-slate-700 pb-3"
-      >
-        Medical Information
-      </h2>
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- TAB 4: MEDICAL & HEALTH RECORDS                            -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <div *ngIf="activeTab === 'medical'" class="form-card space-y-6">
+      <div class="flex items-center gap-3 pb-4 border-b border-slate-100 dark:border-slate-700/80">
+        <div class="w-10 h-10 rounded-xl bg-rose-50 dark:bg-rose-900/40 text-rose-600 dark:text-rose-300 flex items-center justify-center">
+          <i class="fas fa-heartbeat text-lg"></i>
+        </div>
+        <div>
+          <h2 class="text-base font-bold text-slate-900 dark:text-white">Health, Emergency & Immunization</h2>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Clinical profile, emergency contacts, and vaccination verification</p>
+        </div>
+      </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+      <!-- Vitals & Contacts -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div>
           <label class="form-label">Blood Group</label>
-          <select formControlName="bloodGroup" class="form-select">
+          <select formControlName="bloodGroup" class="form-select font-mono">
             <option value="">Unknown</option>
             <option value="A+">A+</option>
             <option value="A-">A-</option>
@@ -510,7 +601,7 @@
         </div>
 
         <div>
-          <label class="form-label">Chronic Illness</label>
+          <label class="form-label">Chronic Illnesses</label>
           <input
             type="text"
             formControlName="chronicIllness"
@@ -525,277 +616,373 @@
             type="text"
             formControlName="emergencyContactName"
             class="form-input"
-            placeholder="Contact person name"
+            placeholder="e.g. Dr. Jane Doe / Uncle"
           />
         </div>
 
         <div>
-          <label class="form-label">Emergency Contact Phone</label>
+          <label class="form-label">Emergency Phone</label>
           <input
             type="tel"
             formControlName="emergencyContact"
-            class="form-input"
-            placeholder="+254..."
+            class="form-input font-mono"
+            placeholder="+254 7..."
           />
         </div>
 
         <div class="sm:col-span-2">
-          <label class="form-label">Known Allergies</label>
+          <label class="form-label">Known Allergies (Comma separated)</label>
           <input
             type="text"
             formControlName="allergies"
             class="form-input"
-            placeholder="Comma-separated, e.g. Peanuts, Penicillin"
+            placeholder="e.g. Peanuts, Penicillin, Dust"
           />
         </div>
 
         <div class="sm:col-span-2">
-          <label class="form-label">Medical Conditions</label>
+          <label class="form-label">Medical Conditions (Comma separated)</label>
           <input
             type="text"
             formControlName="conditions"
             class="form-input"
-            placeholder="Comma-separated, e.g. Asthma, Epilepsy"
+            placeholder="e.g. Mild Epilepsy, Lactose intolerance"
           />
         </div>
 
-        <div class="sm:col-span-2">
-          <label class="form-label">Physical Fitness Certificate Ref</label>
+        <div class="sm:col-span-4">
+          <label class="form-label">Physical Fitness Certificate Ref (PE / Boarding)</label>
           <input
             type="text"
             formControlName="physicalFitnessRef"
-            class="form-input"
-            placeholder="Certificate reference for boarding/PE"
+            class="form-input font-mono"
+            placeholder="Medical fitness sign-off / doctor reference"
           />
         </div>
       </div>
 
-      <!-- Immunization -->
-      <h3
-        class="text-sm font-semibold text-gray-700 dark:text-gray-200 border-b border-gray-200 dark:border-slate-700 pb-2 pt-4"
-      >
-        Immunization Records
-      </h3>
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <ng-container
-          *ngFor="
-            let vax of [
-              { key: 'polio', label: 'Polio' },
-              { key: 'measles', label: 'Measles' },
-              { key: 'dpt', label: 'DPT' },
-              { key: 'bcg', label: 'BCG' },
-              { key: 'hepatitisB', label: 'Hepatitis B' },
-              { key: 'hpv', label: 'HPV' },
-              { key: 'covid19', label: 'COVID-19' },
-              { key: 'yellowFever', label: 'Yellow Fever' },
-              { key: 'tetanus', label: 'Tetanus' },
-            ]
-          "
-        >
-          <div class="flex items-center gap-3 p-2 rounded bg-gray-50 dark:bg-slate-800">
+      <!-- Immunization Matrix -->
+      <div class="pt-4 border-t border-slate-100 dark:border-slate-700/80">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-xs font-bold tracking-wider uppercase text-slate-600 dark:text-slate-400 flex items-center gap-1.5">
+            <i class="fas fa-syringe text-[11px] text-slate-500"></i> MoH Immunization & Vaccine Checklist
+          </h3>
+          <span class="text-[11px] text-slate-500">Check administered vaccines & enter date</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          <ng-container
+            *ngFor="
+              let vax of [
+                { key: 'polio', label: 'Polio (OPV / IPV)' },
+                { key: 'measles', label: 'Measles-Rubella' },
+                { key: 'dpt', label: 'DPT / Pentavalent' },
+                { key: 'bcg', label: 'BCG (Tuberculosis)' },
+                { key: 'hepatitisB', label: 'Hepatitis B' },
+                { key: 'hpv', label: 'HPV (Girls 10+)' },
+                { key: 'covid19', label: 'COVID-19 Vaccine' },
+                { key: 'yellowFever', label: 'Yellow Fever' },
+                { key: 'tetanus', label: 'Tetanus Toxoid' }
+              ]
+            "
+          >
+            <div
+              class="p-3 rounded-xl border border-slate-200/80 dark:border-slate-700/80 bg-slate-50/60 dark:bg-slate-900/40 flex items-center justify-between gap-3"
+            >
+              <label class="flex items-center gap-2.5 cursor-pointer text-xs font-semibold text-slate-800 dark:text-slate-200">
+                <input
+                  type="checkbox"
+                  [formControlName]="$any(vax.key + 'Status')"
+                  class="w-4 h-4 rounded text-accent-600 focus:ring-accent-500 border-slate-300 dark:border-slate-600"
+                />
+                <span>{{ vax.label }}</span>
+              </label>
+              <input
+                type="date"
+                [formControlName]="$any(vax.key + 'Date')"
+                class="px-2 py-1 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 w-32 focus:outline-none"
+              />
+            </div>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- TAB 5: HOUSEHOLD & SOCIOECONOMIC STATUS                    -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <div *ngIf="activeTab === 'household'" class="form-card space-y-6">
+      <div class="flex items-center gap-3 pb-4 border-b border-slate-100 dark:border-slate-700/80">
+        <div class="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-300 flex items-center justify-center">
+          <i class="fas fa-home text-lg"></i>
+        </div>
+        <div>
+          <h2 class="text-base font-bold text-slate-900 dark:text-white">Household & Socioeconomic Profile</h2>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Family composition, parent status, and vulnerable student support markers</p>
+        </div>
+      </div>
+
+      <!-- Vulnerability Indicators (Cards) -->
+      <div>
+        <h3 class="text-xs font-bold tracking-wider uppercase text-slate-600 dark:text-slate-400 mb-3 flex items-center gap-1.5">
+          <i class="fas fa-shield-heart text-[11px] text-slate-500"></i> Vulnerability & Guardian Context
+        </h3>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <label
+            class="p-4 rounded-2xl border transition-all cursor-pointer flex items-start gap-3"
+            [ngClass]="form.get('isOrphan')?.value ? 'border-amber-400 bg-amber-50/50 dark:bg-amber-950/20' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/40'"
+          >
             <input
               type="checkbox"
-              [formControlName]="$any(vax.key + 'Status')"
-              class="rounded"
+              formControlName="isOrphan"
+              class="w-4 h-4 mt-0.5 rounded text-amber-600 focus:ring-amber-500 border-slate-300 dark:border-slate-600"
             />
-            <label class="text-sm text-gray-700 dark:text-gray-300 flex-1">{{ vax.label }}</label>
+            <div>
+              <div class="text-xs font-bold text-slate-900 dark:text-white">Double Orphan</div>
+              <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Both parents deceased; qualifies for special welfare support</p>
+            </div>
+          </label>
+
+          <label
+            class="p-4 rounded-2xl border transition-all cursor-pointer flex items-start gap-3"
+            [ngClass]="form.get('isPartialOrphan')?.value ? 'border-amber-400 bg-amber-50/50 dark:bg-amber-950/20' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/40'"
+          >
             <input
-              type="date"
-              [formControlName]="$any(vax.key + 'Date')"
-              class="form-input text-xs w-32 py-1"
+              type="checkbox"
+              formControlName="isPartialOrphan"
+              class="w-4 h-4 mt-0.5 rounded text-amber-600 focus:ring-amber-500 border-slate-300 dark:border-slate-600"
+            />
+            <div>
+              <div class="text-xs font-bold text-slate-900 dark:text-white">Partial Orphan</div>
+              <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">One parent deceased</p>
+            </div>
+          </label>
+
+          <label
+            class="p-4 rounded-2xl border transition-all cursor-pointer flex items-start gap-3"
+            [ngClass]="form.get('isSingleParent')?.value ? 'border-indigo-400 bg-indigo-50/50 dark:bg-indigo-950/20' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/40'"
+          >
+            <input
+              type="checkbox"
+              formControlName="isSingleParent"
+              class="w-4 h-4 mt-0.5 rounded text-indigo-600 focus:ring-indigo-500 border-slate-300 dark:border-slate-600"
+            />
+            <div>
+              <div class="text-xs font-bold text-slate-900 dark:text-white">Single Parent Family</div>
+              <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Child raised by sole guardian</p>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- Sibling & Financial Baseline -->
+      <div class="pt-4 border-t border-slate-100 dark:border-slate-700/80">
+        <h3 class="text-xs font-bold tracking-wider uppercase text-slate-600 dark:text-slate-400 mb-3 flex items-center gap-1.5">
+          <i class="fas fa-users text-[11px] text-slate-500"></i> Family Demographics & Income
+        </h3>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div>
+            <label class="form-label">Total Siblings</label>
+            <input
+              type="number"
+              formControlName="siblingCount"
+              class="form-input"
+              min="0"
+              placeholder="e.g. 3"
             />
           </div>
-        </ng-container>
-      </div>
-    </div>
 
-    <!-- ── Tab: Household ── -->
-    <div *ngIf="activeTab === 'household'" class="card space-y-5">
-      <h2
-        class="text-base font-semibold text-gray-800 dark:text-gray-100 border-b border-gray-200 dark:border-slate-700 pb-3"
-      >
-        Household & Socioeconomic Information
-      </h2>
+          <div>
+            <label class="form-label">Birth Order</label>
+            <input
+              type="number"
+              formControlName="birthOrder"
+              class="form-input"
+              min="0"
+              placeholder="e.g. 1st born = 1"
+            />
+          </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-        <div>
-          <label class="form-label">Number of Siblings</label>
-          <input
-            type="number"
-            formControlName="siblingCount"
-            class="form-input"
-            min="0"
-          />
-        </div>
+          <div>
+            <label class="form-label">Parent / Guardian Occupation</label>
+            <input
+              type="text"
+              formControlName="parentOccupation"
+              class="form-input"
+              placeholder="e.g. Teacher, Civil Servant"
+            />
+          </div>
 
-        <div>
-          <label class="form-label">Birth Order</label>
-          <input
-            type="number"
-            formControlName="birthOrder"
-            class="form-input"
-            min="0"
-          />
-        </div>
-
-        <div>
-          <label class="form-label">Parent/Guardian Occupation</label>
-          <input
-            type="text"
-            formControlName="parentOccupation"
-            class="form-input"
-            placeholder="e.g. Teacher, Farmer"
-          />
-        </div>
-
-        <div>
-          <label class="form-label">Income Bracket</label>
-          <select formControlName="parentIncomeBracket" class="form-select">
-            <option value="">Unknown</option>
-            <option value="LOW">Low (&lt; KES 10K/mo)</option>
-            <option value="LOWER_MIDDLE">Lower Middle (KES 10K-30K)</option>
-            <option value="MIDDLE">Middle (KES 30K-100K)</option>
-            <option value="UPPER_MIDDLE">Upper Middle (KES 100K-250K)</option>
-            <option value="HIGH">High (&gt; KES 250K)</option>
-          </select>
-        </div>
-
-        <div class="sm:col-span-2 flex flex-wrap gap-6 pt-2">
-          <label class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
-            <input type="checkbox" formControlName="isOrphan" class="rounded" />
-            Double Orphan
-          </label>
-          <label class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
-            <input type="checkbox" formControlName="isPartialOrphan" class="rounded" />
-            Partial Orphan
-          </label>
-          <label class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
-            <input type="checkbox" formControlName="isSingleParent" class="rounded" />
-            Single Parent Household
-          </label>
+          <div>
+            <label class="form-label">Income Bracket</label>
+            <select formControlName="parentIncomeBracket" class="form-select">
+              <option value="">Unknown / Undisclosed</option>
+              <option value="LOW">Low (&lt; KES 10,000 / mo)</option>
+              <option value="LOWER_MIDDLE">Lower Middle (KES 10k - 30k)</option>
+              <option value="MIDDLE">Middle (KES 30k - 100k)</option>
+              <option value="UPPER_MIDDLE">Upper Middle (KES 100k - 250k)</option>
+              <option value="HIGH">High (&gt; KES 250,000)</option>
+            </select>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- ── Tab: Other ── -->
-    <div *ngIf="activeTab === 'other'" class="card space-y-5">
-      <h2
-        class="text-base font-semibold text-gray-800 dark:text-gray-100 border-b border-gray-200 dark:border-slate-700 pb-3"
-      >
-        Feeding, Bursary & Transport
-      </h2>
-
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- TAB 6: SERVICES, BURSARY & TRANSPORT                       -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <div *ngIf="activeTab === 'other'" class="form-card space-y-6">
+      <div class="flex items-center gap-3 pb-4 border-b border-slate-100 dark:border-slate-700/80">
+        <div class="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-900/40 text-teal-600 dark:text-teal-300 flex items-center justify-center">
+          <i class="fas fa-bus text-lg"></i>
+        </div>
         <div>
-          <label class="form-label">Feeding Program</label>
+          <h2 class="text-base font-bold text-slate-900 dark:text-white">Auxiliary Welfare, Meals & Transport</h2>
+          <p class="text-xs text-slate-500 dark:text-slate-400">School feeding program, government bursary allocation, and bus logistics</p>
+        </div>
+      </div>
+
+      <!-- Feeding & Bursary -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div>
+          <label class="form-label">School Feeding Program</label>
           <select formControlName="feedingProgram" class="form-select">
-            <option *ngFor="let f of feedingPrograms" [value]="f.value">
-              {{ f.label }}
-            </option>
+            <option *ngFor="let f of feedingPrograms" [value]="f.value">{{ f.label }}</option>
           </select>
         </div>
 
         <div>
           <label class="form-label">Bursary Status</label>
           <select formControlName="bursaryStatus" class="form-select">
-            <option *ngFor="let b of bursaryStatuses" [value]="b.value">
-              {{ b.label }}
-            </option>
+            <option *ngFor="let b of bursaryStatuses" [value]="b.value">{{ b.label }}</option>
           </select>
         </div>
 
-        <div class="sm:col-span-2">
-          <label class="form-label">Bursary Source (CDF/NGO/etc.)</label>
+        <div>
+          <label class="form-label">Bursary Sponsor / Scheme</label>
           <input
             type="text"
             formControlName="bursarySource"
             class="form-input"
-            placeholder="e.g. CDF - Kasarani, Equity Wings to Fly"
+            placeholder="e.g. CDF Kasarani, Equity Wings"
           />
         </div>
+      </div>
 
-        <div class="sm:col-span-2 pt-3">
-          <label class="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-200 mb-3">
-            <input type="checkbox" formControlName="needsTransport" class="rounded" />
-            Needs School Transport
+      <!-- Transport Logistics -->
+      <div class="pt-4 border-t border-slate-100 dark:border-slate-700/80">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-xs font-bold tracking-wider uppercase text-slate-600 dark:text-slate-400 flex items-center gap-1.5">
+            <i class="fas fa-van-shuttle text-[11px] text-slate-500"></i> Daily School Transit Service
+          </h3>
+        </div>
+
+        <div class="p-4 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 bg-slate-50/50 dark:bg-slate-900/30 space-y-4">
+          <label class="flex items-center gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              formControlName="needsTransport"
+              class="w-5 h-5 rounded text-accent-600 focus:ring-accent-500 border-slate-300 dark:border-slate-600"
+            />
+            <div>
+              <span class="text-sm font-bold text-slate-900 dark:text-white">Enable School Transit Route for this Learner</span>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Enrolls student in the morning and evening bus roster</p>
+            </div>
           </label>
-        </div>
 
-        <div>
-          <label class="form-label">Transport Route</label>
-          <input
-            type="text"
-            formControlName="transportRoute"
-            class="form-input"
-            placeholder="e.g. Route A - CBD"
-          />
-        </div>
+          <div *ngIf="form.get('needsTransport')?.value" class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-3 border-t border-slate-200/60 dark:border-slate-700/60">
+            <div>
+              <label class="form-label">Assigned Route</label>
+              <input
+                type="text"
+                formControlName="transportRoute"
+                class="form-input"
+                placeholder="e.g. Route 4 (Thika Road - Roysambu)"
+              />
+            </div>
 
-        <div>
-          <label class="form-label">Pickup Point</label>
-          <input
-            type="text"
-            formControlName="pickupPoint"
-            class="form-input"
-            placeholder="e.g. Kencom Bus Stop"
-          />
-        </div>
+            <div>
+              <label class="form-label">Designated Pick-up Point</label>
+              <input
+                type="text"
+                formControlName="pickupPoint"
+                class="form-input"
+                placeholder="e.g. Total Petrol Station Stage"
+              />
+            </div>
 
-        <div>
-          <label class="form-label">Transport Fee (KES)</label>
-          <input
-            type="number"
-            formControlName="transportFee"
-            class="form-input"
-            min="0"
-          />
+            <div>
+              <label class="form-label">Transport Fee Per Term (KES)</label>
+              <input
+                type="number"
+                formControlName="transportFee"
+                class="form-input font-mono"
+                min="0"
+                placeholder="e.g. 12500"
+              />
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Form Actions -->
-    <div
-      class="flex items-center justify-between mt-6 pt-4 border-t border-gray-200 dark:border-slate-700"
-    >
-      <div class="flex gap-1.5">
-        <span
-          *ngFor="let tab of ['basic', 'academic', 'location', 'medical', 'household', 'other']"
-          class="w-2 h-2 rounded-full transition-colors"
-          [ngClass]="
-            activeTab === tab
-              ? 'bg-accent-600'
-              : 'bg-gray-300 dark:bg-slate-600'
-          "
-          [style.backgroundColor]="activeTab === tab ? 'var(--accent-600)' : ''"
-        ></span>
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- WIZARD STEP NAVIGATION FOOTER                              -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-slate-200/80 dark:border-slate-700/80 bg-white dark:bg-slate-800/90 p-5 sm:p-6 rounded-2xl sm:rounded-3xl border shadow-xs">
+      <!-- Step Indicator & Quick Dots -->
+      <div class="flex items-center gap-3">
+        <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">
+          Step {{ activeTabIndex + 1 }} of {{ tabList.length }}:
+          <strong class="text-slate-900 dark:text-white ml-0.5">{{ tabList[activeTabIndex].label }}</strong>
+        </span>
+        <div class="hidden sm:flex items-center gap-1.5 ml-2">
+          <button
+            type="button"
+            *ngFor="let tab of tabList; let idx = index"
+            (click)="activeTab = tab.key"
+            class="w-2.5 h-2.5 rounded-full transition-all duration-200 cursor-pointer"
+            [ngClass]="activeTab === tab.key ? 'w-6 rounded-full' : 'bg-slate-200 dark:bg-slate-700 hover:bg-slate-300'"
+            [style.backgroundColor]="activeTab === tab.key ? 'var(--accent-600)' : ''"
+            [title]="tab.label"
+          ></button>
+        </div>
       </div>
 
-      <div class="flex gap-3">
+      <!-- Nav Buttons -->
+      <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
         <button
           type="button"
-          (click)="cancel()"
-          class="btn-secondary"
-          [disabled]="loading"
+          (click)="prevTab()"
+          [disabled]="isFirstTab"
+          class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 disabled:opacity-40 disabled:pointer-events-none transition flex items-center gap-2 cursor-pointer"
         >
-          Cancel
+          <i class="fas fa-arrow-left text-xs"></i>
+          <span>Previous</span>
         </button>
+
         <button
-          type="submit"
-          class="btn-primary flex items-center gap-2"
-          [disabled]="loading"
+          *ngIf="!isLastTab"
+          type="button"
+          (click)="nextTab()"
+          class="px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-white shadow-sm flex items-center gap-2 transition hover:opacity-95 cursor-pointer"
+          [style.backgroundColor]="'var(--accent-600)'"
         >
-          <span
-            *ngIf="loading"
-            class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"
-          ></span>
-          <i
-            *ngIf="!loading"
-            class="fas"
-            [ngClass]="isEditMode ? 'fa-save' : 'fa-user-plus'"
-          ></i>
-          {{
-            loading ? "Saving..." : isEditMode ? "Save Changes" : "Add Student"
-          }}
+          <span>Next: {{ tabList[activeTabIndex + 1].label }}</span>
+          <i class="fas fa-arrow-right text-xs"></i>
+        </button>
+
+        <button
+          *ngIf="isLastTab"
+          type="submit"
+          [disabled]="loading"
+          class="px-6 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-white shadow-md flex items-center gap-2 transition hover:opacity-95 disabled:opacity-50 cursor-pointer"
+          [style.backgroundColor]="'var(--accent-600)'"
+        >
+          <span *ngIf="loading" class="animate-spin rounded-full h-4 w-4 border-2 border-white/30 border-t-white"></span>
+          <i *ngIf="!loading" class="fas" [ngClass]="isEditMode ? 'fa-check' : 'fa-user-plus'"></i>
+          <span>{{ loading ? 'Saving Dossier...' : (isEditMode ? 'Save Learner Profile' : 'Complete Registration') }}</span>
         </button>
       </div>
     </div>
