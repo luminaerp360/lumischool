@@ -7,50 +7,60 @@
 >
   <!-- Brand / Logo Header -->
   <div
-    class="flex items-center h-16 px-4 border-b border-slate-100 dark:border-slate-800/80 flex-shrink-0"
+    class="flex items-center h-16 px-3.5 border-b border-slate-100 dark:border-slate-800/80 flex-shrink-0"
     [class.justify-center]="collapsed && !isMobile"
   >
-    <div class="flex items-center gap-3 min-w-0">
-      <!-- Logo Icon Badge -->
-      <div
-        class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 shadow-xs relative group overflow-hidden bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 p-1"
-      >
-        <img
-          src="assets/images/360.png"
-          alt="Lumina ERP"
-          class="w-full h-full object-contain transform group-hover:scale-110 transition-transform duration-200"
-        />
-      </div>
-
-      <!-- App Name & Organization Subtitle -->
-      <div *ngIf="!collapsed || isMobile" class="flex flex-col min-w-0">
-        <div class="flex items-center gap-1.5">
-          <span class="text-base font-extrabold tracking-tight text-slate-800 dark:text-slate-100">
-            LumiSchool
-          </span>
-          <span
-            class="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full"
-            [style.background-color]="themeService.accent + '20'"
-            [style.color]="themeService.accent"
-          >
-            CBC
-          </span>
-        </div>
-        <span class="text-[11px] font-medium text-slate-400 dark:text-slate-500 truncate max-w-[130px]">
-          {{ getTenantShortName() }}
-        </span>
-      </div>
+    <!-- Collapsed State: Iconic 360 Emblem -->
+    <div
+      *ngIf="collapsed && !isMobile"
+      class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 shadow-xs relative group overflow-hidden bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 p-1"
+      title="Lumina 360 • School Management System (LMS)"
+    >
+      <img
+        src="assets/images/360.png"
+        alt="Lumina 360"
+        class="w-full h-full object-contain transform group-hover:scale-110 transition-transform duration-200"
+      />
     </div>
 
-    <!-- Mobile Close Button -->
-    <button
-      *ngIf="isMobile"
-      (click)="toggle.emit()"
-      class="ml-auto w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-      title="Close sidebar"
-    >
-      <i class="fas fa-times text-sm"></i>
-    </button>
+    <!-- Expanded State: Full Lumina 360 Logo + School Management System (LMS) -->
+    <div *ngIf="!collapsed || isMobile" class="flex items-center justify-between w-full min-w-0 pr-0.5">
+      <div class="flex flex-col min-w-0">
+        <!-- Logo Row with LMS Tag -->
+        <div class="flex items-center gap-2">
+          <img
+            src="assets/images/logo-clean.png"
+            alt="Lumina 360"
+            class="h-7 w-auto max-w-[135px] object-contain flex-shrink-0 hover:scale-102 transition-transform duration-150"
+          />
+          <span
+            class="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded bg-purple-100 dark:bg-purple-950/70 text-purple-700 dark:text-purple-300 border border-purple-200/90 dark:border-purple-800/70 shadow-2xs flex-shrink-0"
+          >
+            LMS
+          </span>
+        </div>
+        <!-- Subtitle Row: School Management System -->
+        <div class="flex items-center gap-1.5 mt-0.5">
+          <span class="text-[10px] font-bold text-slate-500 dark:text-slate-400 tracking-tight whitespace-nowrap">
+            School Management System
+          </span>
+          <span class="text-[8px] text-slate-300 dark:text-slate-600">&bull;</span>
+          <span class="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 truncate max-w-[65px]" [title]="getTenantShortName()">
+            {{ getTenantShortName() }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Mobile Close Button -->
+      <button
+        *ngIf="isMobile"
+        (click)="toggle.emit()"
+        class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex-shrink-0 ml-1"
+        title="Close sidebar"
+      >
+        <i class="fas fa-times text-sm"></i>
+      </button>
+    </div>
   </div>
 
   <!-- Navigation Sections -->
