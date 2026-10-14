@@ -1,148 +1,245 @@
-<div>
-  <button
-    (click)="goBack()"
-    class="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 mb-4 inline-flex items-center gap-1"
-  >
-    <i class="fas fa-arrow-left"></i> Back to Classes
-  </button>
+<div class="space-y-6 w-full">
+  <!-- ── 1. Top Navigation Bar ── -->
+  <div class="flex items-center justify-between gap-4">
+    <button
+      (click)="goBack()"
+      class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 hover:bg-slate-50 dark:hover:bg-slate-700 shadow-2xs transition-colors cursor-pointer"
+    >
+      <i class="fas fa-arrow-left text-xs"></i>
+      <span>Back to Classes</span>
+    </button>
 
-  <div *ngIf="loading" class="flex items-center justify-center py-20">
-    <i class="fas fa-spinner fa-spin text-2xl text-gray-400"></i>
-  </div>
-
-  <div *ngIf="!loading && schoolClass">
-    <div class="flex items-center justify-between mb-6">
-      <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">
-        {{ schoolClass.name }}
-      </h1>
-      <button (click)="editClass()" class="btn-primary flex items-center gap-2">
-        <i class="fas fa-edit"></i> Edit
+    <div *ngIf="schoolClass && !loading" class="flex items-center gap-2">
+      <button
+        (click)="editClass()"
+        class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-white shadow-sm hover:shadow-md transition-all duration-200 transform hover:-translate-y-0.5 cursor-pointer"
+        [style.background-color]="themeService.accent"
+      >
+        <i class="fas fa-edit text-xs"></i>
+        <span>Edit Class</span>
       </button>
     </div>
+  </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <!-- Class Info -->
-      <div
-        class="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-6"
-      >
-        <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">
-          Class Information
-        </h2>
-        <div class="space-y-3">
-          <div class="flex justify-between text-sm">
-            <span class="text-gray-500 dark:text-gray-400">Level</span>
-            <span class="text-gray-800 dark:text-gray-100">{{
-              schoolClass.level
-            }}</span>
+  <!-- Loading State -->
+  <div *ngIf="loading" class="rounded-3xl bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 p-8 space-y-6 animate-pulse">
+    <div class="h-10 bg-slate-200 dark:bg-slate-700 rounded-xl w-1/3"></div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="h-48 bg-slate-200 dark:bg-slate-700 rounded-2xl"></div>
+      <div class="h-48 bg-slate-200 dark:bg-slate-700 rounded-2xl"></div>
+    </div>
+  </div>
+
+  <!-- Main Content When Loaded -->
+  <div *ngIf="!loading && schoolClass" class="space-y-6">
+    <!-- ── Profile Hero Header Card ── -->
+    <div class="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 p-5 sm:p-7 shadow-xs">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-5">
+        <div class="flex items-center gap-4">
+          <div
+            class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl sm:rounded-3xl flex items-center justify-center font-black text-2xl text-white shadow-md shrink-0"
+            [style.background-color]="themeService.accent"
+          >
+            <i class="fas fa-chalkboard"></i>
           </div>
-          <div class="flex justify-between text-sm">
-            <span class="text-gray-500 dark:text-gray-400">Class Teacher</span>
-            <span class="text-gray-800 dark:text-gray-100">
-              {{ teacherName(schoolClass.classTeacherId) }}
-            </span>
+          <div>
+            <div class="flex items-center gap-2.5 flex-wrap">
+              <h1 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+                {{ schoolClass.name }}
+              </h1>
+              <span
+                class="px-2.5 py-0.5 rounded-full text-xs font-bold"
+                [ngClass]="{
+                  'bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300': schoolClass.level === 'PRIMARY',
+                  'bg-purple-100 dark:bg-purple-900/40 text-purple-800 dark:text-purple-300': schoolClass.level === 'JSS',
+                  'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-300': schoolClass.level === 'PRE_PRIMARY',
+                  'bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300': schoolClass.level === 'SENIOR'
+                }"
+              >
+                {{ schoolClass.level }}
+              </span>
+              <span *ngIf="schoolClass.isExamCenter" class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300">
+                KNEC Center
+              </span>
+            </div>
+            <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-3 flex-wrap">
+              <span><i class="fas fa-graduation-cap text-xs mr-1 text-slate-400"></i>Grade {{ schoolClass.grade }}</span>
+              <span><i class="fas fa-door-open text-xs mr-1 text-slate-400"></i>Room: {{ schoolClass.room || 'TBD' }}</span>
+              <span><i class="fas fa-user-friends text-xs mr-1 text-slate-400"></i>Capacity: {{ schoolClass.capacity }} Desks</span>
+            </p>
+          </div>
+        </div>
+
+        <!-- Quick Stats Badge -->
+        <div class="flex items-center gap-3 self-start sm:self-auto">
+          <div class="text-center px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-900/40 border border-slate-100 dark:border-slate-700/60">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Streams</span>
+            <span class="text-lg font-black text-slate-900 dark:text-white">{{ streams.length }}</span>
+          </div>
+          <div class="text-center px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-900/40 border border-slate-100 dark:border-slate-700/60">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Capacity</span>
+            <span class="text-lg font-black text-slate-900 dark:text-white">{{ schoolClass.capacity }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 2 Columns: Class Details & Stream Manager ── -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- Class Information Card -->
+      <div class="rounded-2xl sm:rounded-3xl bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 p-5 sm:p-6 shadow-xs space-y-4">
+        <div class="flex items-center gap-3 pb-3 border-b border-slate-100 dark:border-slate-700/80">
+          <div class="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300 flex items-center justify-center text-sm">
+            <i class="fas fa-info-circle"></i>
+          </div>
+          <div>
+            <h2 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white">Class Logistics & Leadership</h2>
+            <p class="text-[11px] text-slate-400 dark:text-slate-500">Educator assignments and physical room placements</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs sm:text-sm">
+          <div class="p-3.5 rounded-xl bg-slate-50/70 dark:bg-slate-900/40 border border-slate-100 dark:border-slate-700/60">
+            <span class="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">Class Teacher</span>
+            <div class="flex items-center gap-2">
+              <i class="fas fa-user-tie text-slate-400 text-xs"></i>
+              <span class="font-semibold text-slate-800 dark:text-slate-200">{{ teacherName(schoolClass.classTeacherId) }}</span>
+            </div>
+          </div>
+
+          <div class="p-3.5 rounded-xl bg-slate-50/70 dark:bg-slate-900/40 border border-slate-100 dark:border-slate-700/60">
+            <span class="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">Education Level</span>
+            <span class="font-medium text-slate-800 dark:text-slate-200">{{ schoolClass.level }}</span>
+          </div>
+
+          <div class="p-3.5 rounded-xl bg-slate-50/70 dark:bg-slate-900/40 border border-slate-100 dark:border-slate-700/60">
+            <span class="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">Assigned Room</span>
+            <span class="text-slate-800 dark:text-slate-200">{{ schoolClass.room || 'No specific room' }}</span>
+          </div>
+
+          <div class="p-3.5 rounded-xl bg-slate-50/70 dark:bg-slate-900/40 border border-slate-100 dark:border-slate-700/60">
+            <span class="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">Building Block</span>
+            <span class="text-slate-800 dark:text-slate-200">{{ schoolClass.block || 'Main Campus' }}</span>
+          </div>
+
+          <div class="p-3.5 rounded-xl bg-slate-50/70 dark:bg-slate-900/40 border border-slate-100 dark:border-slate-700/60">
+            <span class="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">Academic Year</span>
+            <span class="font-mono text-slate-800 dark:text-slate-200">{{ schoolClass.academicYear }}</span>
+          </div>
+
+          <div class="p-3.5 rounded-xl bg-slate-50/70 dark:bg-slate-900/40 border border-slate-100 dark:border-slate-700/60">
+            <span class="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">Enrolment Status</span>
+            <span class="font-semibold text-emerald-600 dark:text-emerald-400">Active</span>
           </div>
         </div>
       </div>
 
-      <!-- Streams -->
-      <div
-        class="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-6"
-      >
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100">
-            Streams ({{ streams.length }})
-          </h2>
+      <!-- Streams Management Card -->
+      <div class="rounded-2xl sm:rounded-3xl bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 p-5 sm:p-6 shadow-xs space-y-4">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-700/80">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-purple-50 dark:bg-purple-900/40 text-purple-600 dark:text-purple-300 flex items-center justify-center text-sm">
+              <i class="fas fa-layer-group"></i>
+            </div>
+            <div>
+              <h2 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white">Streams Allocation</h2>
+              <p class="text-[11px] text-slate-400 dark:text-slate-500">Manage stream divisions, student rosters, and capacities</p>
+            </div>
+          </div>
+
           <button
             (click)="toggleAddStream()"
-            class="btn-primary text-sm flex items-center gap-1"
+            class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 transition flex items-center gap-1.5 cursor-pointer"
           >
-            <i
-              class="fas"
-              [ngClass]="showAddStream ? 'fa-times' : 'fa-plus'"
-            ></i>
-            {{ showAddStream ? "Cancel" : "Add Stream" }}
+            <i class="fas" [ngClass]="showAddStream ? 'fa-times' : 'fa-plus'"></i>
+            <span>{{ showAddStream ? 'Cancel' : 'Add Stream' }}</span>
           </button>
         </div>
 
-        <!-- Add Stream Form -->
+        <!-- Add Stream Inline Box -->
         <div
           *ngIf="showAddStream"
-          class="mb-4 p-4 rounded-lg bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600"
+          class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 space-y-3"
         >
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+          <div class="text-xs font-bold text-slate-800 dark:text-slate-200">New Stream Configuration</div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label
-                class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1"
-                >Stream Name <span class="text-red-500">*</span></label
-              >
+              <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">
+                Stream Name <span class="text-rose-500">*</span>
+              </label>
               <input
                 [(ngModel)]="newStreamName"
                 type="text"
-                placeholder="e.g. Stream A, North"
-                class="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-slate-500 bg-white dark:bg-slate-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                placeholder="e.g. North, Blue, Stream A"
+                class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none"
               />
             </div>
             <div>
-              <label
-                class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1"
-                >Capacity</label
-              >
+              <label class="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">
+                Desk Capacity
+              </label>
               <input
                 [(ngModel)]="newStreamCapacity"
                 type="number"
-                placeholder="45"
+                placeholder="e.g. 40"
                 min="1"
-                class="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-slate-500 bg-white dark:bg-slate-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                class="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none font-mono"
               />
             </div>
           </div>
-          <p *ngIf="streamError" class="text-xs text-red-500 mb-2">
-            {{ streamError }}
+          <p *ngIf="streamError" class="text-xs text-rose-500 flex items-center gap-1">
+            <i class="fas fa-circle-exclamation text-[10px]"></i> {{ streamError }}
           </p>
-          <button
-            (click)="saveStream()"
-            [disabled]="savingStream"
-            class="btn-primary text-sm flex items-center gap-2"
-          >
-            <i *ngIf="savingStream" class="fas fa-spinner fa-spin"></i>
-            {{ savingStream ? "Saving..." : "Save Stream" }}
-          </button>
+          <div class="flex justify-end pt-1">
+            <button
+              (click)="saveStream()"
+              [disabled]="savingStream"
+              class="px-4 py-2 rounded-xl text-xs font-semibold text-white shadow-sm flex items-center gap-1.5 transition cursor-pointer"
+              [style.backgroundColor]="themeService.accent"
+            >
+              <span *ngIf="savingStream" class="animate-spin rounded-full h-3 w-3 border-2 border-white/30 border-t-white"></span>
+              <span>{{ savingStream ? 'Saving...' : 'Add to Class' }}</span>
+            </button>
+          </div>
         </div>
 
         <!-- Stream List -->
-        <div *ngIf="loadingStreams" class="flex justify-center py-4">
-          <i class="fas fa-spinner fa-spin text-gray-400"></i>
+        <div *ngIf="loadingStreams" class="p-6 text-center text-slate-400">
+          <i class="fas fa-spinner fa-spin text-lg"></i>
         </div>
 
-        <div *ngIf="!loadingStreams">
-          <div *ngIf="streams.length; else noStreams" class="space-y-2">
-            <div
-              *ngFor="let stream of streams"
-              class="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-50 dark:bg-slate-700"
-            >
-              <div>
-                <span
-                  class="text-sm font-medium text-gray-800 dark:text-gray-100"
-                  >{{ stream.name }}</span
-                >
-                <span class="ml-2 text-xs text-gray-500 dark:text-gray-400"
-                  >Capacity: {{ stream.capacity }}</span
-                >
+        <div *ngIf="!loadingStreams" class="space-y-2.5">
+          <div
+            *ngFor="let stream of streams"
+            class="flex items-center justify-between p-3.5 rounded-xl bg-slate-50/70 dark:bg-slate-900/40 border border-slate-100 dark:border-slate-700/60 hover:bg-slate-100/70 dark:hover:bg-slate-700/40 transition"
+          >
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-300 flex items-center justify-center text-xs font-bold">
+                <i class="fas fa-door-closed"></i>
               </div>
-              <button
-                (click)="deleteStream(stream._id)"
-                class="text-red-400 hover:text-red-600 dark:hover:text-red-300 text-xs p-1"
-                title="Remove stream"
-              >
-                <i class="fas fa-trash"></i>
-              </button>
+              <div>
+                <span class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">{{ stream.name }}</span>
+                <span class="text-[11px] text-slate-400 dark:text-slate-500 ml-2">
+                  Capacity: {{ stream.capacity }} learners
+                </span>
+              </div>
             </div>
+
+            <button
+              (click)="deleteStream(stream._id)"
+              class="w-7 h-7 rounded-lg text-rose-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition flex items-center justify-center cursor-pointer"
+              title="Delete stream"
+            >
+              <i class="fas fa-trash text-xs"></i>
+            </button>
           </div>
-          <ng-template #noStreams>
-            <p class="text-sm text-gray-500 dark:text-gray-400">
-              No streams configured yet.
-            </p>
-          </ng-template>
+
+          <div *ngIf="!streams.length" class="text-center py-10">
+            <div class="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center mx-auto mb-2">
+              <i class="fas fa-layer-group text-xl opacity-40"></i>
+            </div>
+            <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">No streams registered under this class.</p>
+          </div>
         </div>
       </div>
     </div>

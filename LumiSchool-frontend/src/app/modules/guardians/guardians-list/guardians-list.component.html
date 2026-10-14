@@ -1,74 +1,243 @@
-<div class="p-6">
-  <div
-    class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4"
-  >
+<div class="space-y-6 w-full">
+  <!-- ── 1. Page Header ── -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
     <div>
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
-        Guardians
-      </h1>
-      <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-        Parents and guardians directory
+      <div class="flex items-center gap-2.5">
+        <h1 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+          Parents & Guardians
+        </h1>
+        <span
+          class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold"
+          [style.background-color]="themeService.accent + '20'"
+          [style.color]="themeService.accent"
+        >
+          {{ totalGuardians }} Registered
+        </span>
+      </div>
+      <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+        Family contacts, emergency emergency responders, and student linkages
       </p>
     </div>
-    <button (click)="addGuardian()" class="btn-primary flex items-center gap-2">
-      <i class="fas fa-plus"></i> Add Guardian
+
+    <!-- Action Button -->
+    <button
+      (click)="addGuardian()"
+      class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-white shadow-sm hover:shadow-md transition-all duration-200 transform hover:-translate-y-0.5 cursor-pointer"
+      [style.background-color]="themeService.accent"
+    >
+      <i class="fas fa-plus text-xs"></i>
+      <span>Add Guardian</span>
     </button>
   </div>
 
-  <div class="card mb-6">
-    <input
-      type="text"
-      [(ngModel)]="search"
-      (keyup.enter)="load()"
-      placeholder="Search by name, phone..."
-      class="form-input"
-    />
+  <!-- ── 2. Top Summary KPI Cards ── -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4">
+    <!-- Total Guardians -->
+    <div class="rounded-2xl bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 p-4 sm:p-5 shadow-xs">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase">Total Directory</span>
+        <div class="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center text-sm">
+          <i class="fas fa-users"></i>
+        </div>
+      </div>
+      <div class="mt-2 text-2xl font-black text-slate-900 dark:text-white">{{ totalGuardians }}</div>
+      <span class="text-[11px] text-slate-400 dark:text-slate-500">Registered family contacts</span>
+    </div>
+
+    <!-- Primary Guardians -->
+    <div class="rounded-2xl bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 p-4 sm:p-5 shadow-xs">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase">Primary Responders</span>
+        <div class="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-sm">
+          <i class="fas fa-user-shield"></i>
+        </div>
+      </div>
+      <div class="mt-2 text-2xl font-black text-slate-900 dark:text-white">{{ primaryCount }}</div>
+      <span class="text-[11px] text-slate-400 dark:text-slate-500">First-call emergency points</span>
+    </div>
+
+    <!-- Linked Learners -->
+    <div class="rounded-2xl bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 p-4 sm:p-5 shadow-xs">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase">Linked Learners</span>
+        <div class="w-9 h-9 rounded-xl bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 flex items-center justify-center text-sm">
+          <i class="fas fa-user-graduate"></i>
+        </div>
+      </div>
+      <div class="mt-2 text-2xl font-black text-slate-900 dark:text-white">{{ totalLinkedStudents }}</div>
+      <span class="text-[11px] text-slate-400 dark:text-slate-500">Enrolled student affiliations</span>
+    </div>
+
+    <!-- SMS Alert Ready -->
+    <div class="rounded-2xl bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 p-4 sm:p-5 shadow-xs">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase">Comms Ready</span>
+        <div class="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 flex items-center justify-center text-sm">
+          <i class="fas fa-phone-alt"></i>
+        </div>
+      </div>
+      <div class="mt-2 text-2xl font-black text-slate-900 dark:text-white">{{ totalGuardians }}</div>
+      <span class="text-[11px] text-slate-400 dark:text-slate-500">SMS / Voice notification contacts</span>
+    </div>
   </div>
 
-  <div *ngIf="loading" class="flex justify-center py-12">
-    <div
-      class="animate-spin rounded-full h-8 w-8 border-b-2"
-      style="border-color: var(--accent-600)"
-    ></div>
+  <!-- ── 3. Filters & Search Bar ── -->
+  <div class="bg-white dark:bg-slate-800/90 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 p-3 sm:p-4 shadow-xs flex flex-col md:flex-row gap-3">
+    <!-- Search Field -->
+    <div class="relative flex-1">
+      <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-xs text-slate-400"></i>
+      <input
+        type="text"
+        [(ngModel)]="search"
+        (keyup.enter)="load()"
+        placeholder="Search guardians by name, mobile number, or email..."
+        class="w-full pl-9 pr-4 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-accent-500/20 focus:border-accent-500 transition-all"
+      />
+    </div>
+
+    <!-- Relationship Filter -->
+    <select
+      [(ngModel)]="selectedRelationship"
+      class="px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 text-slate-800 dark:text-slate-100 focus:outline-none cursor-pointer"
+    >
+      <option value="">All Relationships</option>
+      <option value="FATHER">Father</option>
+      <option value="MOTHER">Mother</option>
+      <option value="GUARDIAN">Guardian</option>
+      <option value="SPONSOR">Sponsor</option>
+      <option value="GRANDFATHER">Grandfather</option>
+      <option value="GRANDMOTHER">Grandmother</option>
+      <option value="UNCLE">Uncle</option>
+      <option value="AUNT">Aunt</option>
+      <option value="OTHER">Other</option>
+    </select>
+
+    <button
+      (click)="load()"
+      class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-slate-100 dark:bg-slate-700/80 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition cursor-pointer flex items-center justify-center gap-2"
+    >
+      <i class="fas fa-filter text-xs text-slate-400"></i>
+      <span>Search</span>
+    </button>
   </div>
 
-  <div *ngIf="!loading" class="card overflow-hidden p-0">
-    <div class="table-container">
-      <table>
+  <!-- ── 4. Guardians Table Card ── -->
+  <div class="rounded-2xl sm:rounded-3xl bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 shadow-xs overflow-hidden">
+    <!-- Loading Shimmer -->
+    <div *ngIf="loading" class="p-8 space-y-4 animate-pulse">
+      <div class="h-10 bg-slate-100 dark:bg-slate-700/60 rounded-xl"></div>
+      <div class="h-12 bg-slate-100 dark:bg-slate-700/60 rounded-xl"></div>
+      <div class="h-12 bg-slate-100 dark:bg-slate-700/60 rounded-xl"></div>
+      <div class="h-12 bg-slate-100 dark:bg-slate-700/60 rounded-xl"></div>
+    </div>
+
+    <!-- Table -->
+    <div *ngIf="!loading" class="overflow-x-auto">
+      <table class="w-full text-left border-collapse">
         <thead>
-          <tr>
-            <th>Name</th>
-            <th>Phone</th>
-            <th>Email</th>
-            <th>Relationship</th>
-            <th>Students</th>
-            <th></th>
+          <tr class="border-b border-slate-100 dark:border-slate-700/80 bg-slate-50/60 dark:bg-slate-900/30 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400">
+            <th class="py-3.5 px-4 sm:px-6">Guardian Profile</th>
+            <th class="py-3.5 px-4">Contact Channels</th>
+            <th class="py-3.5 px-4">Relationship</th>
+            <th class="py-3.5 px-4">Occupation</th>
+            <th class="py-3.5 px-4 text-center">Linked Students</th>
+            <th class="py-3.5 px-4 sm:px-6 text-right">Actions</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody class="divide-y divide-slate-100 dark:divide-slate-700/60 text-xs sm:text-sm">
           <tr
-            *ngFor="let g of guardians"
-            class="cursor-pointer"
+            *ngFor="let g of filteredGuardians"
             (click)="view(g._id)"
+            class="hover:bg-slate-50/70 dark:hover:bg-slate-700/40 transition-colors cursor-pointer group"
           >
-            <td class="font-medium">{{ getFullName(g) }}</td>
-            <td>{{ g.phone }}</td>
-            <td>{{ g.email || "-" }}</td>
-            <td>{{ g.relationship }}</td>
-            <td>{{ g.studentIds.length || 0 }}</td>
-            <td class="text-right">
-              <i class="fas fa-chevron-right text-gray-400"></i>
+            <!-- Name & Avatar -->
+            <td class="py-3.5 px-4 sm:px-6">
+              <div class="flex items-center gap-3">
+                <div
+                  class="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs text-white"
+                  [style.background-color]="themeService.accent"
+                >
+                  {{ getInitials(g) }}
+                </div>
+                <div>
+                  <div class="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                    <span>{{ getFullName(g) }}</span>
+                    <span
+                      *ngIf="g.isPrimaryGuardian"
+                      class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-300"
+                    >
+                      Primary
+                    </span>
+                  </div>
+                  <span class="text-[11px] text-slate-400 dark:text-slate-500">
+                    ID: {{ g.idNumber || 'No national ID' }}
+                  </span>
+                </div>
+              </div>
+            </td>
+
+            <!-- Phone & Email -->
+            <td class="py-3.5 px-4">
+              <div class="space-y-0.5">
+                <div class="flex items-center gap-1.5 font-mono text-slate-800 dark:text-slate-200 font-medium">
+                  <i class="fas fa-phone text-[10px] text-slate-400"></i>
+                  <span>{{ g.phone }}</span>
+                </div>
+                <div *ngIf="g.email" class="text-[11px] text-slate-400 dark:text-slate-500 truncate max-w-[180px]">
+                  <i class="fas fa-envelope text-[10px] mr-1 text-slate-400"></i>
+                  <span>{{ g.email }}</span>
+                </div>
+              </div>
+            </td>
+
+            <!-- Relationship Badge -->
+            <td class="py-3.5 px-4">
+              <span class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-700/80 text-slate-700 dark:text-slate-300 capitalize">
+                {{ g.relationship ? (g.relationship | titlecase) : 'Guardian' }}
+              </span>
+            </td>
+
+            <!-- Occupation / Address -->
+            <td class="py-3.5 px-4">
+              <div class="text-slate-700 dark:text-slate-300 text-xs">
+                {{ g.occupation || '-' }}
+              </div>
+              <div *ngIf="g.county" class="text-[11px] text-slate-400 dark:text-slate-500">
+                {{ g.county }}
+              </div>
+            </td>
+
+            <!-- Linked Students Count -->
+            <td class="py-3.5 px-4 text-center">
+              <span class="inline-flex items-center justify-center w-7 h-7 rounded-xl font-bold text-xs bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-300">
+                {{ g.studentIds.length || 0 }}
+              </span>
+            </td>
+
+            <!-- Action -->
+            <td class="py-3.5 px-4 sm:px-6 text-right">
+              <button
+                (click)="view(g._id); $event.stopPropagation()"
+                class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-500 hover:text-slate-900 dark:hover:text-white transition inline-flex items-center justify-center cursor-pointer"
+                title="View dossier"
+              >
+                <i class="fas fa-chevron-right text-xs"></i>
+              </button>
             </td>
           </tr>
         </tbody>
       </table>
-    </div>
-    <div
-      *ngIf="guardians.length === 0"
-      class="text-center py-12 text-gray-500 dark:text-gray-400"
-    >
-      <i class="fas fa-users text-4xl mb-3 opacity-30"></i>
-      <p>No guardians found</p>
+
+      <!-- Empty State -->
+      <div *ngIf="filteredGuardians.length === 0" class="text-center py-16 px-4">
+        <div class="w-16 h-16 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center mx-auto mb-3 shadow-2xs">
+          <i class="fas fa-users text-2xl opacity-40"></i>
+        </div>
+        <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200">No guardians found</h3>
+        <p class="text-xs text-slate-400 dark:text-slate-500 mt-1 max-w-sm mx-auto">
+          No records match your criteria. Add new guardian entries or reset search filters.
+        </p>
+      </div>
     </div>
   </div>
 </div>

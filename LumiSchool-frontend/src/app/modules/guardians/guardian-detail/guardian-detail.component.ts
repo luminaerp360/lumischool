@@ -2,6 +2,7 @@ import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { GuardiansService } from "../../../shared/services/guardians/guardians.service";
 import { Guardian, PopulatedStudent } from "../../../shared/interfaces/models";
+import { ThemeService } from "../../../shared/services/theme/theme.service";
 
 @Component({
   selector: "app-guardian-detail",
@@ -16,7 +17,14 @@ export class GuardianDetailComponent implements OnInit {
     private guardiansService: GuardiansService,
     private route: ActivatedRoute,
     private router: Router,
+    public themeService: ThemeService,
   ) {}
+
+  getInitials(g: Guardian): string {
+    const f = g.firstName ? g.firstName[0] : "";
+    const l = g.lastName ? g.lastName[0] : "";
+    return (f + l).toUpperCase() || "GD";
+  }
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get("id");

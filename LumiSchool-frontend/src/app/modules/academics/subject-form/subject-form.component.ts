@@ -77,6 +77,8 @@ export const CBC_SUBJECTS: Record<SchoolLevel, string[]> = {
   ],
 };
 
+import { ThemeService } from "../../../shared/services/theme/theme.service";
+
 @Component({
   selector: "app-subject-form",
   templateUrl: "./subject-form.component.html",
@@ -107,6 +109,7 @@ export class SubjectFormComponent implements OnInit {
     private academicsService: AcademicsService,
     private route: ActivatedRoute,
     private router: Router,
+    public themeService: ThemeService,
   ) {}
 
   ngOnInit(): void {
@@ -148,6 +151,10 @@ export class SubjectFormComponent implements OnInit {
 
   isLevelChecked(level: SchoolLevel): boolean {
     return (this.form.value.applicableLevels as SchoolLevel[]).includes(level);
+  }
+
+  isLevelSelected(level: SchoolLevel): boolean {
+    return this.isLevelChecked(level);
   }
 
   toggleLevel(level: SchoolLevel): void {

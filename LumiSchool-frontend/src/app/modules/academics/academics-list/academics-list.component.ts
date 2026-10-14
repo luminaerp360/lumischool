@@ -14,6 +14,8 @@ import {
   LumiSchoolUser,
 } from "../../../shared/interfaces/models";
 
+import { ThemeService } from "../../../shared/services/theme/theme.service";
+
 @Component({
   selector: "app-academics-list",
   templateUrl: "./academics-list.component.html",
@@ -73,6 +75,7 @@ export class AcademicsListComponent implements OnInit {
     private usersService: UsersService,
     private router: Router,
     private fb: FormBuilder,
+    public themeService: ThemeService,
   ) {}
 
   ngOnInit(): void {

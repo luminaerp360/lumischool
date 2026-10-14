@@ -3,6 +3,7 @@ import { Router } from "@angular/router";
 import { UsersService } from "../../../shared/services/users/users.service";
 import { StaffUser, Role } from "../../../shared/interfaces/models";
 import { STAFF_ROLE_META } from "../teacher-form/teacher-form.component";
+import { ThemeService } from "../../../shared/services/theme/theme.service";
 
 interface RoleTab {
   value: string;
@@ -33,7 +34,16 @@ export class TeachersListComponent implements OnInit {
   constructor(
     private usersService: UsersService,
     private router: Router,
+    public themeService: ThemeService,
   ) {}
+
+  get activeStaffCount(): number {
+    return this.staff.filter((s) => s.isActive).length;
+  }
+
+  get tscCount(): number {
+    return this.staff.filter((s) => s.tscNumber).length;
+  }
 
   ngOnInit(): void {
     this.load();

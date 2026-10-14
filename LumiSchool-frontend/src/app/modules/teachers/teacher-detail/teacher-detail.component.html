@@ -1,298 +1,283 @@
-<div>
-  <button
-    (click)="goBack()"
-    class="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 mb-4 inline-flex items-center gap-1"
-  >
-    <i class="fas fa-arrow-left"></i> Back to Staff
-  </button>
+<div class="w-full space-y-6">
+  <!-- Top Navigation & Actions -->
+  <div class="flex items-center justify-between gap-4">
+    <button
+      (click)="goBack()"
+      class="inline-flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+    >
+      <i class="fas fa-arrow-left"></i>
+      <span>Back to Faculty & Staff</span>
+    </button>
 
-  <div *ngIf="loading" class="flex justify-center py-20">
-    <i class="fas fa-spinner fa-spin text-2xl text-gray-400"></i>
-  </div>
-
-  <div *ngIf="!loading && staff">
-    <!-- Header -->
-    <div class="flex items-start justify-between mb-6 gap-4 flex-wrap">
-      <div class="flex items-center gap-4">
-        <div
-          class="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-bold text-white flex-shrink-0"
-          style="
-            background: linear-gradient(
-              135deg,
-              var(--accent-600),
-              var(--accent-400, #818cf8)
-            );
-          "
-        >
-          {{ initials }}
-        </div>
-        <div>
-          <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">
-            {{ fullName }}
-          </h1>
-          <div class="flex items-center gap-2 mt-1 flex-wrap">
-            <span
-              *ngIf="currentRoleMeta"
-              class="badge text-xs"
-              [ngClass]="currentRoleMeta.color"
-            >
-              <i [class]="'fas ' + currentRoleMeta.icon + ' mr-1'"></i>
-              {{ currentRoleMeta.label }}
-            </span>
-            <span
-              class="badge text-xs"
-              [ngClass]="staff.isActive ? 'badge-active' : 'badge-draft'"
-            >
-              {{ staff.isActive ? "Active" : "Inactive" }}
-            </span>
-          </div>
-          <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            {{ staff.email }}
-          </p>
-        </div>
-      </div>
+    <div *ngIf="staff" class="flex items-center gap-2">
       <button
         (click)="editStaff()"
-        class="btn-secondary flex items-center gap-2"
+        class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/60 text-slate-700 dark:text-slate-200 shadow-sm transition"
       >
-        <i class="fas fa-edit"></i> Edit
+        <i class="fas fa-edit text-xs"></i>
+        <span>Edit Member</span>
       </button>
     </div>
+  </div>
 
+  <div *ngIf="loading" class="flex flex-col items-center justify-center py-24">
+    <div class="w-10 h-10 border-3 border-slate-200 dark:border-slate-700 border-t-accent-600 rounded-full animate-spin"></div>
+    <span class="text-xs font-medium text-slate-400 mt-3">Loading faculty dossier...</span>
+  </div>
+
+  <div *ngIf="!loading && staff" class="space-y-6">
+    <!-- Hero Profile Card -->
+    <div class="bg-white dark:bg-slate-800/90 rounded-2xl border border-slate-200 dark:border-slate-700/80 p-6 sm:p-7 shadow-xs">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+        <div class="flex items-center gap-5">
+          <div
+            class="w-18 h-18 sm:w-20 sm:h-20 rounded-2xl flex items-center justify-center text-2xl sm:text-3xl font-extrabold text-white shadow-md flex-shrink-0"
+            style="background: linear-gradient(135deg, var(--accent-600), var(--accent-500, #6366f1));"
+          >
+            {{ initials }}
+          </div>
+          <div class="space-y-1.5">
+            <div class="flex items-center gap-2.5 flex-wrap">
+              <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
+                {{ fullName }}
+              </h1>
+              <span
+                *ngIf="currentRoleMeta"
+                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold"
+                [ngClass]="currentRoleMeta.color"
+              >
+                <i [class]="'fas ' + currentRoleMeta.icon"></i>
+                {{ currentRoleMeta.label }}
+              </span>
+              <span
+                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold"
+                [ngClass]="staff.isActive ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300' : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400'"
+              >
+                <span class="w-1.5 h-1.5 rounded-full" [ngClass]="staff.isActive ? 'bg-emerald-500' : 'bg-slate-400'"></span>
+                {{ staff.isActive ? "Active Account" : "Inactive" }}
+              </span>
+            </div>
+            <div class="flex items-center gap-4 text-xs font-medium text-slate-500 dark:text-slate-400 flex-wrap">
+              <span class="inline-flex items-center gap-1.5">
+                <i class="fas fa-envelope text-slate-400"></i>
+                {{ staff.email }}
+              </span>
+              <span class="inline-flex items-center gap-1.5" *ngIf="staff.phone">
+                <i class="fas fa-phone text-slate-400"></i>
+                {{ staff.phone }}
+              </span>
+              <span class="inline-flex items-center gap-1.5" *ngIf="staff.lastLoginAt">
+                <i class="fas fa-clock text-slate-400"></i>
+                Last login {{ staff.lastLoginAt | date: 'dd MMM yyyy, HH:mm' }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 w-full sm:w-auto">
+          <a
+            [href]="'mailto:' + staff.email"
+            class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-700/60 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition"
+          >
+            <i class="fas fa-paper-plane text-xs"></i>
+            <span>Email</span>
+          </a>
+          <a
+            *ngIf="staff.phone"
+            [href]="'tel:' + staff.phone"
+            class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold text-white transition shadow-xs"
+            style="background: var(--accent-600);"
+          >
+            <i class="fas fa-phone-alt text-xs"></i>
+            <span>Call</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3 Core Information Cards -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <!-- Profile Card -->
-      <div
-        class="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-6"
-      >
-        <h2
-          class="text-base font-semibold text-gray-800 dark:text-gray-100 mb-4"
-        >
-          Profile
-        </h2>
-        <div class="space-y-3 text-sm">
-          <div class="flex justify-between gap-2">
-            <span class="text-gray-500 dark:text-gray-400">First Name</span>
-            <span class="text-gray-800 dark:text-gray-100 font-medium">{{
-              staff.firstName
-            }}</span>
+      <!-- Profile Metadata Card -->
+      <div class="bg-white dark:bg-slate-800/90 rounded-2xl border border-slate-200 dark:border-slate-700/80 p-6 shadow-xs">
+        <div class="flex items-center gap-2 mb-4 pb-3 border-b border-slate-100 dark:border-slate-700/60">
+          <div class="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+            <i class="fas fa-id-card text-sm"></i>
           </div>
-          <div class="flex justify-between gap-2">
-            <span class="text-gray-500 dark:text-gray-400">Last Name</span>
-            <span class="text-gray-800 dark:text-gray-100 font-medium">{{
-              staff.lastName
-            }}</span>
+          <div>
+            <h2 class="text-sm font-bold text-slate-800 dark:text-slate-100">Profile Details</h2>
+            <p class="text-[11px] text-slate-400">Account and personal data</p>
           </div>
-          <div class="flex justify-between gap-2">
-            <span class="text-gray-500 dark:text-gray-400">Email</span>
-            <span
-              class="text-gray-800 dark:text-gray-100 text-right break-all"
-              >{{ staff.email }}</span
-            >
+        </div>
+
+        <div class="space-y-3.5 text-xs">
+          <div class="flex justify-between items-center py-1 border-b border-slate-50 dark:border-slate-800">
+            <span class="text-slate-500 dark:text-slate-400 font-medium">First Name</span>
+            <span class="text-slate-800 dark:text-slate-100 font-semibold">{{ staff.firstName }}</span>
           </div>
-          <div class="flex justify-between gap-2">
-            <span class="text-gray-500 dark:text-gray-400">Phone</span>
-            <span class="text-gray-800 dark:text-gray-100">{{
-              staff.phone || "—"
-            }}</span>
+          <div class="flex justify-between items-center py-1 border-b border-slate-50 dark:border-slate-800">
+            <span class="text-slate-500 dark:text-slate-400 font-medium">Last Name</span>
+            <span class="text-slate-800 dark:text-slate-100 font-semibold">{{ staff.lastName }}</span>
           </div>
-          <div class="flex justify-between gap-2">
-            <span class="text-gray-500 dark:text-gray-400">Role</span>
-            <span
-              *ngIf="currentRoleMeta"
-              class="badge text-xs"
-              [ngClass]="currentRoleMeta.color"
-              >{{ currentRoleMeta.label }}</span
-            >
+          <div class="flex justify-between items-center py-1 border-b border-slate-50 dark:border-slate-800">
+            <span class="text-slate-500 dark:text-slate-400 font-medium">Email</span>
+            <span class="text-slate-800 dark:text-slate-100 font-semibold truncate max-w-[200px]">{{ staff.email }}</span>
           </div>
-          <div class="flex justify-between gap-2">
-            <span class="text-gray-500 dark:text-gray-400">Status</span>
-            <span
-              class="badge text-xs"
-              [ngClass]="staff.isActive ? 'badge-active' : 'badge-draft'"
-              >{{ staff.isActive ? "Active" : "Inactive" }}</span
-            >
+          <div class="flex justify-between items-center py-1 border-b border-slate-50 dark:border-slate-800">
+            <span class="text-slate-500 dark:text-slate-400 font-medium">Phone Number</span>
+            <span class="text-slate-800 dark:text-slate-100 font-semibold">{{ staff.phone || "—" }}</span>
           </div>
-          <div *ngIf="staff.lastLoginAt" class="flex justify-between gap-2">
-            <span class="text-gray-500 dark:text-gray-400">Last Login</span>
-            <span class="text-gray-800 dark:text-gray-100">{{
-              staff.lastLoginAt | date: "dd MMM yyyy"
-            }}</span>
+          <div class="flex justify-between items-center py-1 border-b border-slate-50 dark:border-slate-800">
+            <span class="text-slate-500 dark:text-slate-400 font-medium">System Role</span>
+            <span *ngIf="currentRoleMeta" class="px-2 py-0.5 rounded text-[11px] font-semibold" [ngClass]="currentRoleMeta.color">
+              {{ currentRoleMeta.label }}
+            </span>
+          </div>
+          <div class="flex justify-between items-center py-1">
+            <span class="text-slate-500 dark:text-slate-400 font-medium">Status</span>
+            <span class="font-semibold" [ngClass]="staff.isActive ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400'">
+              {{ staff.isActive ? "Active Account" : "Inactive" }}
+            </span>
           </div>
         </div>
       </div>
 
-      <!-- Class Teacher Assignment -->
-      <div
-        class="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-6"
-      >
-        <h2
-          class="text-base font-semibold text-gray-800 dark:text-gray-100 mb-1"
-        >
-          Class Teacher Assignment
-        </h2>
-        <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">
-          Classes where this staff member is the designated class teacher
-        </p>
-        <div *ngIf="classesAsTeacher.length; else noClasses" class="space-y-2">
+      <!-- Class Teacher Allocation -->
+      <div class="bg-white dark:bg-slate-800/90 rounded-2xl border border-slate-200 dark:border-slate-700/80 p-6 shadow-xs">
+        <div class="flex items-center gap-2 mb-4 pb-3 border-b border-slate-100 dark:border-slate-700/60">
+          <div class="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+            <i class="fas fa-chalkboard-teacher text-sm"></i>
+          </div>
+          <div>
+            <h2 class="text-sm font-bold text-slate-800 dark:text-slate-100">Class In-Charge</h2>
+            <p class="text-[11px] text-slate-400">Designated Class / Form Teacher</p>
+          </div>
+        </div>
+
+        <div *ngIf="classesAsTeacher.length; else noClasses" class="space-y-2.5">
           <div
             *ngFor="let c of classesAsTeacher"
-            class="flex items-center justify-between px-3 py-2.5 rounded-lg bg-gray-50 dark:bg-slate-700"
+            class="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-700/50 border border-slate-100 dark:border-slate-700/50 hover:border-emerald-300 dark:hover:border-emerald-600/50 transition"
           >
             <div>
-              <p class="text-sm font-semibold text-gray-800 dark:text-gray-100">
+              <p class="text-xs font-bold text-slate-900 dark:text-white">
                 {{ c.name }}
               </p>
-              <p class="text-xs text-gray-500 dark:text-gray-400">
+              <p class="text-[11px] text-slate-500 dark:text-slate-400">
                 {{ c.level }} · Grade {{ c.grade }} · {{ c.academicYear }}
               </p>
             </div>
-            <span class="badge text-xs badge-active">Class Teacher</span>
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300">
+              Assigned
+            </span>
           </div>
         </div>
         <ng-template #noClasses>
-          <div
-            class="flex flex-col items-center py-6 text-center text-gray-400 dark:text-gray-500"
-          >
-            <i class="fas fa-chalkboard text-2xl mb-2"></i>
-            <p class="text-sm">Not a class teacher</p>
-            <p class="text-xs mt-1">
-              Assign via Class → Edit Class → Class Teacher
-            </p>
+          <div class="flex flex-col items-center justify-center py-8 text-center text-slate-400">
+            <div class="w-12 h-12 rounded-xl bg-slate-50 dark:bg-slate-700/40 flex items-center justify-center text-slate-400 mb-2">
+              <i class="fas fa-chalkboard text-lg"></i>
+            </div>
+            <p class="text-xs font-medium text-slate-600 dark:text-slate-300">Not assigned as Class Teacher</p>
+            <p class="text-[11px] text-slate-400 mt-0.5">Assign via Classes & Streams settings</p>
           </div>
         </ng-template>
       </div>
 
-      <!-- Subject Assignments -->
-      <div
-        class="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-6"
-      >
-        <h2
-          class="text-base font-semibold text-gray-800 dark:text-gray-100 mb-1"
-        >
-          Subject Assignments
-          <span
-            *ngIf="assignments.length"
-            class="ml-2 text-xs font-normal text-gray-400"
-            >({{ assignments.length }})</span
-          >
-        </h2>
-        <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">
-          Subjects this staff member teaches per class
-        </p>
-        <div *ngIf="assignments.length; else noAssignments" class="space-y-2">
+      <!-- Subject Allocations -->
+      <div class="bg-white dark:bg-slate-800/90 rounded-2xl border border-slate-200 dark:border-slate-700/80 p-6 shadow-xs">
+        <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-100 dark:border-slate-700/60">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-900/30 flex items-center justify-center text-amber-600 dark:text-amber-400">
+              <i class="fas fa-book-open text-sm"></i>
+            </div>
+            <div>
+              <h2 class="text-sm font-bold text-slate-800 dark:text-slate-100">Subject Teaching</h2>
+              <p class="text-[11px] text-slate-400">Active learning areas</p>
+            </div>
+          </div>
+          <span *ngIf="assignments.length" class="text-xs font-bold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
+            {{ assignments.length }}
+          </span>
+        </div>
+
+        <div *ngIf="assignments.length; else noAssignments" class="space-y-2.5 max-h-72 overflow-y-auto pr-1">
           <div
             *ngFor="let a of assignments"
-            class="flex items-start justify-between px-3 py-2.5 rounded-lg bg-gray-50 dark:bg-slate-700"
+            class="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-700/50 border border-slate-100 dark:border-slate-700/50"
           >
             <div>
-              <p class="text-sm font-semibold text-gray-800 dark:text-gray-100">
+              <p class="text-xs font-bold text-slate-900 dark:text-white">
                 {{ subjectName(a.subjectId) }}
               </p>
-              <p class="text-xs text-gray-500 dark:text-gray-400">
+              <p class="text-[11px] text-slate-500 dark:text-slate-400">
                 {{ className(a.classId) }} · {{ a.academicYear }}
               </p>
             </div>
             <span
-              class="badge text-xs flex-shrink-0"
-              [ngClass]="a.isActive ? 'badge-active' : 'badge-draft'"
+              class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider"
+              [ngClass]="a.isActive ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300' : 'bg-slate-100 text-slate-500 dark:bg-slate-700'"
             >
-              {{ a.isActive ? "Active" : "Inactive" }}
+              {{ a.isActive ? "Active" : "Archived" }}
             </span>
           </div>
         </div>
         <ng-template #noAssignments>
-          <div
-            class="flex flex-col items-center py-6 text-center text-gray-400 dark:text-gray-500"
-          >
-            <i class="fas fa-book text-2xl mb-2"></i>
-            <p class="text-sm">No subject assignments</p>
-            <p class="text-xs mt-1">Assign via Academics → Assignments</p>
+          <div class="flex flex-col items-center justify-center py-8 text-center text-slate-400">
+            <div class="w-12 h-12 rounded-xl bg-slate-50 dark:bg-slate-700/40 flex items-center justify-center text-slate-400 mb-2">
+              <i class="fas fa-book text-lg"></i>
+            </div>
+            <p class="text-xs font-medium text-slate-600 dark:text-slate-300">No subject assignments yet</p>
+            <p class="text-[11px] text-slate-400 mt-0.5">Allocate via Academics → Assignments</p>
           </div>
         </ng-template>
       </div>
     </div>
 
-    <!-- Kenya Context Card -->
+    <!-- Kenya CBC Teacher & Administrative Context -->
     <div
       *ngIf="staff.role === 'TEACHER'"
-      class="mt-6 p-4 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700"
+      class="p-5 rounded-2xl bg-indigo-50/60 dark:bg-indigo-950/20 border border-indigo-100 dark:border-indigo-900/40"
     >
-      <p
-        class="text-xs font-semibold text-blue-700 dark:text-blue-400 mb-2 flex items-center gap-1"
-      >
-        <i class="fas fa-info-circle"></i> Kenya CBC Teacher Roles
-      </p>
-      <div
-        class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-gray-600 dark:text-gray-400"
-      >
-        <div>
-          <p class="font-semibold text-gray-700 dark:text-gray-300 mb-1">
-            Class Teacher
-          </p>
-          <p>
-            Responsible for pastoral care, attendance, and overall welfare of
-            one specific class or stream.
-          </p>
-        </div>
-        <div>
-          <p class="font-semibold text-gray-700 dark:text-gray-300 mb-1">
-            Subject Teacher
-          </p>
-          <p>
-            Teaches one or more subjects across multiple classes. Handles CATs
-            (30%), Mid-Terms, and End-Term (70%) exams.
-          </p>
-        </div>
-        <div>
-          <p class="font-semibold text-gray-700 dark:text-gray-300 mb-1">
-            HOD (Head of Department)
-          </p>
-          <p>
-            Senior teacher overseeing a subject department (e.g. Languages,
-            Sciences, Humanities). Coordinates exams and curriculum.
-          </p>
-        </div>
+      <div class="flex items-center gap-2 mb-3">
+        <i class="fas fa-info-circle text-xs text-indigo-600 dark:text-indigo-400"></i>
+        <h3 class="text-xs font-bold text-indigo-900 dark:text-indigo-300 uppercase tracking-wider">
+          Kenyan CBC Educator Responsibilities & Assessment Roles
+        </h3>
       </div>
-    </div>
-
-    <!-- BOM Context Card -->
-    <div
-      *ngIf="staff.role === 'SCHOOL_ADMIN'"
-      class="mt-6 p-4 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700"
-    >
-      <p
-        class="text-xs font-semibold text-amber-700 dark:text-amber-400 mb-2 flex items-center gap-1"
-      >
-        <i class="fas fa-info-circle"></i> Board of Management (BOM)
-      </p>
-      <div
-        class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-gray-600 dark:text-gray-400"
-      >
-        <div>
-          <p class="font-semibold text-gray-700 dark:text-gray-300 mb-1">
-            BOM Composition
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+        <div class="bg-white/70 dark:bg-slate-800/60 p-3.5 rounded-xl border border-indigo-100/60 dark:border-indigo-900/40">
+          <p class="font-bold text-slate-800 dark:text-slate-200 mb-1 flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-indigo-500"></span> Class Teacher
           </p>
-          <p>
-            Chairperson (community/religious), parent representatives, teachers'
-            rep, non-teaching staff rep, and government/TSC rep.
+          <p class="text-slate-600 dark:text-slate-400 leading-relaxed text-[11px]">
+            Oversees learner pastoral care, daily roll-call attendance, and core behaviour reports for assigned streams.
           </p>
         </div>
-        <div>
-          <p class="font-semibold text-gray-700 dark:text-gray-300 mb-1">
-            BOM Mandate
+        <div class="bg-white/70 dark:bg-slate-800/60 p-3.5 rounded-xl border border-indigo-100/60 dark:border-indigo-900/40">
+          <p class="font-bold text-slate-800 dark:text-slate-200 mb-1 flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-indigo-500"></span> Subject Teacher
           </p>
-          <p>
-            Responsible for school governance, hiring support staff, managing
-            school finances, and infrastructure under Ministry of Education
-            guidelines.
+          <p class="text-slate-600 dark:text-slate-400 leading-relaxed text-[11px]">
+            Conducts formative strand assessments, CATs (30%), Term evaluations (70%), and enters rubric grades.
+          </p>
+        </div>
+        <div class="bg-white/70 dark:bg-slate-800/60 p-3.5 rounded-xl border border-indigo-100/60 dark:border-indigo-900/40">
+          <p class="font-bold text-slate-800 dark:text-slate-200 mb-1 flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-indigo-500"></span> HOD / Senior Staff
+          </p>
+          <p class="text-slate-600 dark:text-slate-400 leading-relaxed text-[11px]">
+            Curriculum planning, standard moderation, and verification of KNEC portal submissions.
           </p>
         </div>
       </div>
     </div>
   </div>
 
-  <div *ngIf="!loading && !staff" class="text-center py-20 text-gray-400">
-    <i class="fas fa-user-slash text-3xl mb-3"></i>
-    <p>Staff member not found.</p>
+  <div *ngIf="!loading && !staff" class="text-center py-24 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700">
+    <div class="w-14 h-14 rounded-2xl bg-slate-100 dark:bg-slate-700/60 flex items-center justify-center text-slate-400 mx-auto mb-3">
+      <i class="fas fa-user-slash text-2xl"></i>
+    </div>
+    <h3 class="text-base font-bold text-slate-800 dark:text-slate-100">Staff Member Not Found</h3>
+    <p class="text-xs text-slate-400 mt-1 mb-4">The requested faculty record may have been relocated or removed.</p>
+    <button (click)="goBack()" class="btn-secondary text-xs">Return to Directory</button>
   </div>
 </div>

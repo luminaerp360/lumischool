@@ -1,7 +1,26 @@
 .form-label {
-  @apply block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1;
+  @apply block text-xs font-semibold tracking-wide uppercase text-slate-600 dark:text-slate-300 mb-1.5;
+}
+
+.form-input,
+.form-select {
+  @apply w-full px-3.5 py-2.5 rounded-xl text-sm bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 border border-slate-200 dark:border-slate-700/80 transition-all duration-150 placeholder-slate-400;
+
+  &:focus {
+    outline: none;
+    border-color: var(--accent-600, #3b82f6);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.18);
+  }
+}
+
+.form-select {
+  @apply cursor-pointer;
 }
 
 .form-error {
-  @apply text-xs text-red-500 mt-1;
+  @apply text-xs text-rose-500 dark:text-rose-400 font-medium mt-1.5 flex items-center gap-1;
+}
+
+.form-card {
+  @apply bg-white dark:bg-slate-800/90 rounded-2xl sm:rounded-3xl border border-slate-200/80 dark:border-slate-700/80 p-5 sm:p-8 shadow-sm;
 }

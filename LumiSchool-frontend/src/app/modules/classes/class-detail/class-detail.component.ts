@@ -6,6 +6,7 @@ import {
   Stream,
   PopulatedUser,
 } from "../../../shared/interfaces/models";
+import { ThemeService } from "../../../shared/services/theme/theme.service";
 
 @Component({
   selector: "app-class-detail",
@@ -28,6 +29,7 @@ export class ClassDetailComponent implements OnInit {
     private classesService: ClassesService,
     private route: ActivatedRoute,
     private router: Router,
+    public themeService: ThemeService,
   ) {}
 
   ngOnInit(): void {

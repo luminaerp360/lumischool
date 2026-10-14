@@ -1,75 +1,230 @@
-<div>
-  <div class="flex items-center justify-between mb-6">
-    <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Classes</h1>
-    <button (click)="addClass()" class="btn-primary flex items-center gap-2">
-      <i class="fas fa-plus"></i> Create Class
+<div class="space-y-6 w-full">
+  <!-- ── 1. Page Header ── -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div>
+      <div class="flex items-center gap-2.5">
+        <h1 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+          Classes & Streams
+        </h1>
+        <span
+          class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold"
+          [style.background-color]="themeService.accent + '20'"
+          [style.color]="themeService.accent"
+        >
+          {{ totalClasses }} Classes
+        </span>
+      </div>
+      <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+        Grade structures, stream partitions, classroom capacity, and teacher allocations
+      </p>
+    </div>
+
+    <!-- Action Button -->
+    <button
+      (click)="addClass()"
+      class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-white shadow-sm hover:shadow-md transition-all duration-200 transform hover:-translate-y-0.5 cursor-pointer"
+      [style.background-color]="themeService.accent"
+    >
+      <i class="fas fa-plus text-xs"></i>
+      <span>Create Class</span>
     </button>
   </div>
 
-  <!-- Search -->
-  <div class="mb-4">
-    <input
-      type="text"
-      [(ngModel)]="search"
-      (ngModelChange)="load()"
-      placeholder="Search classes..."
-      class="form-input max-w-md"
-    />
+  <!-- ── 2. Top Summary KPI Cards ── -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4">
+    <!-- Total Classes -->
+    <div class="rounded-2xl bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 p-4 sm:p-5 shadow-xs">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase">Active Classes</span>
+        <div class="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center text-sm">
+          <i class="fas fa-chalkboard"></i>
+        </div>
+      </div>
+      <div class="mt-2 text-2xl font-black text-slate-900 dark:text-white">{{ totalClasses }}</div>
+      <span class="text-[11px] text-slate-400 dark:text-slate-500">Grade & form levels</span>
+    </div>
+
+    <!-- Total Streams -->
+    <div class="rounded-2xl bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 p-4 sm:p-5 shadow-xs">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase">Stream Units</span>
+        <div class="w-9 h-9 rounded-xl bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 flex items-center justify-center text-sm">
+          <i class="fas fa-layer-group"></i>
+        </div>
+      </div>
+      <div class="mt-2 text-2xl font-black text-slate-900 dark:text-white">{{ totalStreams }}</div>
+      <span class="text-[11px] text-slate-400 dark:text-slate-500">Sub-divided streams</span>
+    </div>
+
+    <!-- Total Learner Capacity -->
+    <div class="rounded-2xl bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 p-4 sm:p-5 shadow-xs">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase">Room Capacity</span>
+        <div class="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-sm">
+          <i class="fas fa-user-friends"></i>
+        </div>
+      </div>
+      <div class="mt-2 text-2xl font-black text-slate-900 dark:text-white">{{ totalCapacity }}</div>
+      <span class="text-[11px] text-slate-400 dark:text-slate-500">Total desk availability</span>
+    </div>
+
+    <!-- Average Stream Size -->
+    <div class="rounded-2xl bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 p-4 sm:p-5 shadow-xs">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase">Avg Stream Cap</span>
+        <div class="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 flex items-center justify-center text-sm">
+          <i class="fas fa-chart-pie"></i>
+        </div>
+      </div>
+      <div class="mt-2 text-2xl font-black text-slate-900 dark:text-white">
+        {{ totalClasses ? (totalCapacity / totalClasses | number: '1.0-0') : 0 }}
+      </div>
+      <span class="text-[11px] text-slate-400 dark:text-slate-500">Learners per class target</span>
+    </div>
   </div>
 
-  <!-- Loading -->
-  <div *ngIf="loading" class="flex items-center justify-center py-20">
-    <i class="fas fa-spinner fa-spin text-2xl text-gray-400"></i>
+  <!-- ── 3. Filters & Search Bar ── -->
+  <div class="bg-white dark:bg-slate-800/90 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 p-3 sm:p-4 shadow-xs flex flex-col md:flex-row gap-3">
+    <!-- Search Input -->
+    <div class="relative flex-1">
+      <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-xs text-slate-400"></i>
+      <input
+        type="text"
+        [(ngModel)]="search"
+        (ngModelChange)="load()"
+        placeholder="Search classes by name, level, or assigned class teacher..."
+        class="w-full pl-9 pr-4 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-accent-500/20 focus:border-accent-500 transition-all"
+      />
+    </div>
+
+    <!-- Education Level Filter -->
+    <select
+      [(ngModel)]="selectedLevel"
+      class="px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 text-slate-800 dark:text-slate-100 focus:outline-none cursor-pointer"
+    >
+      <option value="">All Education Levels</option>
+      <option value="PRE_PRIMARY">Pre-Primary (PP1 - PP2)</option>
+      <option value="PRIMARY">Primary (Grade 1 - 6)</option>
+      <option value="JSS">Junior Secondary (Grade 7 - 9)</option>
+      <option value="SENIOR">Senior Secondary (Grade 10 - 12)</option>
+    </select>
   </div>
 
-  <!-- Table -->
-  <div
-    *ngIf="!loading"
-    class="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 overflow-hidden"
-  >
-    <div class="table-container overflow-x-auto">
-      <table>
+  <!-- ── 4. Classes Table Card ── -->
+  <div class="rounded-2xl sm:rounded-3xl bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 shadow-xs overflow-hidden">
+    <!-- Loading Shimmer -->
+    <div *ngIf="loading" class="p-8 space-y-4 animate-pulse">
+      <div class="h-10 bg-slate-100 dark:bg-slate-700/60 rounded-xl"></div>
+      <div class="h-12 bg-slate-100 dark:bg-slate-700/60 rounded-xl"></div>
+      <div class="h-12 bg-slate-100 dark:bg-slate-700/60 rounded-xl"></div>
+    </div>
+
+    <!-- Table -->
+    <div *ngIf="!loading" class="overflow-x-auto">
+      <table class="w-full text-left border-collapse">
         <thead>
-          <tr>
-            <th>Name</th>
-            <th>Level</th>
-            <th>Streams</th>
-            <th>Class Teacher</th>
-            <th>Actions</th>
+          <tr class="border-b border-slate-100 dark:border-slate-700/80 bg-slate-50/60 dark:bg-slate-900/30 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400">
+            <th class="py-3.5 px-4 sm:px-6">Class Name & Level</th>
+            <th class="py-3.5 px-4">Education Level</th>
+            <th class="py-3.5 px-4 text-center">Streams</th>
+            <th class="py-3.5 px-4">Class Teacher</th>
+            <th class="py-3.5 px-4 text-center">Room Capacity</th>
+            <th class="py-3.5 px-4 sm:px-6 text-right">Actions</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody class="divide-y divide-slate-100 dark:divide-slate-700/60 text-xs sm:text-sm">
           <tr
-            *ngFor="let c of classes"
-            class="cursor-pointer"
+            *ngFor="let c of filteredClasses"
             (click)="view(c._id)"
+            class="hover:bg-slate-50/70 dark:hover:bg-slate-700/40 transition-colors cursor-pointer group"
           >
-            <td class="font-medium text-gray-800 dark:text-gray-100">
-              {{ c.name }}
+            <!-- Class Name -->
+            <td class="py-3.5 px-4 sm:px-6">
+              <div class="flex items-center gap-3">
+                <div
+                  class="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs text-white"
+                  [style.background-color]="themeService.accent"
+                >
+                  <i class="fas fa-chalkboard"></i>
+                </div>
+                <div>
+                  <div class="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                    <span>{{ c.name }}</span>
+                    <span
+                      *ngIf="c.isExamCenter"
+                      class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300"
+                    >
+                      KNEC Center
+                    </span>
+                  </div>
+                  <span class="text-[11px] text-slate-400 dark:text-slate-500">
+                    Grade {{ c.grade }} • Room: {{ c.room || 'TBD' }}
+                  </span>
+                </div>
+              </div>
             </td>
-            <td>{{ c.level }}</td>
-            <td>{{ c.streamIds.length || 0 }}</td>
-            <td>{{ teacherName(c.classTeacherId) }}</td>
-            <td>
+
+            <!-- Level Badge -->
+            <td class="py-3.5 px-4">
+              <span
+                class="px-2.5 py-1 rounded-lg text-xs font-semibold"
+                [ngClass]="{
+                  'bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300': c.level === 'PRIMARY',
+                  'bg-purple-50 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300': c.level === 'JSS',
+                  'bg-emerald-50 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300': c.level === 'PRE_PRIMARY',
+                  'bg-amber-50 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300': c.level === 'SENIOR'
+                }"
+              >
+                {{ c.level }}
+              </span>
+            </td>
+
+            <!-- Streams Count -->
+            <td class="py-3.5 px-4 text-center">
+              <span class="inline-flex items-center justify-center px-2.5 py-1 rounded-xl font-bold text-xs bg-slate-100 dark:bg-slate-700/80 text-slate-700 dark:text-slate-300">
+                {{ c.streamIds.length || 0 }} Stream{{ (c.streamIds.length || 0) === 1 ? '' : 's' }}
+              </span>
+            </td>
+
+            <!-- Class Teacher -->
+            <td class="py-3.5 px-4">
+              <div class="flex items-center gap-2">
+                <i class="fas fa-user-tie text-xs text-slate-400"></i>
+                <span class="font-medium text-slate-800 dark:text-slate-200">
+                  {{ teacherName(c.classTeacherId) }}
+                </span>
+              </div>
+            </td>
+
+            <!-- Capacity -->
+            <td class="py-3.5 px-4 text-center font-mono font-semibold text-slate-700 dark:text-slate-300">
+              {{ c.capacity || '—' }} desks
+            </td>
+
+            <!-- Action -->
+            <td class="py-3.5 px-4 sm:px-6 text-right">
               <button
                 (click)="view(c._id); $event.stopPropagation()"
-                class="text-sm font-medium hover:underline"
-                style="color: var(--accent-600)"
+                class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-500 hover:text-slate-900 dark:hover:text-white transition inline-flex items-center justify-center cursor-pointer"
+                title="View class details & streams"
               >
-                View
+                <i class="fas fa-chevron-right text-xs"></i>
               </button>
-            </td>
-          </tr>
-          <tr *ngIf="!classes.length">
-            <td
-              colspan="5"
-              class="text-center py-8 text-gray-500 dark:text-gray-400"
-            >
-              No classes found
             </td>
           </tr>
         </tbody>
       </table>
+
+      <!-- Empty State -->
+      <div *ngIf="filteredClasses.length === 0" class="text-center py-16 px-4">
+        <div class="w-16 h-16 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center mx-auto mb-3 shadow-2xs">
+          <i class="fas fa-chalkboard text-2xl opacity-40"></i>
+        </div>
+        <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200">No classes found</h3>
+        <p class="text-xs text-slate-400 dark:text-slate-500 mt-1 max-w-sm mx-auto">
+          No records match your criteria. Create a new class or clear the active search filter.
+        </p>
+      </div>
     </div>
   </div>
 </div>

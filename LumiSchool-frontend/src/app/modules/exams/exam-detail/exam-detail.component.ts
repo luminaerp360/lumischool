@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from "@angular/router";
 import { ExamsService } from "../../../shared/services/exams/exams.service";
 import { Exam, ExamType } from "../../../shared/interfaces/models";
 import { EXAM_TYPE_META } from "../exam-form/exam-form.component";
+import { ThemeService } from "../../../shared/services/theme/theme.service";
 
 @Component({
   selector: "app-exam-detail",
@@ -20,6 +21,7 @@ export class ExamDetailComponent implements OnInit {
     private examsService: ExamsService,
     private route: ActivatedRoute,
     private router: Router,
+    public themeService: ThemeService,
   ) {}
 
   ngOnInit(): void {

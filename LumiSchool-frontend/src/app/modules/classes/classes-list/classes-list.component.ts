@@ -2,6 +2,7 @@ import { Component, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
 import { ClassesService } from "../../../shared/services/classes/classes.service";
 import { SchoolClass, PopulatedUser } from "../../../shared/interfaces/models";
+import { ThemeService } from "../../../shared/services/theme/theme.service";
 
 @Component({
   selector: "app-classes-list",
@@ -12,11 +13,37 @@ export class ClassesListComponent implements OnInit {
   classes: SchoolClass[] = [];
   loading = true;
   search = "";
+  selectedLevel = "";
 
   constructor(
     private classesService: ClassesService,
     private router: Router,
+    public themeService: ThemeService,
   ) {}
+
+  get totalClasses(): number {
+    return this.classes.length;
+  }
+
+  get totalStreams(): number {
+    return this.classes.reduce((sum, c) => sum + (c.streamIds?.length || 0), 0);
+  }
+
+  get totalCapacity(): number {
+    return this.classes.reduce((sum, c) => sum + (c.capacity || 0), 0);
+  }
+
+  get filteredClasses(): SchoolClass[] {
+    return this.classes.filter((c) => {
+      const matchLevel = !this.selectedLevel || c.level === this.selectedLevel;
+      const term = this.search.toLowerCase().trim();
+      if (!term) return matchLevel;
+      const name = (c.name || "").toLowerCase();
+      const level = (c.level || "").toLowerCase();
+      const teacher = this.teacherName(c.classTeacherId).toLowerCase();
+      return matchLevel && (name.includes(term) || level.includes(term) || teacher.includes(term));
+    });
+  }
 
   ngOnInit(): void {
     this.load();

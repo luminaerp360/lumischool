@@ -1,69 +1,111 @@
-<div class="p-6 max-w-2xl mx-auto">
-  <!-- Header -->
-  <div class="flex items-center gap-4 mb-6">
-    <button
-      (click)="cancel()"
-      class="p-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
-    >
-      <i class="fas fa-arrow-left"></i>
-    </button>
-    <div>
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
-        {{ isEditMode ? "Edit Guardian" : "Add Guardian" }}
-      </h1>
-      <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-        {{
-          isEditMode
-            ? "Update guardian information"
-            : "Register a new parent or guardian"
-        }}
-      </p>
+<div class="space-y-6 pb-16 w-full">
+  <!-- Top Navigation & Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-slate-800/90 p-5 sm:p-6 rounded-2xl sm:rounded-3xl border border-slate-200/80 dark:border-slate-700/80 shadow-xs">
+    <div class="flex items-center gap-3.5">
+      <button
+        type="button"
+        (click)="cancel()"
+        class="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 flex items-center justify-center transition-all duration-150 cursor-pointer"
+        title="Go back"
+      >
+        <i class="fas fa-arrow-left text-sm"></i>
+      </button>
+      <div>
+        <div class="flex items-center gap-2">
+          <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+            {{ isEditMode ? "Edit Guardian Profile" : "Register Guardian" }}
+          </h1>
+          <span
+            class="px-2.5 py-0.5 rounded-full text-xs font-semibold"
+            [ngClass]="isEditMode ? 'bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300' : 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-300'"
+          >
+            {{ isEditMode ? 'Editing' : 'New Contact' }}
+          </span>
+        </div>
+        <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+          {{ isEditMode ? 'Update family contact details and student relationship roles' : 'Record parent, emergency contact, or sponsor information' }}
+        </p>
+      </div>
+    </div>
+
+    <!-- Top Action Buttons -->
+    <div class="flex items-center gap-2.5 self-end sm:self-auto">
+      <button
+        type="button"
+        (click)="cancel()"
+        class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700/80 hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer"
+      >
+        Cancel
+      </button>
+      <button
+        type="button"
+        (click)="submit()"
+        [disabled]="loading"
+        class="px-4.5 py-2 rounded-xl text-xs sm:text-sm font-semibold text-white shadow-sm flex items-center gap-2 transition cursor-pointer hover:opacity-95 disabled:opacity-50"
+        [style.backgroundColor]="themeService.accent"
+      >
+        <span *ngIf="loading" class="animate-spin rounded-full h-3.5 w-3.5 border-2 border-white/30 border-t-white"></span>
+        <i *ngIf="!loading" class="fas fa-save text-xs"></i>
+        <span>{{ loading ? 'Saving...' : (isEditMode ? 'Save Changes' : 'Save Guardian') }}</span>
+      </button>
     </div>
   </div>
 
-  <!-- Loading skeleton -->
-  <div *ngIf="loadingGuardian" class="card animate-pulse space-y-4">
-    <div class="h-4 bg-gray-200 dark:bg-slate-700 rounded w-1/3"></div>
-    <div class="h-10 bg-gray-200 dark:bg-slate-700 rounded"></div>
-    <div class="h-10 bg-gray-200 dark:bg-slate-700 rounded"></div>
+  <!-- Loading Skeleton -->
+  <div *ngIf="loadingGuardian" class="form-card animate-pulse space-y-4">
+    <div class="h-6 bg-slate-200 dark:bg-slate-700 rounded-lg w-1/4"></div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div class="h-11 bg-slate-200 dark:bg-slate-700 rounded-xl"></div>
+      <div class="h-11 bg-slate-200 dark:bg-slate-700 rounded-xl"></div>
+      <div class="h-11 bg-slate-200 dark:bg-slate-700 rounded-xl"></div>
+      <div class="h-11 bg-slate-200 dark:bg-slate-700 rounded-xl"></div>
+    </div>
   </div>
 
+  <!-- Form Body -->
   <form
     *ngIf="!loadingGuardian"
     [formGroup]="form"
     (ngSubmit)="submit()"
     novalidate
+    class="space-y-6"
   >
-    <!-- Error banner -->
+    <!-- Error Alert Banner -->
     <div
       *ngIf="error"
-      class="mb-4 p-3 rounded-lg bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-sm"
+      class="p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 text-rose-800 dark:text-rose-200 text-sm flex items-start gap-3 shadow-xs"
     >
-      <i class="fas fa-exclamation-circle mr-2"></i>{{ error }}
+      <i class="fas fa-circle-exclamation text-rose-500 mt-0.5 text-base"></i>
+      <div>
+        <div class="font-semibold">Unable to save guardian record</div>
+        <div class="text-xs mt-0.5 text-rose-700 dark:text-rose-300">{{ error }}</div>
+      </div>
     </div>
 
-    <!-- Personal Info -->
-    <div class="card mb-5 space-y-5">
-      <h2
-        class="text-base font-semibold text-gray-800 dark:text-gray-100 border-b border-gray-200 dark:border-slate-700 pb-3"
-      >
-        Personal Information
-      </h2>
-
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+    <!-- 1. Personal & Relationship Information -->
+    <div class="form-card space-y-5">
+      <div class="flex items-center gap-3 pb-4 border-b border-slate-100 dark:border-slate-700/80">
+        <div class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300 flex items-center justify-center">
+          <i class="fas fa-user-shield text-lg"></i>
+        </div>
         <div>
-          <label class="form-label"
-            >First Name <span class="text-red-500">*</span></label
-          >
+          <h2 class="text-base font-bold text-slate-900 dark:text-white">Personal Identity & Relationship</h2>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Legal name, identification and kinship connection to the learner</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div>
+          <label class="form-label">First Name <span class="text-rose-500">*</span></label>
           <input
             type="text"
             formControlName="firstName"
             class="form-input"
-            [class.border-red-500]="isInvalid('firstName')"
-            placeholder="First name"
+            [class.border-rose-400]="isInvalid('firstName')"
+            placeholder="e.g. Samuel"
           />
           <p *ngIf="isInvalid('firstName')" class="form-error">
-            First name is required
+            <i class="fas fa-circle-exclamation text-[10px]"></i> First name is required
           </p>
         </div>
 
@@ -73,94 +115,99 @@
             type="text"
             formControlName="middleName"
             class="form-input"
-            placeholder="Middle name (optional)"
+            placeholder="e.g. Kiptoo"
           />
         </div>
 
         <div>
-          <label class="form-label"
-            >Last Name <span class="text-red-500">*</span></label
-          >
+          <label class="form-label">Last Name <span class="text-rose-500">*</span></label>
           <input
             type="text"
             formControlName="lastName"
             class="form-input"
-            [class.border-red-500]="isInvalid('lastName')"
-            placeholder="Last name"
+            [class.border-rose-400]="isInvalid('lastName')"
+            placeholder="e.g. Cheruiyot"
           />
           <p *ngIf="isInvalid('lastName')" class="form-error">
-            Last name is required
+            <i class="fas fa-circle-exclamation text-[10px]"></i> Last name is required
           </p>
         </div>
 
         <div>
-          <label class="form-label">National ID Number</label>
+          <label class="form-label">National ID Number / Passport</label>
           <input
             type="text"
             formControlName="idNumber"
-            class="form-input"
-            placeholder="e.g. 12345678"
+            class="form-input font-mono"
+            placeholder="e.g. 28941029"
           />
         </div>
 
         <div>
-          <label class="form-label">Occupation</label>
-          <input
-            type="text"
-            formControlName="occupation"
-            class="form-input"
-            placeholder="e.g. Farmer, Teacher"
-          />
-        </div>
-
-        <div>
-          <label class="form-label">Relationship to Student</label>
+          <label class="form-label">Relationship to Learner</label>
           <select formControlName="relationship" class="form-select">
             <option *ngFor="let r of relationships" [value]="r">
               {{ r | titlecase }}
             </option>
           </select>
         </div>
+
+        <div>
+          <label class="form-label">Occupation / Employment</label>
+          <input
+            type="text"
+            formControlName="occupation"
+            class="form-input"
+            placeholder="e.g. Accountant, Business Owner"
+          />
+        </div>
       </div>
 
-      <!-- Primary guardian toggle -->
-      <div class="flex items-center gap-3 pt-1">
-        <input
-          id="isPrimary"
-          type="checkbox"
-          formControlName="isPrimaryGuardian"
-          class="w-4 h-4 rounded accent-primary"
-        />
+      <!-- Primary Guardian Toggle Card -->
+      <div class="pt-3">
         <label
-          for="isPrimary"
-          class="text-sm text-gray-700 dark:text-gray-300 cursor-pointer"
-          >Mark as primary guardian</label
+          class="p-4 rounded-2xl border transition-all cursor-pointer flex items-start gap-3"
+          [ngClass]="form.get('isPrimaryGuardian')?.value ? 'border-emerald-400 bg-emerald-50/50 dark:bg-emerald-950/20' : 'border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/40'"
         >
+          <input
+            type="checkbox"
+            formControlName="isPrimaryGuardian"
+            class="w-4 h-4 mt-0.5 rounded text-emerald-600 focus:ring-emerald-500 border-slate-300 dark:border-slate-600"
+          />
+          <div>
+            <div class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">Designate as Primary Guardian</div>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+              Receives primary school billing statements, emergency alerts, fee balances, and general automated communications.
+            </p>
+          </div>
+        </label>
       </div>
     </div>
 
-    <!-- Contact Info -->
-    <div class="card mb-5 space-y-5">
-      <h2
-        class="text-base font-semibold text-gray-800 dark:text-gray-100 border-b border-gray-200 dark:border-slate-700 pb-3"
-      >
-        Contact Information
-      </h2>
-
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+    <!-- 2. Contact & Location Information -->
+    <div class="form-card space-y-5">
+      <div class="flex items-center gap-3 pb-4 border-b border-slate-100 dark:border-slate-700/80">
+        <div class="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-900/40 text-purple-600 dark:text-purple-300 flex items-center justify-center">
+          <i class="fas fa-phone-alt text-lg"></i>
+        </div>
         <div>
-          <label class="form-label"
-            >Phone Number <span class="text-red-500">*</span></label
-          >
+          <h2 class="text-base font-bold text-slate-900 dark:text-white">Contact & Address Details</h2>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Phone lines, email inbox, and residential dispatch addresses</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div>
+          <label class="form-label">Phone Number <span class="text-rose-500">*</span></label>
           <input
             type="tel"
             formControlName="phone"
-            class="form-input"
-            [class.border-red-500]="isInvalid('phone')"
-            placeholder="+254..."
+            class="form-input font-mono"
+            [class.border-rose-400]="isInvalid('phone')"
+            placeholder="e.g. +254 712 345 678"
           />
           <p *ngIf="isInvalid('phone')" class="form-error">
-            Phone number is required
+            <i class="fas fa-circle-exclamation text-[10px]"></i> Phone is required
           </p>
         </div>
 
@@ -169,8 +216,8 @@
           <input
             type="tel"
             formControlName="alternatePhone"
-            class="form-input"
-            placeholder="+254... (optional)"
+            class="form-input font-mono"
+            placeholder="e.g. +254 798 765 432"
           />
         </div>
 
@@ -180,62 +227,55 @@
             type="email"
             formControlName="email"
             class="form-input"
-            [class.border-red-500]="isInvalid('email')"
-            placeholder="email@example.com"
+            [class.border-rose-400]="isInvalid('email')"
+            placeholder="guardian@example.com"
           />
           <p *ngIf="isInvalid('email')" class="form-error">
-            Enter a valid email address
+            <i class="fas fa-circle-exclamation text-[10px]"></i> Valid email required
           </p>
         </div>
 
         <div>
-          <label class="form-label">County</label>
+          <label class="form-label">County of Residence</label>
           <input
             type="text"
             formControlName="county"
             class="form-input"
-            placeholder="e.g. Nairobi"
+            placeholder="e.g. Nairobi, Kiambu"
           />
         </div>
 
-        <div class="sm:col-span-2">
-          <label class="form-label">Physical Address</label>
+        <div class="sm:col-span-2 lg:col-span-4">
+          <label class="form-label">Physical Residential Address</label>
           <textarea
             formControlName="address"
-            class="form-input min-h-[70px] resize-y"
-            placeholder="Street, estate, or P.O. Box..."
+            rows="2"
+            class="form-input resize-y"
+            placeholder="Street name, estate name, apartment number or postal box..."
           ></textarea>
         </div>
       </div>
     </div>
 
-    <!-- Actions -->
-    <div class="flex justify-end gap-3">
+    <!-- Bottom Actions -->
+    <div class="flex items-center justify-between gap-4 pt-4 border-t border-slate-200/80 dark:border-slate-700/80 bg-white dark:bg-slate-800/90 p-5 sm:p-6 rounded-2xl sm:rounded-3xl border shadow-xs">
       <button
         type="button"
         (click)="cancel()"
-        class="btn-secondary"
-        [disabled]="loading"
+        class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 transition cursor-pointer"
       >
         Cancel
       </button>
+
       <button
         type="submit"
-        class="btn-primary flex items-center gap-2"
         [disabled]="loading"
+        class="px-6 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-white shadow-md flex items-center gap-2 transition hover:opacity-95 disabled:opacity-50 cursor-pointer"
+        [style.backgroundColor]="themeService.accent"
       >
-        <span
-          *ngIf="loading"
-          class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"
-        ></span>
-        <i
-          *ngIf="!loading"
-          class="fas"
-          [ngClass]="isEditMode ? 'fa-save' : 'fa-user-plus'"
-        ></i>
-        {{
-          loading ? "Saving..." : isEditMode ? "Save Changes" : "Add Guardian"
-        }}
+        <span *ngIf="loading" class="animate-spin rounded-full h-4 w-4 border-2 border-white/30 border-t-white"></span>
+        <i *ngIf="!loading" class="fas" [ngClass]="isEditMode ? 'fa-save' : 'fa-check'"></i>
+        <span>{{ loading ? 'Saving...' : (isEditMode ? 'Update Guardian Profile' : 'Complete Guardian Registration') }}</span>
       </button>
     </div>
   </form>

@@ -299,6 +299,7 @@ export interface StaffUser {
   email: string;
   role: Role;
   phone?: string;
+  tscNumber?: string;
   avatar?: string;
   isActive: boolean;
   lastLoginAt?: string;

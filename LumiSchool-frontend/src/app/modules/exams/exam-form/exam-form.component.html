@@ -1,348 +1,313 @@
-<div class="max-w-3xl mx-auto">
-  <button
-    (click)="cancel()"
-    class="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 mb-4 inline-flex items-center gap-1"
-  >
-    <i class="fas fa-arrow-left"></i> Back to Exams
-  </button>
-
-  <div
-    class="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-6"
-  >
-    <h1 class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-1">
-      {{ isEdit ? "Edit Exam" : "Create Exam" }}
-    </h1>
-    <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">
-      Kenya CBC system: 3 terms per year · CATs count 30% · End-Term counts 70%
-      · CBC grades: EE / ME / AE / BE
-    </p>
-
-    <div *ngIf="loadingData" class="flex justify-center py-10">
-      <i class="fas fa-spinner fa-spin text-2xl text-gray-400"></i>
+<div class="space-y-6 pb-16 w-full">
+  <!-- Top Navigation & Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-slate-800/90 p-5 sm:p-6 rounded-2xl sm:rounded-3xl border border-slate-200/80 dark:border-slate-700/80 shadow-xs">
+    <div class="flex items-center gap-3.5">
+      <button
+        type="button"
+        (click)="cancel()"
+        class="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 flex items-center justify-center transition-all duration-150 cursor-pointer"
+        title="Go back"
+      >
+        <i class="fas fa-arrow-left text-sm"></i>
+      </button>
+      <div>
+        <div class="flex items-center gap-2">
+          <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+            {{ isEdit ? "Edit Examination Series" : "Create Exam Series" }}
+          </h1>
+          <span
+            class="px-2.5 py-0.5 rounded-full text-xs font-semibold"
+            [ngClass]="isEdit ? 'bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300' : 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-300'"
+          >
+            {{ isEdit ? 'Editing' : 'New Series' }}
+          </span>
+        </div>
+        <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+          {{ isEdit ? 'Update exam configuration and class allocations' : 'Setup a new CBC assessment, CAT or term examination session' }}
+        </p>
+      </div>
     </div>
 
-    <form
-      *ngIf="!loadingData"
-      [formGroup]="form"
-      (ngSubmit)="submit()"
-      novalidate
-    >
-      <!-- ── Section 1: Basic Info ── -->
-      <div class="mb-6">
-        <h2
-          class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3"
-        >
-          Basic Information
-        </h2>
+    <!-- Top Action Buttons -->
+    <div class="flex items-center gap-2.5 self-end sm:self-auto">
+      <button
+        type="button"
+        (click)="cancel()"
+        class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700/80 hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer"
+      >
+        Cancel
+      </button>
+      <button
+        type="button"
+        (click)="submit()"
+        [disabled]="loading"
+        class="px-4.5 py-2 rounded-xl text-xs sm:text-sm font-semibold text-white shadow-sm flex items-center gap-2 transition cursor-pointer hover:opacity-95 disabled:opacity-50"
+        [style.backgroundColor]="themeService.accent"
+      >
+        <span *ngIf="loading" class="animate-spin rounded-full h-3.5 w-3.5 border-2 border-white/30 border-t-white"></span>
+        <i *ngIf="!loading" class="fas fa-save text-xs"></i>
+        <span>{{ loading ? 'Saving...' : (isEdit ? 'Save Changes' : 'Create Exam') }}</span>
+      </button>
+    </div>
+  </div>
 
-        <!-- Name -->
-        <div class="mb-4">
-          <label class="form-label"
-            >Exam Name <span class="text-red-500">*</span></label
-          >
+  <!-- Loading Skeleton -->
+  <div *ngIf="loadingData" class="form-card animate-pulse space-y-4">
+    <div class="h-6 bg-slate-200 dark:bg-slate-700 rounded-lg w-1/4"></div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div class="h-11 bg-slate-200 dark:bg-slate-700 rounded-xl"></div>
+      <div class="h-11 bg-slate-200 dark:bg-slate-700 rounded-xl"></div>
+    </div>
+  </div>
+
+  <!-- Form Body -->
+  <form
+    *ngIf="!loadingData"
+    [formGroup]="form"
+    (ngSubmit)="submit()"
+    novalidate
+    class="space-y-6"
+  >
+    <!-- Error Alert Banner -->
+    <div
+      *ngIf="error"
+      class="p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 text-rose-800 dark:text-rose-200 text-sm flex items-start gap-3 shadow-xs"
+    >
+      <i class="fas fa-circle-exclamation text-rose-500 mt-0.5 text-base"></i>
+      <div>
+        <div class="font-semibold">Unable to save examination</div>
+        <div class="text-xs mt-0.5 text-rose-700 dark:text-rose-300">{{ error }}</div>
+      </div>
+    </div>
+
+    <!-- 1. Series Name & Evaluation Type -->
+    <div class="form-card space-y-5">
+      <div class="flex items-center gap-3 pb-4 border-b border-slate-100 dark:border-slate-700/80">
+        <div class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300 flex items-center justify-center">
+          <i class="fas fa-file-signature text-lg"></i>
+        </div>
+        <div>
+          <h2 class="text-base font-bold text-slate-900 dark:text-white">Exam Designation & Assessment Type</h2>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Formal examination series title and Kenyan MoE evaluation format</p>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <div>
+          <label class="form-label">Exam Title <span class="text-rose-500">*</span></label>
           <input
             formControlName="name"
             type="text"
-            placeholder="e.g. Term 1 End-of-Term Exam 2026"
+            placeholder="e.g. Term 1 End-of-Term Examination 2026, CAT 1"
             class="form-input"
-            [class.border-red-400]="
-              form.get('name')?.invalid && form.get('name')?.touched
-            "
+            [class.border-rose-400]="form.get('name')?.invalid && form.get('name')?.touched"
           />
-          <p
-            *ngIf="form.get('name')?.invalid && form.get('name')?.touched"
-            class="mt-1 text-xs text-red-500"
-          >
-            Exam name is required.
+          <p *ngIf="form.get('name')?.invalid && form.get('name')?.touched" class="form-error">
+            <i class="fas fa-circle-exclamation text-[10px]"></i> Exam name is required
           </p>
         </div>
 
-        <!-- Type -->
-        <div class="mb-4">
-          <label class="form-label"
-            >Exam Type <span class="text-red-500">*</span></label
-          >
-          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-1">
+        <div>
+          <label class="form-label">Evaluation Category <span class="text-rose-500">*</span></label>
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 pt-1">
             <div
               *ngFor="let t of examTypes"
-              class="flex items-center gap-2 px-3 py-2.5 rounded-lg border cursor-pointer text-sm transition-colors"
-              [class.border-indigo-400]="form.value.type === t"
-              [class.bg-indigo-50]="form.value.type === t"
-              [class.border-gray-200]="form.value.type !== t"
-              [class.dark:border-slate-600]="form.value.type !== t"
               (click)="form.patchValue({ type: t })"
+              class="p-3 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between"
+              [ngClass]="
+                form.value.type === t
+                  ? 'border-accent-500 bg-accent-50/20 dark:bg-accent-950/20 ring-1'
+                  : 'border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/30 hover:border-slate-300'
+              "
+              [style.ringColor]="form.value.type === t ? themeService.accent : 'transparent'"
             >
-              <div
-                class="w-3.5 h-3.5 rounded-full border-2 flex-shrink-0 transition-colors"
-                [class.bg-indigo-600]="form.value.type === t"
-                [class.border-indigo-600]="form.value.type === t"
-                [class.border-gray-300]="form.value.type !== t"
-              ></div>
-              <span class="font-medium text-gray-700 dark:text-gray-200">{{
-                examTypeMeta[t].label
-              }}</span>
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-xs font-bold text-slate-900 dark:text-white">{{ examTypeMeta[t].label }}</span>
+                <span
+                  class="w-3.5 h-3.5 rounded-full border-2 flex items-center justify-center"
+                  [style.borderColor]="form.value.type === t ? themeService.accent : 'currentColor'"
+                  [style.backgroundColor]="form.value.type === t ? themeService.accent : 'transparent'"
+                ></span>
+              </div>
             </div>
           </div>
-          <!-- Type hint -->
+
           <div
             *ngIf="selectedTypeMeta"
-            class="mt-2 px-3 py-2 rounded-lg bg-gray-50 dark:bg-slate-700 text-xs text-gray-600 dark:text-gray-400"
+            class="mt-2.5 p-3 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200/80 dark:border-slate-700 text-xs text-slate-600 dark:text-slate-300 flex items-center gap-2"
           >
-            <i class="fas fa-info-circle mr-1 text-indigo-400"></i
-            >{{ selectedTypeMeta.hint }}
-          </div>
-        </div>
-
-        <!-- Year + Term + Total Marks -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div>
-            <label class="form-label"
-              >Academic Year <span class="text-red-500">*</span></label
-            >
-            <select formControlName="academicYear" class="form-input">
-              <option *ngFor="let y of academicYears" [value]="y">
-                {{ y }}
-              </option>
-            </select>
-          </div>
-          <div>
-            <label class="form-label"
-              >Term <span class="text-red-500">*</span></label
-            >
-            <select formControlName="term" class="form-input">
-              <option *ngFor="let t of terms" [value]="t">{{ t }}</option>
-            </select>
-          </div>
-          <div>
-            <label class="form-label"
-              >Total Marks <span class="text-red-500">*</span></label
-            >
-            <input
-              formControlName="totalMarks"
-              type="number"
-              min="1"
-              placeholder="100"
-              class="form-input"
-              [class.border-red-400]="
-                form.get('totalMarks')?.invalid &&
-                form.get('totalMarks')?.touched
-              "
-            />
+            <i class="fas fa-info-circle text-accent-500"></i>
+            <span>{{ selectedTypeMeta.hint }}</span>
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- ── Section 2: Schedule ── -->
-      <div class="mb-6">
-        <h2
-          class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3"
-        >
-          Schedule
-          <span class="font-normal normal-case text-xs">(optional)</span>
-        </h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label class="form-label">Start Date</label>
-            <input formControlName="startDate" type="date" class="form-input" />
-          </div>
-          <div>
-            <label class="form-label">End Date</label>
-            <input formControlName="endDate" type="date" class="form-input" />
-          </div>
+    <!-- 2. Session, Term & Maximum Marks -->
+    <div class="form-card space-y-5">
+      <div class="flex items-center gap-3 pb-4 border-b border-slate-100 dark:border-slate-700/80">
+        <div class="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-900/40 text-purple-600 dark:text-purple-300 flex items-center justify-center">
+          <i class="fas fa-calendar-check text-lg"></i>
+        </div>
+        <div>
+          <h2 class="text-base font-bold text-slate-900 dark:text-white">Academic Term & Scoring Rubric</h2>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Target term, testing window, and total points ceiling</p>
         </div>
       </div>
 
-      <!-- ── Section 3: Classes ── -->
-      <div class="mb-6">
-        <h2
-          class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3"
-        >
-          Applicable Classes
-          <span class="ml-2 text-xs font-normal normal-case text-gray-400">
-            {{ form.value.classIds.length }} selected
-          </span>
-        </h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div>
+          <label class="form-label">Academic Year <span class="text-rose-500">*</span></label>
+          <select formControlName="academicYear" class="form-select font-mono">
+            <option *ngFor="let y of academicYears" [value]="y">{{ y }}</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="form-label">Term <span class="text-rose-500">*</span></label>
+          <select formControlName="term" class="form-select font-semibold">
+            <option *ngFor="let t of terms" [value]="t">{{ t }}</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="form-label">Total Marks Scale <span class="text-rose-500">*</span></label>
+          <input
+            formControlName="totalMarks"
+            type="number"
+            min="1"
+            placeholder="100"
+            class="form-input font-mono font-bold"
+            [class.border-rose-400]="form.get('totalMarks')?.invalid && form.get('totalMarks')?.touched"
+          />
+        </div>
+
+        <div>
+          <label class="form-label">Testing Window Start</label>
+          <input formControlName="startDate" type="date" class="form-input" />
+        </div>
+
+        <div class="sm:col-span-2 lg:col-span-4">
+          <label class="form-label">Testing Window End</label>
+          <input formControlName="endDate" type="date" class="form-input" />
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Applicable Classes -->
+    <div class="form-card space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-700/80">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-900/40 text-amber-600 dark:text-amber-300 flex items-center justify-center text-sm">
+            <i class="fas fa-chalkboard"></i>
+          </div>
+          <div>
+            <h2 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white">Classes Examined</h2>
+            <p class="text-[11px] text-slate-400 dark:text-slate-500">Pick which classes are sitting for this exam series</p>
+          </div>
+        </div>
+        <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300">
+          {{ form.value.classIds.length }} selected
+        </span>
+      </div>
+
+      <div *ngIf="classes.length; else noClasses" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
         <div
-          *ngIf="classes.length; else noClasses"
-          class="grid grid-cols-1 sm:grid-cols-2 gap-2"
+          *ngFor="let c of classes"
+          (click)="toggleClass(c._id)"
+          class="flex items-center gap-3 p-3.5 rounded-2xl border transition-all cursor-pointer"
+          [ngClass]="
+            isClassSelected(c._id)
+              ? 'border-accent-500 bg-accent-50/20 dark:bg-accent-950/20 ring-1'
+              : 'border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/30 hover:border-slate-300'
+          "
+          [style.ringColor]="isClassSelected(c._id) ? themeService.accent : 'transparent'"
         >
-          <div
-            *ngFor="let c of classes"
-            class="flex items-center gap-3 px-3 py-2 rounded-lg border cursor-pointer transition-colors"
-            [class.border-indigo-400]="isClassSelected(c._id)"
-            [class.bg-indigo-50]="isClassSelected(c._id)"
-            [class.border-gray-200]="!isClassSelected(c._id)"
-            [class.dark:border-slate-600]="!isClassSelected(c._id)"
-            (click)="toggleClass(c._id)"
-          >
-            <div
-              class="w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0"
-              [class.bg-indigo-600]="isClassSelected(c._id)"
-              [class.border-indigo-600]="isClassSelected(c._id)"
-              [class.border-gray-300]="!isClassSelected(c._id)"
-              [class.dark:border-slate-500]="!isClassSelected(c._id)"
-            >
-              <i
-                *ngIf="isClassSelected(c._id)"
-                class="fas fa-check text-white text-xs"
-              ></i>
-            </div>
-            <div>
-              <span
-                class="text-sm font-medium text-gray-800 dark:text-gray-100"
-                >{{ c.name }}</span
-              >
-              <span class="ml-1.5 text-xs text-gray-500 dark:text-gray-400">{{
-                c.level
-              }}</span>
-            </div>
+          <input
+            type="checkbox"
+            [checked]="isClassSelected(c._id)"
+            (change)="toggleClass(c._id)"
+            (click)="$event.stopPropagation()"
+            class="w-4 h-4 rounded text-accent-600 focus:ring-accent-500 border-slate-300 dark:border-slate-600"
+          />
+          <div>
+            <div class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">{{ c.name }}</div>
+            <span class="text-[11px] text-slate-400">{{ c.level }}</span>
           </div>
         </div>
-        <ng-template #noClasses>
-          <p class="text-sm text-gray-400">
-            No classes found. Create classes first.
-          </p>
-        </ng-template>
+      </div>
+      <ng-template #noClasses>
+        <p class="text-xs text-slate-400">No classes registered in the system yet.</p>
+      </ng-template>
+    </div>
+
+    <!-- 4. Applicable Subjects -->
+    <div class="form-card space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-700/80">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-300 flex items-center justify-center text-sm">
+            <i class="fas fa-book"></i>
+          </div>
+          <div>
+            <h2 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white">Subjects Included</h2>
+            <p class="text-[11px] text-slate-400 dark:text-slate-500">Pick curriculum subjects included in this exam series</p>
+          </div>
+        </div>
+        <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-300">
+          {{ form.value.subjectIds.length }} selected
+        </span>
       </div>
 
-      <!-- ── Section 4: Subjects ── -->
-      <div class="mb-6">
-        <h2
-          class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3"
-        >
-          Subjects Examined
-          <span class="ml-2 text-xs font-normal normal-case text-gray-400">
-            {{ form.value.subjectIds.length }} selected
-          </span>
-        </h2>
+      <div *ngIf="subjects.length; else noSubjects" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
         <div
-          *ngIf="subjects.length; else noSubjects"
-          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2"
+          *ngFor="let s of subjects"
+          (click)="toggleSubject(s._id)"
+          class="flex items-center gap-3 p-3.5 rounded-2xl border transition-all cursor-pointer"
+          [ngClass]="
+            isSubjectSelected(s._id)
+              ? 'border-accent-500 bg-accent-50/20 dark:bg-accent-950/20 ring-1'
+              : 'border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/30 hover:border-slate-300'
+          "
+          [style.ringColor]="isSubjectSelected(s._id) ? themeService.accent : 'transparent'"
         >
-          <div
-            *ngFor="let s of subjects"
-            class="flex items-center gap-3 px-3 py-2 rounded-lg border cursor-pointer transition-colors"
-            [class.border-indigo-400]="isSubjectSelected(s._id)"
-            [class.bg-indigo-50]="isSubjectSelected(s._id)"
-            [class.border-gray-200]="!isSubjectSelected(s._id)"
-            [class.dark:border-slate-600]="!isSubjectSelected(s._id)"
-            (click)="toggleSubject(s._id)"
-          >
-            <div
-              class="w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0"
-              [class.bg-indigo-600]="isSubjectSelected(s._id)"
-              [class.border-indigo-600]="isSubjectSelected(s._id)"
-              [class.border-gray-300]="!isSubjectSelected(s._id)"
-              [class.dark:border-slate-500]="!isSubjectSelected(s._id)"
-            >
-              <i
-                *ngIf="isSubjectSelected(s._id)"
-                class="fas fa-check text-white text-xs"
-              ></i>
-            </div>
-            <div>
-              <span
-                class="text-sm font-medium text-gray-800 dark:text-gray-100"
-                >{{ s.name }}</span
-              >
-              <span class="ml-1.5 font-mono text-xs text-gray-400">{{
-                s.code
-              }}</span>
-            </div>
+          <input
+            type="checkbox"
+            [checked]="isSubjectSelected(s._id)"
+            (change)="toggleSubject(s._id)"
+            (click)="$event.stopPropagation()"
+            class="w-4 h-4 rounded text-accent-600 focus:ring-accent-500 border-slate-300 dark:border-slate-600"
+          />
+          <div>
+            <div class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">{{ s.name }}</div>
+            <span class="text-[11px] font-mono text-slate-400">{{ s.code }}</span>
           </div>
         </div>
-        <ng-template #noSubjects>
-          <p class="text-sm text-gray-400">
-            No subjects found. Create subjects first.
-          </p>
-        </ng-template>
       </div>
+      <ng-template #noSubjects>
+        <p class="text-xs text-slate-400">No subjects registered in the system yet.</p>
+      </ng-template>
+    </div>
 
-      <!-- Kenya Grading Reference -->
-      <div
-        class="mb-6 p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700"
+    <!-- Bottom Actions -->
+    <div class="flex items-center justify-between gap-4 pt-4 border-t border-slate-200/80 dark:border-slate-700/80 bg-white dark:bg-slate-800/90 p-5 sm:p-6 rounded-2xl sm:rounded-3xl border shadow-xs">
+      <button
+        type="button"
+        (click)="cancel()"
+        class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 transition cursor-pointer"
       >
-        <p class="text-xs font-semibold text-blue-700 dark:text-blue-400 mb-2">
-          <i class="fas fa-graduation-cap mr-1"></i>Kenya Grading Reference
-        </p>
-        <div
-          class="grid grid-cols-2 gap-4 text-xs text-gray-600 dark:text-gray-400"
-        >
-          <div>
-            <p class="font-semibold text-gray-700 dark:text-gray-300 mb-1">
-              CBC (Pre-Primary · Primary · JSS)
-            </p>
-            <div class="space-y-0.5">
-              <div>
-                <span class="font-mono font-bold text-green-600">EE</span> —
-                Exceeding Expectations (80–100%)
-              </div>
-              <div>
-                <span class="font-mono font-bold text-blue-600">ME</span> —
-                Meeting Expectations (60–79%)
-              </div>
-              <div>
-                <span class="font-mono font-bold text-yellow-600">AE</span> —
-                Approaching Expectations (40–59%)
-              </div>
-              <div>
-                <span class="font-mono font-bold text-red-600">BE</span> — Below
-                Expectations (0–39%)
-              </div>
-            </div>
-          </div>
-          <div>
-            <p class="font-semibold text-gray-700 dark:text-gray-300 mb-1">
-              KCSE (Senior Secondary Grade 10–12)
-            </p>
-            <div class="space-y-0.5">
-              <div>
-                <span class="font-mono font-bold">A</span> 80–100 (12 pts) ·
-                <span class="font-mono font-bold">A-</span> 75–79 (11 pts)
-              </div>
-              <div>
-                <span class="font-mono font-bold">B+</span> 70–74 ·
-                <span class="font-mono font-bold">B</span> 65–69 ·
-                <span class="font-mono font-bold">B-</span> 60–64
-              </div>
-              <div>
-                <span class="font-mono font-bold">C+</span> 55–59 ·
-                <span class="font-mono font-bold">C</span> 50–54 ·
-                <span class="font-mono font-bold">C-</span> 45–49
-              </div>
-              <div>
-                <span class="font-mono font-bold">D+</span> 40–44 ·
-                <span class="font-mono font-bold">D</span> 35–39 ·
-                <span class="font-mono font-bold">D-</span> 30–34 ·
-                <span class="font-mono font-bold">E</span> 0–29
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+        Cancel
+      </button>
 
-      <!-- Error -->
-      <div
-        *ngIf="error"
-        class="mb-4 px-4 py-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 text-sm text-red-700 dark:text-red-400"
+      <button
+        type="submit"
+        [disabled]="loading"
+        class="px-6 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-white shadow-md flex items-center gap-2 transition hover:opacity-95 disabled:opacity-50 cursor-pointer"
+        [style.backgroundColor]="themeService.accent"
       >
-        <i class="fas fa-exclamation-circle mr-2"></i>{{ error }}
-      </div>
-
-      <!-- Actions -->
-      <div class="flex gap-3">
-        <button
-          type="submit"
-          [disabled]="loading"
-          class="btn-primary flex items-center gap-2"
-        >
-          <i *ngIf="loading" class="fas fa-spinner fa-spin"></i>
-          {{ loading ? "Saving..." : isEdit ? "Update Exam" : "Create Exam" }}
-        </button>
-        <button type="button" (click)="cancel()" class="btn-secondary">
-          Cancel
-        </button>
-      </div>
-    </form>
-  </div>
+        <span *ngIf="loading" class="animate-spin rounded-full h-4 w-4 border-2 border-white/30 border-t-white"></span>
+        <i *ngIf="!loading" class="fas" [ngClass]="isEdit ? 'fa-save' : 'fa-plus'"></i>
+        <span>{{ loading ? 'Saving...' : (isEdit ? 'Update Exam Series' : 'Create Exam Series') }}</span>
+      </button>
+    </div>
+  </form>
 </div>

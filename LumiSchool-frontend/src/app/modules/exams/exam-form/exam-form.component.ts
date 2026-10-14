@@ -51,6 +51,8 @@ export const EXAM_TYPE_META: Record<
   },
 };
 
+import { ThemeService } from "../../../shared/services/theme/theme.service";
+
 @Component({
   selector: "app-exam-form",
   templateUrl: "./exam-form.component.html",
@@ -84,6 +86,7 @@ export class ExamFormComponent implements OnInit {
     private academicsService: AcademicsService,
     private route: ActivatedRoute,
     private router: Router,
+    public themeService: ThemeService,
   ) {}
 
   ngOnInit(): void {

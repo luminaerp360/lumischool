@@ -2,6 +2,7 @@ import { Component, OnInit } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { ActivatedRoute, Router } from "@angular/router";
 import { ClassesService } from "../../../shared/services/classes/classes.service";
+import { ThemeService } from "../../../shared/services/theme/theme.service";
 
 @Component({
   selector: "app-class-form",
@@ -52,6 +53,7 @@ export class ClassFormComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private classesService: ClassesService,
+    public themeService: ThemeService,
   ) {}
 
   ngOnInit(): void {

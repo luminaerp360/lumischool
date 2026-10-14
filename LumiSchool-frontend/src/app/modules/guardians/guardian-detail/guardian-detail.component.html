@@ -1,93 +1,190 @@
-<div>
-  <button
-    (click)="goBack()"
-    class="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 mb-4 inline-flex items-center gap-1"
-  >
-    <i class="fas fa-arrow-left"></i> Back to Guardians
-  </button>
+<div class="space-y-6 w-full">
+  <!-- ── 1. Top Navigation Bar ── -->
+  <div class="flex items-center justify-between gap-4">
+    <button
+      (click)="goBack()"
+      class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 hover:bg-slate-50 dark:hover:bg-slate-700 shadow-2xs transition-colors cursor-pointer"
+    >
+      <i class="fas fa-arrow-left text-xs"></i>
+      <span>Back to Guardians</span>
+    </button>
 
-  <div *ngIf="loading" class="flex items-center justify-center py-20">
-    <i class="fas fa-spinner fa-spin text-2xl text-gray-400"></i>
-  </div>
-
-  <div *ngIf="!loading && guardian">
-    <div class="flex items-center justify-between mb-6">
-      <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">
-        {{ getFullName(guardian) }}
-      </h1>
+    <div *ngIf="guardian && !loading" class="flex items-center gap-2">
       <button
         (click)="editGuardian()"
-        class="btn-primary flex items-center gap-2"
+        class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-white shadow-sm hover:shadow-md transition-all duration-200 transform hover:-translate-y-0.5 cursor-pointer"
+        [style.background-color]="themeService.accent"
       >
-        <i class="fas fa-edit"></i> Edit
+        <i class="fas fa-edit text-xs"></i>
+        <span>Edit Dossier</span>
       </button>
     </div>
+  </div>
 
+  <!-- Loading State -->
+  <div *ngIf="loading" class="rounded-3xl bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 p-8 space-y-6 animate-pulse">
+    <div class="flex items-center gap-4">
+      <div class="w-16 h-16 rounded-2xl bg-slate-200 dark:bg-slate-700"></div>
+      <div class="space-y-2">
+        <div class="h-6 bg-slate-200 dark:bg-slate-700 rounded w-48"></div>
+        <div class="h-4 bg-slate-200 dark:bg-slate-700 rounded w-32"></div>
+      </div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="h-48 bg-slate-200 dark:bg-slate-700 rounded-2xl"></div>
+      <div class="h-48 bg-slate-200 dark:bg-slate-700 rounded-2xl"></div>
+    </div>
+  </div>
+
+  <!-- Main Content When Loaded -->
+  <div *ngIf="!loading && guardian" class="space-y-6">
+    <!-- ── Profile Hero Header Card ── -->
+    <div class="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 p-5 sm:p-7 shadow-xs">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-5">
+        <div class="flex items-center gap-4">
+          <div
+            class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl sm:rounded-3xl flex items-center justify-center font-black text-xl sm:text-2xl text-white shadow-md shrink-0"
+            [style.background-color]="themeService.accent"
+          >
+            {{ getInitials(guardian) }}
+          </div>
+          <div>
+            <div class="flex items-center gap-2.5 flex-wrap">
+              <h1 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+                {{ getFullName(guardian) }}
+              </h1>
+              <span
+                *ngIf="guardian.isPrimaryGuardian"
+                class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-300"
+              >
+                Primary Guardian
+              </span>
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 dark:bg-slate-700/80 text-slate-700 dark:text-slate-300 capitalize">
+                {{ guardian.relationship | titlecase }}
+              </span>
+            </div>
+            <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-3 flex-wrap">
+              <span><i class="fas fa-id-card text-xs mr-1 text-slate-400"></i>ID: {{ guardian.idNumber || 'Not provided' }}</span>
+              <span><i class="fas fa-briefcase text-xs mr-1 text-slate-400"></i>{{ guardian.occupation || 'Occupation not listed' }}</span>
+              <span *ngIf="guardian.county"><i class="fas fa-location-dot text-xs mr-1 text-slate-400"></i>{{ guardian.county }}</span>
+            </p>
+          </div>
+        </div>
+
+        <!-- Direct Actions -->
+        <div class="flex items-center gap-2 self-start sm:self-auto">
+          <a
+            [href]="'tel:' + guardian.phone"
+            class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 transition flex items-center gap-2"
+          >
+            <i class="fas fa-phone-alt text-xs"></i>
+            <span>Call {{ guardian.phone }}</span>
+          </a>
+          <a
+            *ngIf="guardian.email"
+            [href]="'mailto:' + guardian.email"
+            class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-slate-100 dark:bg-slate-700/80 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition flex items-center gap-2"
+          >
+            <i class="fas fa-envelope text-xs"></i>
+            <span>Email</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 2 Columns: Contact Details & Linked Students ── -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <!-- Personal Info -->
-      <div
-        class="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-6"
-      >
-        <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">
-          Personal Information
-        </h2>
-        <div class="space-y-3">
-          <div class="flex justify-between text-sm">
-            <span class="text-gray-500 dark:text-gray-400">Phone</span>
-            <span class="text-gray-800 dark:text-gray-100">{{
-              guardian.phone
-            }}</span>
+      <!-- Contact Information Card -->
+      <div class="rounded-2xl sm:rounded-3xl bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 p-5 sm:p-6 shadow-xs space-y-4">
+        <div class="flex items-center gap-3 pb-3 border-b border-slate-100 dark:border-slate-700/80">
+          <div class="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300 flex items-center justify-center text-sm">
+            <i class="fas fa-address-book"></i>
           </div>
-          <div *ngIf="guardian.email" class="flex justify-between text-sm">
-            <span class="text-gray-500 dark:text-gray-400">Email</span>
-            <span class="text-gray-800 dark:text-gray-100">{{
-              guardian.email
-            }}</span>
+          <div>
+            <h2 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white">Contact & Identity</h2>
+            <p class="text-[11px] text-slate-400 dark:text-slate-500">Official contact records for automated SMS, billing & emergencies</p>
           </div>
-          <div class="flex justify-between text-sm">
-            <span class="text-gray-500 dark:text-gray-400">Relationship</span>
-            <span class="text-gray-800 dark:text-gray-100 capitalize">{{
-              guardian.relationship
-            }}</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs sm:text-sm">
+          <div class="p-3.5 rounded-xl bg-slate-50/70 dark:bg-slate-900/40 border border-slate-100 dark:border-slate-700/60">
+            <span class="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">Primary Mobile</span>
+            <span class="font-mono font-semibold text-slate-800 dark:text-slate-200">{{ guardian.phone }}</span>
           </div>
-          <div *ngIf="guardian.occupation" class="flex justify-between text-sm">
-            <span class="text-gray-500 dark:text-gray-400">Occupation</span>
-            <span class="text-gray-800 dark:text-gray-100">{{
-              guardian.occupation
-            }}</span>
+
+          <div class="p-3.5 rounded-xl bg-slate-50/70 dark:bg-slate-900/40 border border-slate-100 dark:border-slate-700/60">
+            <span class="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">Alternate Phone</span>
+            <span class="font-mono text-slate-800 dark:text-slate-200">{{ guardian.alternatePhone || 'None' }}</span>
           </div>
-          <div *ngIf="guardian.address" class="flex justify-between text-sm">
-            <span class="text-gray-500 dark:text-gray-400">Address</span>
-            <span class="text-gray-800 dark:text-gray-100">{{
-              guardian.address
-            }}</span>
+
+          <div class="p-3.5 rounded-xl bg-slate-50/70 dark:bg-slate-900/40 border border-slate-100 dark:border-slate-700/60">
+            <span class="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">Email Address</span>
+            <span class="text-slate-800 dark:text-slate-200">{{ guardian.email || 'None' }}</span>
+          </div>
+
+          <div class="p-3.5 rounded-xl bg-slate-50/70 dark:bg-slate-900/40 border border-slate-100 dark:border-slate-700/60">
+            <span class="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">National ID / Passport</span>
+            <span class="font-mono text-slate-800 dark:text-slate-200">{{ guardian.idNumber || 'None' }}</span>
+          </div>
+
+          <div class="p-3.5 rounded-xl bg-slate-50/70 dark:bg-slate-900/40 border border-slate-100 dark:border-slate-700/60 sm:col-span-2">
+            <span class="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">Physical Residential Address</span>
+            <span class="text-slate-800 dark:text-slate-200">{{ guardian.address || 'Not recorded' }}</span>
           </div>
         </div>
       </div>
 
-      <!-- Linked Students -->
-      <div
-        class="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-6"
-      >
-        <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">
-          Linked Students
-        </h2>
-        <div
-          *ngIf="guardian.studentIds.length; else noStudents"
-          class="space-y-2"
-        >
+      <!-- Linked Students Card -->
+      <div class="rounded-2xl sm:rounded-3xl bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 p-5 sm:p-6 shadow-xs space-y-4">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-700/80">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-purple-50 dark:bg-purple-900/40 text-purple-600 dark:text-purple-300 flex items-center justify-center text-sm">
+              <i class="fas fa-graduation-cap"></i>
+            </div>
+            <div>
+              <h2 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white">Linked Students</h2>
+              <p class="text-[11px] text-slate-400 dark:text-slate-500">Learners enrolled under this guardian's guardianship</p>
+            </div>
+          </div>
+          <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300">
+            {{ linkedStudents.length }}
+          </span>
+        </div>
+
+        <div *ngIf="linkedStudents.length; else noStudents" class="space-y-2.5">
           <div
             *ngFor="let sid of linkedStudents"
-            class="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-50 dark:bg-slate-700 text-sm text-gray-700 dark:text-gray-300"
+            class="flex items-center justify-between p-3.5 rounded-xl bg-slate-50/70 dark:bg-slate-900/40 border border-slate-100 dark:border-slate-700/60 hover:bg-slate-100/70 dark:hover:bg-slate-700/40 transition"
           >
-            <i class="fas fa-user-graduate text-xs text-gray-400"></i>
-            <span>{{ studentName(sid) }}</span>
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-xl bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-300 flex items-center justify-center text-xs font-bold">
+                <i class="fas fa-user"></i>
+              </div>
+              <div>
+                <div class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">
+                  {{ studentName(sid) }}
+                </div>
+                <span class="text-[11px] text-slate-400 dark:text-slate-500">
+                  Enrolled Learner
+                </span>
+              </div>
+            </div>
+
+            <button
+              class="w-7 h-7 rounded-lg bg-white dark:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition flex items-center justify-center shadow-2xs"
+            >
+              <i class="fas fa-chevron-right text-[10px]"></i>
+            </button>
           </div>
         </div>
+
         <ng-template #noStudents>
-          <p class="text-sm text-gray-500 dark:text-gray-400">
-            No students linked.
-          </p>
+          <div class="text-center py-10">
+            <div class="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center mx-auto mb-2">
+              <i class="fas fa-user-graduate text-xl opacity-40"></i>
+            </div>
+            <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">No students linked to this guardian yet.</p>
+          </div>
         </ng-template>
       </div>
     </div>

@@ -1,150 +1,192 @@
-<div>
-  <div class="flex items-center justify-between mb-6 flex-wrap gap-3">
-    <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">
-      Staff Directory
-    </h1>
-    <button (click)="addStaff()" class="btn-primary flex items-center gap-2">
-      <i class="fas fa-user-plus"></i> Add Staff
-    </button>
-  </div>
-
-  <!-- Role Tabs -->
-  <div class="flex gap-2 flex-wrap mb-4">
-    <button
-      *ngFor="let tab of roleTabs"
-      (click)="selectTab(tab.value)"
-      class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors border"
-      [class.border-transparent]="filterRole === tab.value"
-      [class.text-white]="filterRole === tab.value"
-      [class.border-gray-200]="filterRole !== tab.value"
-      [class.dark:border-slate-600]="filterRole !== tab.value"
-      [class.text-gray-600]="filterRole !== tab.value"
-      [class.dark:text-gray-400]="filterRole !== tab.value"
-      [class.hover:bg-gray-100]="filterRole !== tab.value"
-      [class.dark:hover:bg-slate-700]="filterRole !== tab.value"
-      [style.background-color]="
-        filterRole === tab.value ? 'var(--accent-600)' : 'transparent'
-      "
-    >
-      <i [class]="'fas ' + tab.icon + ' text-xs'"></i>
-      {{ tab.label }}
-    </button>
-  </div>
-
-  <!-- Search -->
-  <div class="mb-4">
-    <input
-      type="text"
-      [(ngModel)]="search"
-      (ngModelChange)="load()"
-      placeholder="Search by name or email..."
-      class="form-input max-w-sm"
-    />
-  </div>
-
-  <div *ngIf="loading" class="flex justify-center py-20">
-    <i class="fas fa-spinner fa-spin text-2xl text-gray-400"></i>
-  </div>
-
-  <!-- Staff Grid -->
-  <div
-    *ngIf="!loading && staff.length"
-    class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
-  >
-    <div
-      *ngFor="let u of staff"
-      (click)="view(u._id)"
-      class="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-5 cursor-pointer hover:shadow-md transition-shadow group"
-    >
-      <!-- Avatar + Badge -->
-      <div class="flex items-start justify-between mb-4">
-        <div
-          class="w-12 h-12 rounded-xl flex items-center justify-center text-lg font-bold text-white flex-shrink-0"
-          style="
-            background: linear-gradient(
-              135deg,
-              var(--accent-600),
-              var(--accent-400, #818cf8)
-            );
-          "
-        >
-          {{ initials(u) }}
-        </div>
+<div class="space-y-6 w-full">
+  <!-- ── 1. Page Header ── -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div>
+      <div class="flex items-center gap-2.5">
+        <h1 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+          Staff & Faculty Directory
+        </h1>
         <span
-          class="badge text-xs"
-          [ngClass]="u.isActive ? 'badge-active' : 'badge-draft'"
+          class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold"
+          [style.background-color]="themeService.accent + '20'"
+          [style.color]="themeService.accent"
         >
-          {{ u.isActive ? "Active" : "Inactive" }}
+          {{ staff.length }} Personnel
         </span>
       </div>
+      <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+        Educators, academic coordinators, administrative leadership, and bursar staff
+      </p>
+    </div>
 
-      <!-- Name + Role -->
-      <h3
-        class="text-sm font-semibold text-gray-800 dark:text-gray-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors"
-      >
-        {{ fullName(u) }}
-      </h3>
-      <span
-        class="badge text-xs mt-1 inline-block"
-        [ngClass]="roleClass(u.role)"
-      >
-        {{ roleLabel(u.role) }}
-      </span>
+    <!-- Action Button -->
+    <button
+      (click)="addStaff()"
+      class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-white shadow-sm hover:shadow-md transition-all duration-200 transform hover:-translate-y-0.5 cursor-pointer"
+      [style.background-color]="themeService.accent"
+    >
+      <i class="fas fa-user-plus text-xs"></i>
+      <span>Add Staff Member</span>
+    </button>
+  </div>
 
-      <!-- Contact -->
-      <div class="mt-3 space-y-1 text-xs text-gray-500 dark:text-gray-400">
-        <div class="flex items-center gap-1.5 truncate">
-          <i class="fas fa-envelope w-3"></i>
-          <span class="truncate">{{ u.email }}</span>
-        </div>
-        <div *ngIf="u.phone" class="flex items-center gap-1.5">
-          <i class="fas fa-phone w-3"></i>
-          <span>{{ u.phone }}</span>
+  <!-- ── 2. Top Summary KPI Cards ── -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4">
+    <!-- Total In Role -->
+    <div class="rounded-2xl bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 p-4 sm:p-5 shadow-xs">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase">In Department</span>
+        <div class="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center text-sm">
+          <i class="fas fa-users-cog"></i>
         </div>
       </div>
+      <div class="mt-2 text-2xl font-black text-slate-900 dark:text-white">{{ staff.length }}</div>
+      <span class="text-[11px] text-slate-400 dark:text-slate-500">Currently filtered role</span>
+    </div>
 
-      <!-- Actions -->
-      <div
-        class="flex gap-2 mt-4 pt-3 border-t border-gray-100 dark:border-slate-700"
+    <!-- Active Personnel -->
+    <div class="rounded-2xl bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 p-4 sm:p-5 shadow-xs">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase">Active Status</span>
+        <div class="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-sm">
+          <i class="fas fa-check-circle"></i>
+        </div>
+      </div>
+      <div class="mt-2 text-2xl font-black text-slate-900 dark:text-white">{{ activeStaffCount }}</div>
+      <span class="text-[11px] text-slate-400 dark:text-slate-500">Authorized accounts</span>
+    </div>
+
+    <!-- TSC Registered -->
+    <div class="rounded-2xl bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 p-4 sm:p-5 shadow-xs">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase">TSC Numbered</span>
+        <div class="w-9 h-9 rounded-xl bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 flex items-center justify-center text-sm">
+          <i class="fas fa-id-card"></i>
+        </div>
+      </div>
+      <div class="mt-2 text-2xl font-black text-slate-900 dark:text-white">{{ tscCount }}</div>
+      <span class="text-[11px] text-slate-400 dark:text-slate-500">Government commission verified</span>
+    </div>
+
+    <!-- Departments -->
+    <div class="rounded-2xl bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 p-4 sm:p-5 shadow-xs">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase">Categories</span>
+        <div class="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 flex items-center justify-center text-sm">
+          <i class="fas fa-sitemap"></i>
+        </div>
+      </div>
+      <div class="mt-2 text-2xl font-black text-slate-900 dark:text-white">4</div>
+      <span class="text-[11px] text-slate-400 dark:text-slate-500">Teaching & admin wings</span>
+    </div>
+  </div>
+
+  <!-- ── 3. Role Tabs & Search Bar ── -->
+  <div class="space-y-3">
+    <!-- Role Switcher -->
+    <div class="flex gap-2 flex-wrap p-1.5 rounded-2xl bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 shadow-xs w-fit">
+      <button
+        *ngFor="let tab of roleTabs"
+        (click)="selectTab(tab.value)"
+        class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer"
+        [ngClass]="filterRole === tab.value ? 'bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-white shadow-2xs' : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'"
       >
-        <button
-          (click)="view(u._id); $event.stopPropagation()"
-          class="flex-1 text-xs font-medium py-1.5 rounded-lg text-center hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
-          style="color: var(--accent-600)"
-        >
-          View
-        </button>
-        <button
-          (click)="edit(u._id, $event)"
-          class="flex-1 text-xs font-medium py-1.5 rounded-lg text-center text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
-        >
-          Edit
-        </button>
+        <i [class]="'fas ' + tab.icon + ' text-xs'" [style.color]="filterRole === tab.value ? themeService.accent : ''"></i>
+        <span>{{ tab.label }}</span>
+      </button>
+    </div>
+
+    <!-- Search Input -->
+    <div class="bg-white dark:bg-slate-800/90 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 p-3 sm:p-4 shadow-xs">
+      <div class="relative max-w-md">
+        <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-xs text-slate-400"></i>
+        <input
+          type="text"
+          [(ngModel)]="search"
+          (ngModelChange)="load()"
+          placeholder="Search staff by full name, email or phone number..."
+          class="w-full pl-9 pr-4 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-accent-500/20 focus:border-accent-500 transition-all"
+        />
       </div>
     </div>
   </div>
 
-  <!-- Empty State -->
-  <div
-    *ngIf="!loading && !staff.length"
-    class="flex flex-col items-center py-20 text-gray-400 dark:text-gray-500"
-  >
-    <i class="fas fa-users text-4xl mb-4"></i>
-    <p class="text-base font-medium">No staff found</p>
-    <p class="text-sm mt-1">
-      {{
-        filterRole === "TEACHER"
-          ? "No teachers added yet."
-          : filterRole === "SCHOOL_ADMIN"
-            ? "No admin / BOM members added yet."
-            : "No staff in this category yet."
-      }}
-    </p>
-    <button
-      (click)="addStaff()"
-      class="btn-primary mt-4 flex items-center gap-2"
+  <!-- ── 4. Staff Cards Grid ── -->
+  <div>
+    <!-- Loading Shimmer -->
+    <div *ngIf="loading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 animate-pulse">
+      <div *ngFor="let _ of [1,2,3,4,5,6,7,8]" class="h-48 bg-slate-100 dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700"></div>
+    </div>
+
+    <!-- Grid -->
+    <div
+      *ngIf="!loading && staff.length"
+      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
     >
-      <i class="fas fa-plus"></i> Add Staff Member
-    </button>
+      <div
+        *ngFor="let u of staff"
+        (click)="view(u._id)"
+        class="bg-white dark:bg-slate-800/90 rounded-2xl sm:rounded-3xl border border-slate-200/80 dark:border-slate-700/80 p-5 cursor-pointer hover:shadow-md transition-all duration-200 group relative overflow-hidden"
+      >
+        <!-- Top Status & Avatar -->
+        <div class="flex items-start justify-between mb-3.5">
+          <div
+            class="w-12 h-12 rounded-2xl flex items-center justify-center text-sm font-black text-white shadow-sm shrink-0"
+            [style.background-color]="themeService.accent"
+          >
+            {{ initials(u) }}
+          </div>
+          <span
+            class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold"
+            [ngClass]="u.isActive ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-300' : 'bg-slate-100 dark:bg-slate-700 text-slate-500'"
+          >
+            <span class="w-1.5 h-1.5 rounded-full" [ngClass]="u.isActive ? 'bg-emerald-500' : 'bg-slate-400'"></span>
+            {{ u.isActive ? 'Active' : 'Inactive' }}
+          </span>
+        </div>
+
+        <!-- Name & Role -->
+        <h3 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white group-hover:text-accent-600 transition-colors truncate">
+          {{ fullName(u) }}
+        </h3>
+        <div class="mt-1 flex items-center gap-2">
+          <span class="px-2 py-0.5 rounded-md text-[11px] font-bold" [ngClass]="roleClass(u.role)">
+            {{ roleLabel(u.role) }}
+          </span>
+          <span *ngIf="u.tscNumber" class="text-[11px] font-mono text-slate-400">
+            TSC: {{ u.tscNumber }}
+          </span>
+        </div>
+
+        <!-- Contact lines -->
+        <div class="mt-3.5 pt-3 border-t border-slate-100 dark:border-slate-700/60 space-y-1.5 text-xs text-slate-500 dark:text-slate-400">
+          <div class="flex items-center gap-2 truncate">
+            <i class="fas fa-envelope text-[11px] text-slate-400 w-3.5"></i>
+            <span class="truncate">{{ u.email }}</span>
+          </div>
+          <div *ngIf="u.phone" class="flex items-center gap-2 font-mono">
+            <i class="fas fa-phone text-[11px] text-slate-400 w-3.5"></i>
+            <span>{{ u.phone }}</span>
+          </div>
+        </div>
+
+        <!-- Arrow indicator on hover -->
+        <div class="mt-3.5 pt-2 flex items-center justify-between text-[11px] font-bold text-slate-400 group-hover:text-slate-700 dark:group-hover:text-slate-200">
+          <span>View staff record</span>
+          <i class="fas fa-arrow-right text-[10px] transform group-hover:translate-x-1 transition-transform"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading && !staff.length" class="text-center py-16 px-4 bg-white dark:bg-slate-800/90 rounded-3xl border border-slate-200/80 dark:border-slate-700/80">
+      <div class="w-16 h-16 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center mx-auto mb-3 shadow-2xs">
+        <i class="fas fa-chalkboard-teacher text-2xl opacity-40"></i>
+      </div>
+      <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200">No staff found in this role</h3>
+      <p class="text-xs text-slate-400 dark:text-slate-500 mt-1 max-w-sm mx-auto">
+        No records match this role category. Click "Add Staff Member" to register a new employee.
+      </p>
+    </div>
   </div>
 </div>

@@ -3,6 +3,7 @@ import { Router } from "@angular/router";
 import { ExamsService } from "../../../shared/services/exams/exams.service";
 import { Exam, ExamType } from "../../../shared/interfaces/models";
 import { EXAM_TYPE_META } from "../exam-form/exam-form.component";
+import { ThemeService } from "../../../shared/services/theme/theme.service";
 
 @Component({
   selector: "app-exams-list",
@@ -39,7 +40,24 @@ export class ExamsListComponent implements OnInit {
   constructor(
     private examsService: ExamsService,
     private router: Router,
+    public themeService: ThemeService,
   ) {}
+
+  get totalExams(): number {
+    return this.exams.length;
+  }
+
+  get publishedCount(): number {
+    return this.exams.filter((e) => e.isPublished).length;
+  }
+
+  get draftCount(): number {
+    return this.exams.filter((e) => !e.isPublished).length;
+  }
+
+  get catCount(): number {
+    return this.exams.filter((e) => e.type === "CAT").length;
+  }
 
   ngOnInit(): void {
     this.load();

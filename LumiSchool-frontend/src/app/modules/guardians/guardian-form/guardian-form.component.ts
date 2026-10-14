@@ -2,6 +2,7 @@ import { Component, OnInit } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { ActivatedRoute, Router } from "@angular/router";
 import { GuardiansService } from "../../../shared/services/guardians/guardians.service";
+import { ThemeService } from "../../../shared/services/theme/theme.service";
 
 @Component({
   selector: "app-guardian-form",
@@ -35,6 +36,7 @@ export class GuardianFormComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private guardiansService: GuardiansService,
+    public themeService: ThemeService,
   ) {}
 
   ngOnInit(): void {

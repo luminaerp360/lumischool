@@ -1,315 +1,273 @@
-<div>
-  <button
-    (click)="goBack()"
-    class="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 mb-4 inline-flex items-center gap-1"
-  >
-    <i class="fas fa-arrow-left"></i> Back to Exams
-  </button>
+<div class="space-y-6 w-full">
+  <!-- ── 1. Top Navigation Bar ── -->
+  <div class="flex items-center justify-between gap-4">
+    <button
+      (click)="goBack()"
+      class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 hover:bg-slate-50 dark:hover:bg-slate-700 shadow-2xs transition-colors cursor-pointer"
+    >
+      <i class="fas fa-arrow-left text-xs"></i>
+      <span>Back to Exams</span>
+    </button>
 
-  <div *ngIf="loading" class="flex justify-center py-20">
-    <i class="fas fa-spinner fa-spin text-2xl text-gray-400"></i>
+    <div *ngIf="exam && !loading" class="flex items-center gap-2">
+      <button
+        *ngIf="!exam.isPublished"
+        (click)="publish()"
+        [disabled]="publishing"
+        class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-white shadow-sm hover:shadow-md transition-all duration-200 transform hover:-translate-y-0.5 cursor-pointer disabled:opacity-50"
+        [style.background-color]="themeService.accent"
+      >
+        <span *ngIf="publishing" class="animate-spin rounded-full h-3.5 w-3.5 border-2 border-white/30 border-t-white"></span>
+        <i *ngIf="!publishing" class="fas fa-paper-plane text-xs"></i>
+        <span>{{ publishing ? "Publishing..." : "Publish Results" }}</span>
+      </button>
+
+      <button
+        (click)="editExam()"
+        class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 transition cursor-pointer"
+      >
+        <i class="fas fa-edit text-xs"></i>
+        <span>Edit Exam</span>
+      </button>
+    </div>
   </div>
 
-  <div *ngIf="!loading && exam">
-    <!-- Header -->
-    <div class="flex items-start justify-between mb-6 gap-4 flex-wrap">
-      <div>
-        <div class="flex items-center gap-3 mb-1 flex-wrap">
-          <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">
-            {{ exam.name }}
-          </h1>
-          <span
-            *ngIf="typeMeta"
-            class="badge text-xs"
-            [ngClass]="typeMeta.color"
+  <!-- Loading State -->
+  <div *ngIf="loading" class="rounded-3xl bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 p-8 space-y-6 animate-pulse">
+    <div class="h-10 bg-slate-200 dark:bg-slate-700 rounded-xl w-1/3"></div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="h-48 bg-slate-200 dark:bg-slate-700 rounded-2xl"></div>
+      <div class="h-48 bg-slate-200 dark:bg-slate-700 rounded-2xl"></div>
+    </div>
+  </div>
+
+  <!-- Main Content When Loaded -->
+  <div *ngIf="!loading && exam" class="space-y-6">
+    <!-- ── Profile Hero Header Card ── -->
+    <div class="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 p-5 sm:p-7 shadow-xs">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-5">
+        <div class="flex items-center gap-4">
+          <div
+            class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl sm:rounded-3xl flex items-center justify-center font-black text-2xl text-white shadow-md shrink-0"
+            [style.background-color]="themeService.accent"
           >
-            {{ typeMeta.label }}
-          </span>
-          <span
-            class="badge text-xs"
-            [ngClass]="exam.isPublished ? 'badge-active' : 'badge-draft'"
-          >
-            {{ exam.isPublished ? "Published" : "Draft" }}
-          </span>
+            <i class="fas fa-file-signature"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2.5 flex-wrap">
+              <h1 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+                {{ exam.name }}
+              </h1>
+              <span
+                *ngIf="typeMeta"
+                class="px-2.5 py-0.5 rounded-full text-xs font-bold"
+                [ngClass]="typeMeta.color"
+              >
+                {{ typeMeta.label }}
+              </span>
+              <span
+                class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold"
+                [ngClass]="exam.isPublished ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-300' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400'"
+              >
+                <span class="w-1.5 h-1.5 rounded-full" [ngClass]="exam.isPublished ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'"></span>
+                {{ exam.isPublished ? 'Published' : 'Draft' }}
+              </span>
+            </div>
+            <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-3 flex-wrap">
+              <span><i class="fas fa-calendar-alt text-xs mr-1 text-slate-400"></i>{{ exam.academicYear }} · {{ exam.term }}</span>
+              <span><i class="fas fa-star text-xs mr-1 text-slate-400"></i>Total Scale: {{ exam.totalMarks }} Marks</span>
+              <span><i class="fas fa-clock text-xs mr-1 text-slate-400"></i>{{ formatDate(exam.startDate) }} — {{ formatDate(exam.endDate) }}</span>
+            </p>
+          </div>
         </div>
-        <p class="text-sm text-gray-500 dark:text-gray-400">
-          {{ exam.academicYear }} · {{ exam.term }}
-        </p>
-      </div>
-      <div class="flex gap-2">
-        <button
-          *ngIf="!exam.isPublished"
-          (click)="publish()"
-          [disabled]="publishing"
-          class="btn-primary flex items-center gap-2"
-        >
-          <i *ngIf="publishing" class="fas fa-spinner fa-spin"></i>
-          <i *ngIf="!publishing" class="fas fa-paper-plane"></i>
-          {{ publishing ? "Publishing..." : "Publish Results" }}
-        </button>
-        <button
-          (click)="editExam()"
-          class="btn-secondary flex items-center gap-2"
-        >
-          <i class="fas fa-edit"></i> Edit
-        </button>
+
+        <div class="flex items-center gap-3 self-start sm:self-auto">
+          <div class="text-center px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-900/40 border border-slate-100 dark:border-slate-700/60">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Classes</span>
+            <span class="text-lg font-black text-slate-900 dark:text-white">{{ exam.classIds.length || 0 }}</span>
+          </div>
+          <div class="text-center px-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-900/40 border border-slate-100 dark:border-slate-700/60">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Subjects</span>
+            <span class="text-lg font-black text-slate-900 dark:text-white">{{ exam.subjectIds.length || 0 }}</span>
+          </div>
+        </div>
       </div>
     </div>
 
+    <!-- ── 2 Columns: Exam Details & Class Allocations ── -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- Exam Details -->
-      <div
-        class="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-6"
-      >
-        <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">
-          Exam Details
-        </h2>
-        <div class="space-y-3 text-sm">
-          <div class="flex justify-between">
-            <span class="text-gray-500 dark:text-gray-400">Type</span>
-            <span class="badge text-xs" [ngClass]="typeMeta?.color">{{
-              typeMeta?.label
-            }}</span>
+      <div class="rounded-2xl sm:rounded-3xl bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 p-5 sm:p-6 shadow-xs space-y-4">
+        <div class="flex items-center gap-3 pb-3 border-b border-slate-100 dark:border-slate-700/80">
+          <div class="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300 flex items-center justify-center text-sm">
+            <i class="fas fa-info-circle"></i>
           </div>
-          <div class="flex justify-between">
-            <span class="text-gray-500 dark:text-gray-400">Academic Year</span>
-            <span class="text-gray-800 dark:text-gray-100">{{
-              exam.academicYear
-            }}</span>
+          <div>
+            <h2 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white">Exam Session Parameters</h2>
+            <p class="text-[11px] text-slate-400 dark:text-slate-500">Academic session timeline, evaluation tier, and marks scheme</p>
           </div>
-          <div class="flex justify-between">
-            <span class="text-gray-500 dark:text-gray-400">Term</span>
-            <span class="text-gray-800 dark:text-gray-100">{{
-              exam.term
-            }}</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs sm:text-sm">
+          <div class="p-3.5 rounded-xl bg-slate-50/70 dark:bg-slate-900/40 border border-slate-100 dark:border-slate-700/60">
+            <span class="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">Assessment Type</span>
+            <span class="font-semibold text-slate-800 dark:text-slate-200">{{ typeMeta?.label || exam.type }}</span>
           </div>
-          <div class="flex justify-between">
-            <span class="text-gray-500 dark:text-gray-400">Total Marks</span>
-            <span class="text-gray-800 dark:text-gray-100 font-semibold">{{
-              exam.totalMarks
-            }}</span>
+
+          <div class="p-3.5 rounded-xl bg-slate-50/70 dark:bg-slate-900/40 border border-slate-100 dark:border-slate-700/60">
+            <span class="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">Total Marks Base</span>
+            <span class="font-mono font-bold text-slate-800 dark:text-slate-200">{{ exam.totalMarks }} points</span>
           </div>
-          <div class="flex justify-between">
-            <span class="text-gray-500 dark:text-gray-400">Start Date</span>
-            <span class="text-gray-800 dark:text-gray-100">{{
-              formatDate(exam.startDate)
-            }}</span>
+
+          <div class="p-3.5 rounded-xl bg-slate-50/70 dark:bg-slate-900/40 border border-slate-100 dark:border-slate-700/60">
+            <span class="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">Testing Window Start</span>
+            <span class="text-slate-800 dark:text-slate-200">{{ formatDate(exam.startDate) }}</span>
           </div>
-          <div class="flex justify-between">
-            <span class="text-gray-500 dark:text-gray-400">End Date</span>
-            <span class="text-gray-800 dark:text-gray-100">{{
-              formatDate(exam.endDate)
-            }}</span>
-          </div>
-          <div class="flex justify-between">
-            <span class="text-gray-500 dark:text-gray-400">Status</span>
-            <span
-              class="badge text-xs"
-              [ngClass]="exam.isPublished ? 'badge-active' : 'badge-draft'"
-            >
-              {{ exam.isPublished ? "Published" : "Draft" }}
-            </span>
+
+          <div class="p-3.5 rounded-xl bg-slate-50/70 dark:bg-slate-900/40 border border-slate-100 dark:border-slate-700/60">
+            <span class="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">Testing Window End</span>
+            <span class="text-slate-800 dark:text-slate-200">{{ formatDate(exam.endDate) }}</span>
           </div>
         </div>
       </div>
 
-      <!-- Classes -->
-      <div
-        class="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-6"
-      >
-        <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">
-          Classes ({{ exam.classIds.length }})
-        </h2>
-        <div
-          *ngIf="exam.classIds.length; else noClasses"
-          class="flex flex-wrap gap-2"
-        >
-          <span
-            *ngFor="let cid of exam.classIds"
-            class="px-2.5 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400"
-          >
-            {{ className(cid) }}
-          </span>
-        </div>
-        <ng-template #noClasses>
-          <p class="text-sm text-gray-400">No classes assigned.</p>
-        </ng-template>
+      <!-- Participating Classes & Subjects -->
+      <div class="rounded-2xl sm:rounded-3xl bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 p-5 sm:p-6 shadow-xs space-y-5">
+        <div>
+          <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-700/80">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-xl bg-purple-50 dark:bg-purple-900/40 text-purple-600 dark:text-purple-300 flex items-center justify-center text-sm">
+                <i class="fas fa-chalkboard"></i>
+              </div>
+              <div>
+                <h2 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white">Examined Classes</h2>
+                <p class="text-[11px] text-slate-400 dark:text-slate-500">Student cohorts undertaking this examination</p>
+                         <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300">
+              {{ exam.classIds.length || 0 }}
+            </span>
+          </div>
 
-        <h2
-          class="text-lg font-semibold text-gray-800 dark:text-gray-100 mt-6 mb-4"
-        >
-          Subjects ({{ exam.subjectIds.length }})
-        </h2>
-        <div
-          *ngIf="exam.subjectIds.length; else noSubjects"
-          class="flex flex-wrap gap-2"
-        >
-          <span
-            *ngFor="let sid of exam.subjectIds"
-            class="px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-          >
-            {{ subjectName(sid) }}
-          </span>
+          <div class="flex flex-wrap gap-2 pt-3">
+            <span
+              *ngFor="let cid of exam.classIds"
+              class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800/60"
+            >
+              {{ className(cid) }}
+            </span>
+            <span *ngIf="!exam.classIds.length" class="text-xs text-slate-400">No classes linked yet.</span>
+          </div>
         </div>
-        <ng-template #noSubjects>
-          <p class="text-sm text-gray-400">No subjects assigned.</p>
-        </ng-template>
+
+        <div>
+          <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-700/80">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-300 flex items-center justify-center text-sm">
+                <i class="fas fa-book"></i>
+              </div>
+              <div>
+                <h2 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white">Subject Learning Areas</h2>
+                <p class="text-[11px] text-slate-400 dark:text-slate-500">Subjects included in this test series</p>
+              </div>
+            </div>
+            <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300">
+              {{ exam.subjectIds.length || 0 }}
+            </span>
+          </div>
+
+          <div class="flex flex-wrap gap-2 pt-3">
+            <span
+              *ngFor="let sid of exam.subjectIds"
+              class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60"
+            >
+              {{ subjectName(sid) }}
+            </span>
+            <span *ngIf="!exam.subjectIds.length" class="text-xs text-slate-400">No subjects linked yet.</span>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- Grading Guide -->
-    <div
-      class="mt-6 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-6"
-    >
-      <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">
-        Kenya Grading Guide
-      </h2>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 text-sm">
-        <!-- CBC -->
+    <!-- ── Kenya CBC Grading Matrix Reference ── -->
+    <div class="rounded-2xl sm:rounded-3xl bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 p-5 sm:p-6 shadow-xs space-y-4">
+      <div class="flex items-center gap-3 pb-3 border-b border-slate-100 dark:border-slate-700/80">
+        <div class="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-900/40 text-amber-600 dark:text-amber-300 flex items-center justify-center text-sm">
+          <i class="fas fa-award"></i>
+        </div>
         <div>
-          <h3
-            class="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-3"
-          >
-            CBC — Pre-Primary · Primary · Junior Secondary (Grade 1–9)
-          </h3>
-          <div class="space-y-2">
-            <div
-              class="flex items-center justify-between p-2 rounded-lg bg-green-50 dark:bg-green-900/20"
-            >
-              <div class="flex items-center gap-2">
-                <span
-                  class="font-mono font-bold text-green-700 dark:text-green-400 w-8"
-                  >EE</span
-                >
-                <span class="text-gray-700 dark:text-gray-300"
-                  >Exceeding Expectations</span
-                >
-              </div>
-              <span class="text-xs text-gray-500">80 – 100%</span>
+          <h2 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white">Kenya MoE & KNEC Grading Standards</h2>
+          <p class="text-[11px] text-slate-400 dark:text-slate-500">CBC competency performance levels and KCSE senior secondary point conversion</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs sm:text-sm">
+        <!-- CBC Levels -->
+        <div class="space-y-2.5">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">CBC Competency Scale (Grade 1 – 9)</h3>
+          <div class="p-3 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/60 flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <span class="font-black text-emerald-700 dark:text-emerald-400 w-8">EE</span>
+              <span class="font-semibold text-slate-800 dark:text-slate-200">Exceeding Expectations</span>
             </div>
-            <div
-              class="flex items-center justify-between p-2 rounded-lg bg-blue-50 dark:bg-blue-900/20"
-            >
-              <div class="flex items-center gap-2">
-                <span
-                  class="font-mono font-bold text-blue-700 dark:text-blue-400 w-8"
-                  >ME</span
-                >
-                <span class="text-gray-700 dark:text-gray-300"
-                  >Meeting Expectations</span
-                >
-              </div>
-              <span class="text-xs text-gray-500">60 – 79%</span>
+            <span class="font-mono text-xs text-emerald-700 dark:text-emerald-400 font-bold">80 – 100%</span>
+          </div>
+          <div class="p-3 rounded-xl bg-blue-50/70 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800/60 flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <span class="font-black text-blue-700 dark:text-blue-400 w-8">ME</span>
+              <span class="font-semibold text-slate-800 dark:text-slate-200">Meeting Expectations</span>
             </div>
-            <div
-              class="flex items-center justify-between p-2 rounded-lg bg-yellow-50 dark:bg-yellow-900/20"
-            >
-              <div class="flex items-center gap-2">
-                <span
-                  class="font-mono font-bold text-yellow-700 dark:text-yellow-400 w-8"
-                  >AE</span
-                >
-                <span class="text-gray-700 dark:text-gray-300"
-                  >Approaching Expectations</span
-                >
-              </div>
-              <span class="text-xs text-gray-500">40 – 59%</span>
+            <span class="font-mono text-xs text-blue-700 dark:text-blue-400 font-bold">60 – 79%</span>
+          </div>
+          <div class="p-3 rounded-xl bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <span class="font-black text-amber-700 dark:text-amber-400 w-8">AE</span>
+              <span class="font-semibold text-slate-800 dark:text-slate-200">Approaching Expectations</span>
             </div>
-            <div
-              class="flex items-center justify-between p-2 rounded-lg bg-red-50 dark:bg-red-900/20"
-            >
-              <div class="flex items-center gap-2">
-                <span
-                  class="font-mono font-bold text-red-700 dark:text-red-400 w-8"
-                  >BE</span
-                >
-                <span class="text-gray-700 dark:text-gray-300"
-                  >Below Expectations</span
-                >
-              </div>
-              <span class="text-xs text-gray-500">0 – 39%</span>
+            <span class="font-mono text-xs text-amber-700 dark:text-amber-400 font-bold">40 – 59%</span>
+          </div>
+          <div class="p-3 rounded-xl bg-rose-50/70 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800/60 flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <span class="font-black text-rose-700 dark:text-rose-400 w-8">BE</span>
+              <span class="font-semibold text-slate-800 dark:text-slate-200">Below Expectations</span>
             </div>
+            <span class="font-mono text-xs text-rose-700 dark:text-rose-400 font-bold">0 – 39%</span>
           </div>
         </div>
-        <!-- KCSE -->
+
+        <!-- KCSE Scale -->
         <div>
-          <h3
-            class="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-3"
-          >
-            KCSE — Senior Secondary (Grade 10–12)
-          </h3>
-          <div class="grid grid-cols-2 gap-1 text-xs">
-            <div
-              class="flex justify-between p-1.5 rounded bg-gray-50 dark:bg-slate-700"
-            >
-              <span class="font-mono font-bold">A</span
-              ><span class="text-gray-500">80–100 · 12 pts</span>
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">KCSE Senior Secondary (Grade 10 – 12)</h3>
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <div class="p-2 rounded-lg bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-700/60 flex justify-between">
+              <strong class="font-mono font-bold text-slate-900 dark:text-white">A</strong>
+              <span class="text-slate-500">80–100 · 12 pts</span>
             </div>
-            <div
-              class="flex justify-between p-1.5 rounded bg-gray-50 dark:bg-slate-700"
-            >
-              <span class="font-mono font-bold">A-</span
-              ><span class="text-gray-500">75–79 · 11 pts</span>
+            <div class="p-2 rounded-lg bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-700/60 flex justify-between">
+              <strong class="font-mono font-bold text-slate-900 dark:text-white">A-</strong>
+              <span class="text-slate-500">75–79 · 11 pts</span>
             </div>
-            <div
-              class="flex justify-between p-1.5 rounded bg-gray-50 dark:bg-slate-700"
-            >
-              <span class="font-mono font-bold">B+</span
-              ><span class="text-gray-500">70–74 · 10 pts</span>
+            <div class="p-2 rounded-lg bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-700/60 flex justify-between">
+              <strong class="font-mono font-bold text-slate-900 dark:text-white">B+</strong>
+              <span class="text-slate-500">70–74 · 10 pts</span>
             </div>
-            <div
-              class="flex justify-between p-1.5 rounded bg-gray-50 dark:bg-slate-700"
-            >
-              <span class="font-mono font-bold">B</span
-              ><span class="text-gray-500">65–69 · 9 pts</span>
+            <div class="p-2 rounded-lg bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-700/60 flex justify-between">
+              <strong class="font-mono font-bold text-slate-900 dark:text-white">B</strong>
+              <span class="text-slate-500">65–69 · 9 pts</span>
             </div>
-            <div
-              class="flex justify-between p-1.5 rounded bg-gray-50 dark:bg-slate-700"
-            >
-              <span class="font-mono font-bold">B-</span
-              ><span class="text-gray-500">60–64 · 8 pts</span>
+            <div class="p-2 rounded-lg bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-700/60 flex justify-between">
+              <strong class="font-mono font-bold text-slate-900 dark:text-white">C+</strong>
+              <span class="text-slate-500">55–59 · 7 pts</span>
             </div>
-            <div
-              class="flex justify-between p-1.5 rounded bg-gray-50 dark:bg-slate-700"
-            >
-              <span class="font-mono font-bold">C+</span
-              ><span class="text-gray-500">55–59 · 7 pts</span>
+            <div class="p-2 rounded-lg bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-700/60 flex justify-between">
+              <strong class="font-mono font-bold text-slate-900 dark:text-white">C</strong>
+              <span class="text-slate-500">50–54 · 6 pts</span>
             </div>
-            <div
-              class="flex justify-between p-1.5 rounded bg-gray-50 dark:bg-slate-700"
-            >
-              <span class="font-mono font-bold">C</span
-              ><span class="text-gray-500">50–54 · 6 pts</span>
+            <div class="p-2 rounded-lg bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-700/60 flex justify-between">
+              <strong class="font-mono font-bold text-slate-900 dark:text-white">D+</strong>
+              <span class="text-slate-500">40–44 · 4 pts</span>
             </div>
-            <div
-              class="flex justify-between p-1.5 rounded bg-gray-50 dark:bg-slate-700"
-            >
-              <span class="font-mono font-bold">C-</span
-              ><span class="text-gray-500">45–49 · 5 pts</span>
-            </div>
-            <div
-              class="flex justify-between p-1.5 rounded bg-gray-50 dark:bg-slate-700"
-            >
-              <span class="font-mono font-bold">D+</span
-              ><span class="text-gray-500">40–44 · 4 pts</span>
-            </div>
-            <div
-              class="flex justify-between p-1.5 rounded bg-gray-50 dark:bg-slate-700"
-            >
-              <span class="font-mono font-bold">D</span
-              ><span class="text-gray-500">35–39 · 3 pts</span>
-            </div>
-            <div
-              class="flex justify-between p-1.5 rounded bg-gray-50 dark:bg-slate-700"
-            >
-              <span class="font-mono font-bold">D-</span
-              ><span class="text-gray-500">30–34 · 2 pts</span>
-            </div>
-            <div
-              class="flex justify-between p-1.5 rounded bg-gray-50 dark:bg-slate-700"
-            >
-              <span class="font-mono font-bold">E</span
-              ><span class="text-gray-500">0–29 · 1 pt</span>
+            <div class="p-2 rounded-lg bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-700/60 flex justify-between">
+              <strong class="font-mono font-bold text-slate-900 dark:text-white">E</strong>
+              <span class="text-slate-500">0–29 · 1 pt</span>
             </div>
           </div>
         </div>
