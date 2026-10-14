@@ -28,4 +28,4 @@ volumes:
 networks:
   lumischool-net:
     name: lumischool-net
-    driver: bridge
+    external: true
