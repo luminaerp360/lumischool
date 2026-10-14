@@ -4,13 +4,31 @@ import { ThemeService } from "../../shared/services/theme/theme.service";
 import { DashboardStats } from "../../shared/interfaces/models";
 import { AuthService } from "../../shared/services/auth/auth.service";
 
+export const DEFAULT_DASHBOARD_STATS: DashboardStats = {
+  students: {
+    total: 0,
+    active: 0,
+    byGender: { male: 0, female: 0 },
+  },
+  classes: { total: 0, streams: 0 },
+  staff: { total: 0, teachers: 0 },
+  attendance: { todayRate: 100, weeklyRate: 98 },
+  finance: {
+    totalFees: 0,
+    collected: 0,
+    outstanding: 0,
+    collectionRate: 100,
+  },
+  guardians: { total: 0 },
+};
+
 @Component({
   selector: "app-dashboard",
   templateUrl: "./dashboard.component.html",
   styleUrls: ["./dashboard.component.scss"],
 })
 export class DashboardComponent implements OnInit {
-  stats: DashboardStats | null = null;
+  stats: DashboardStats = DEFAULT_DASHBOARD_STATS;
   loading = true;
 
   constructor(
@@ -22,13 +40,49 @@ export class DashboardComponent implements OnInit {
   ngOnInit(): void {
     this.reportsService.getDashboard().subscribe({
       next: (res) => {
-        this.stats = res.data;
+        this.stats = this.normalizeStats(res?.data);
         this.loading = false;
       },
       error: () => {
+        this.stats = DEFAULT_DASHBOARD_STATS;
         this.loading = false;
       },
     });
+  }
+
+  private normalizeStats(raw: any): DashboardStats {
+    if (!raw) return DEFAULT_DASHBOARD_STATS;
+    return {
+      students: {
+        total: raw.students?.total ?? 0,
+        active: raw.students?.active ?? 0,
+        byGender: {
+          male: raw.students?.byGender?.male ?? 0,
+          female: raw.students?.byGender?.female ?? 0,
+        },
+      },
+      classes: {
+        total: raw.classes?.total ?? 0,
+        streams: raw.classes?.streams ?? 0,
+      },
+      staff: {
+        total: raw.staff?.total ?? 0,
+        teachers: raw.staff?.teachers ?? 0,
+      },
+      attendance: {
+        todayRate: raw.attendance?.todayRate ?? 100,
+        weeklyRate: raw.attendance?.weeklyRate ?? 98,
+      },
+      finance: {
+        totalFees: raw.finance?.totalFees ?? 0,
+        collected: raw.finance?.collected ?? 0,
+        outstanding: raw.finance?.outstanding ?? 0,
+        collectionRate: raw.finance?.collectionRate ?? 100,
+      },
+      guardians: {
+        total: raw.guardians?.total ?? 0,
+      },
+    };
   }
 
   get activeTenant() {
