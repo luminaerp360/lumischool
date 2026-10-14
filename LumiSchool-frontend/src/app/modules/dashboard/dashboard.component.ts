@@ -39,4 +39,48 @@ export class DashboardComponent implements OnInit {
   get tenantCount(): number {
     return this.authService.getTenants().length;
   }
+
+  getGreeting(): string {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Good morning";
+    if (hour < 17) return "Good afternoon";
+    return "Good evening";
+  }
+
+  getUserName(): string {
+    const user = this.authService.getUser();
+    return user?.firstName || user?.name || "Administrator";
+  }
+
+  getCurrentDateFormatted(): string {
+    return new Intl.DateTimeFormat("en-GB", {
+      weekday: "long",
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    }).format(new Date());
+  }
+
+  getMalePercentage(): number {
+    if (!this.stats?.students?.total) return 50;
+    const male = this.stats.students.byGender?.male || 0;
+    return Math.round((male / this.stats.students.total) * 100);
+  }
+
+  getFemalePercentage(): number {
+    if (!this.stats?.students?.total) return 50;
+    const female = this.stats.students.byGender?.female || 0;
+    return Math.round((female / this.stats.students.total) * 100);
+  }
+
+  getStudentTeacherRatio(): string {
+    if (!this.stats?.students?.total || !this.stats?.staff?.teachers) return "1:25";
+    const ratio = Math.round(this.stats.students.total / this.stats.staff.teachers);
+    return `1:${ratio}`;
+  }
+
+  getStreamsPerClass(): string {
+    if (!this.stats?.classes?.total || !this.stats?.classes?.streams) return "1.0";
+    return (this.stats.classes.streams / this.stats.classes.total).toFixed(1);
+  }
 }

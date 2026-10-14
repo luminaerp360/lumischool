@@ -1,265 +1,451 @@
-<div>
-  <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6">
-    Dashboard
-  </h1>
-
-  <!-- Active Organization Banner -->
+<div class="space-y-6 max-w-7xl mx-auto">
+  <!-- ── 1. Welcome & School Header Banner ── -->
   <div
-    *ngIf="activeTenant"
-    class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-2xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-5 py-4 shadow-sm"
+    class="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-white dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 p-5 sm:p-7 shadow-xs transition-all duration-300"
   >
-    <div class="flex min-w-0 items-center gap-3">
-      <div
-        class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl text-sm font-bold text-white"
-        [style.background-color]="themeService.accent"
-      >
-        {{ activeTenant.name.charAt(0).toUpperCase() }}
-      </div>
-      <div class="min-w-0">
-        <p
-          class="truncate text-sm font-semibold text-gray-900 dark:text-gray-100"
-        >
-          {{ activeTenant.name }}
-        </p>
-        <p class="text-xs text-gray-500 dark:text-gray-400">
-          All data on this page is scoped to this school
-        </p>
-      </div>
-    </div>
-    <div class="flex flex-wrap items-center gap-2">
-      <span
-        class="rounded-full bg-gray-100 dark:bg-slate-700 px-2.5 py-1 text-xs font-medium text-gray-600 dark:text-gray-300 capitalize"
-      >
-        {{ activeTenant.plan }}
-      </span>
-      <span
-        *ngIf="tenantCount > 1"
-        class="rounded-full bg-blue-50 dark:bg-blue-900/20 px-2.5 py-1 text-xs font-medium text-blue-600 dark:text-blue-400"
-      >
-        {{ tenantCount }} schools — switch via top nav
-      </span>
-    </div>
-  </div>
+    <!-- Background subtle gradient accent overlay -->
+    <div
+      class="absolute top-0 right-0 -mr-16 -mt-16 w-80 h-80 rounded-full blur-3xl opacity-15 pointer-events-none"
+      [style.background-color]="themeService.accent"
+    ></div>
 
-  <!-- Loading -->
-  <div *ngIf="loading" class="flex items-center justify-center py-20">
-    <i
-      class="fas fa-spinner fa-spin text-2xl"
-      [style.color]="themeService.accent"
-    ></i>
-  </div>
-
-  <div *ngIf="!loading && stats">
-    <!-- Stats Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-      <!-- Students -->
-      <div
-        class="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-5"
-      >
-        <div class="flex items-center justify-between mb-3">
-          <div
-            class="w-10 h-10 rounded-lg flex items-center justify-center bg-blue-100 dark:bg-blue-900/30"
-          >
-            <i
-              class="fas fa-user-graduate text-blue-600 dark:text-blue-400"
-            ></i>
-          </div>
-        </div>
-        <p class="text-2xl font-bold text-gray-800 dark:text-gray-100">
-          {{ stats.students.total }}
-        </p>
-        <p class="text-sm text-gray-500 dark:text-gray-400">Total Students</p>
-        <div class="flex gap-3 mt-2 text-xs text-gray-500 dark:text-gray-400">
+    <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-5">
+      <!-- Greeting & Title -->
+      <div class="space-y-1.5">
+        <div class="flex items-center gap-2 flex-wrap">
           <span
-            ><i class="fas fa-check-circle text-green-500 mr-1"></i
-            >{{ stats.students.active }} active</span
+            class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold select-none shadow-2xs"
+            [style.background-color]="themeService.accent + '20'"
+            [style.color]="themeService.accent"
           >
-          <span
-            ><i class="fas fa-male text-blue-500 mr-1"></i
-            >{{ stats.students.byGender.male }} M</span
-          >
-          <span
-            ><i class="fas fa-female text-pink-500 mr-1"></i
-            >{{ stats.students.byGender.female }} F</span
-          >
-        </div>
-      </div>
-
-      <!-- Classes -->
-      <div
-        class="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-5"
-      >
-        <div class="flex items-center justify-between mb-3">
-          <div
-            class="w-10 h-10 rounded-lg flex items-center justify-center bg-green-100 dark:bg-green-900/30"
-          >
-            <i class="fas fa-chalkboard text-green-600 dark:text-green-400"></i>
-          </div>
-        </div>
-        <p class="text-2xl font-bold text-gray-800 dark:text-gray-100">
-          {{ stats.classes.total }}
-        </p>
-        <p class="text-sm text-gray-500 dark:text-gray-400">Total Classes</p>
-        <div class="flex gap-3 mt-2 text-xs text-gray-500 dark:text-gray-400">
-          <span
-            ><i class="fas fa-stream text-green-500 mr-1"></i
-            >{{ stats.classes.streams }} streams</span
-          >
-        </div>
-      </div>
-
-      <!-- Staff -->
-      <div
-        class="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-5"
-      >
-        <div class="flex items-center justify-between mb-3">
-          <div
-            class="w-10 h-10 rounded-lg flex items-center justify-center bg-purple-100 dark:bg-purple-900/30"
-          >
-            <i
-              class="fas fa-users-cog text-purple-600 dark:text-purple-400"
-            ></i>
-          </div>
-        </div>
-        <p class="text-2xl font-bold text-gray-800 dark:text-gray-100">
-          {{ stats.staff.total }}
-        </p>
-        <p class="text-sm text-gray-500 dark:text-gray-400">Total Staff</p>
-        <div class="flex gap-3 mt-2 text-xs text-gray-500 dark:text-gray-400">
-          <span
-            ><i class="fas fa-chalkboard-teacher text-purple-500 mr-1"></i
-            >{{ stats.staff.teachers }} teachers</span
-          >
-        </div>
-      </div>
-
-      <!-- Fee Collection -->
-      <div
-        class="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-5"
-      >
-        <div class="flex items-center justify-between mb-3">
-          <div
-            class="w-10 h-10 rounded-lg flex items-center justify-center bg-emerald-100 dark:bg-emerald-900/30"
-          >
-            <i
-              class="fas fa-money-bill-wave text-emerald-600 dark:text-emerald-400"
-            ></i>
-          </div>
-          <span
-            class="text-xs font-medium px-2 py-1 rounded-full bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400"
-          >
-            {{ stats.finance.collectionRate | number: "1.0-0" }}% collected
+            <span class="w-1.5 h-1.5 rounded-full" [style.background-color]="themeService.accent"></span>
+            CBC Kenya 2-6-3-3-3 System
+          </span>
+          <span class="text-xs text-slate-400 dark:text-slate-500 font-medium hidden sm:inline-block">•</span>
+          <span class="text-xs text-slate-500 dark:text-slate-400 font-medium">
+            {{ getCurrentDateFormatted() }}
           </span>
         </div>
-        <p class="text-2xl font-bold text-gray-800 dark:text-gray-100">
+
+        <h1 class="text-xl sm:text-2xl md:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+          {{ getGreeting() }}, <span [style.color]="themeService.accent">{{ getUserName() }}</span>! 👋
+        </h1>
+
+        <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 max-w-xl">
+          Here is your school's daily operational summary for <strong class="text-slate-700 dark:text-slate-200">{{ activeTenant?.name || 'Your School' }}</strong>.
+        </p>
+      </div>
+
+      <!-- Quick Action Buttons -->
+      <div class="flex items-center gap-2.5 flex-wrap sm:flex-nowrap">
+        <a
+          routerLink="/students/new"
+          class="flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-white shadow-sm hover:shadow-md transition-all duration-200 transform hover:-translate-y-0.5 cursor-pointer flex-1 sm:flex-none justify-center"
+          [style.background]="'linear-gradient(135deg, ' + themeService.accent + ', #047857)'"
+        >
+          <i class="fas fa-user-plus text-xs"></i>
+          <span>New Student</span>
+        </a>
+
+        <a
+          routerLink="/attendance"
+          class="flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 transition-all cursor-pointer flex-1 sm:flex-none justify-center"
+        >
+          <i class="fas fa-clipboard-check text-xs text-slate-500 dark:text-slate-400"></i>
+          <span>Take Attendance</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 2. Loading State (Shimmer Skeleton Cards) ── -->
+  <div *ngIf="loading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 animate-pulse">
+    <div *ngFor="let item of [1, 2, 3, 4]" class="bg-white dark:bg-slate-800 rounded-2xl p-5 border border-slate-200/80 dark:border-slate-700/80 h-40">
+      <div class="flex justify-between items-center mb-4">
+        <div class="w-10 h-10 rounded-xl bg-slate-200 dark:bg-slate-700"></div>
+        <div class="w-16 h-5 rounded-full bg-slate-200 dark:bg-slate-700"></div>
+      </div>
+      <div class="w-24 h-8 rounded-lg bg-slate-200 dark:bg-slate-700 mb-2"></div>
+      <div class="w-32 h-4 rounded bg-slate-200 dark:bg-slate-700"></div>
+    </div>
+  </div>
+
+  <!-- ── 3. Main Dashboard Content (When Loaded) ── -->
+  <div *ngIf="!loading && stats" class="space-y-6">
+    <!-- Top KPI Cards Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+      <!-- Card 1: Students -->
+      <div
+        class="group relative bg-white dark:bg-slate-800 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 p-5 shadow-2xs hover:shadow-md transition-all duration-300 hover:border-slate-300 dark:hover:border-slate-600 overflow-hidden"
+      >
+        <div class="flex items-center justify-between mb-4">
+          <div class="w-11 h-11 rounded-xl flex items-center justify-center bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 shadow-2xs group-hover:scale-105 transition-transform duration-200">
+            <i class="fas fa-user-graduate text-lg"></i>
+          </div>
+          <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+            {{ stats.students.active }} Active
+          </span>
+        </div>
+
+        <p class="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+          {{ stats.students.total | number }}
+        </p>
+        <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-0.5">Total Enrolled Students</p>
+
+        <!-- Gender Breakdown Bar -->
+        <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-700/60">
+          <div class="w-full bg-slate-100 dark:bg-slate-700 h-2 rounded-full overflow-hidden flex mb-2">
+            <div class="bg-blue-500 h-full transition-all duration-500" [style.width.%]="getMalePercentage()"></div>
+            <div class="bg-pink-500 h-full transition-all duration-500" [style.width.%]="getFemalePercentage()"></div>
+          </div>
+          <div class="flex justify-between text-[11px] font-medium text-slate-500 dark:text-slate-400">
+            <span class="flex items-center gap-1">
+              <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+              {{ stats.students.byGender.male }} Male ({{ getMalePercentage() }}%)
+            </span>
+            <span class="flex items-center gap-1">
+              <span class="w-2 h-2 rounded-full bg-pink-500"></span>
+              {{ stats.students.byGender.female }} Female ({{ getFemalePercentage() }}%)
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2: Classes & Streams -->
+      <div
+        class="group relative bg-white dark:bg-slate-800 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 p-5 shadow-2xs hover:shadow-md transition-all duration-300 hover:border-slate-300 dark:hover:border-slate-600 overflow-hidden"
+      >
+        <div class="flex items-center justify-between mb-4">
+          <div class="w-11 h-11 rounded-xl flex items-center justify-center bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 shadow-2xs group-hover:scale-105 transition-transform duration-200">
+            <i class="fas fa-chalkboard text-lg"></i>
+          </div>
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
+            {{ stats.classes.streams }} Streams
+          </span>
+        </div>
+
+        <p class="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+          {{ stats.classes.total }}
+        </p>
+        <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-0.5">Classes & Grades</p>
+
+        <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between text-[11px]">
+          <span class="text-slate-500 dark:text-slate-400">Avg Streams / Class</span>
+          <span class="font-bold text-slate-800 dark:text-slate-200 bg-slate-100 dark:bg-slate-700/60 px-2 py-0.5 rounded-md">
+            {{ getStreamsPerClass() }}x
+          </span>
+        </div>
+      </div>
+
+      <!-- Card 3: Staff & Faculty -->
+      <div
+        class="group relative bg-white dark:bg-slate-800 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 p-5 shadow-2xs hover:shadow-md transition-all duration-300 hover:border-slate-300 dark:hover:border-slate-600 overflow-hidden"
+      >
+        <div class="flex items-center justify-between mb-4">
+          <div class="w-11 h-11 rounded-xl flex items-center justify-center bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400 shadow-2xs group-hover:scale-105 transition-transform duration-200">
+            <i class="fas fa-users-cog text-lg"></i>
+          </div>
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-purple-50 text-purple-700 dark:bg-purple-950/40 dark:text-purple-400">
+            {{ getStudentTeacherRatio() }} Ratio
+          </span>
+        </div>
+
+        <p class="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+          {{ stats.staff.total }}
+        </p>
+        <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-0.5">Total Staff Members</p>
+
+        <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between text-[11px]">
+          <span class="text-slate-500 dark:text-slate-400">Teaching Faculty</span>
+          <span class="font-bold text-slate-800 dark:text-slate-200">
+            {{ stats.staff.teachers }} Teachers
+          </span>
+        </div>
+      </div>
+
+      <!-- Card 4: Fee Revenue -->
+      <div
+        class="group relative bg-white dark:bg-slate-800 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 p-5 shadow-2xs hover:shadow-md transition-all duration-300 hover:border-slate-300 dark:hover:border-slate-600 overflow-hidden"
+      >
+        <div class="flex items-center justify-between mb-4">
+          <div class="w-11 h-11 rounded-xl flex items-center justify-center bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 shadow-2xs group-hover:scale-105 transition-transform duration-200">
+            <i class="fas fa-money-bill-wave text-lg"></i>
+          </div>
+          <span
+            class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold"
+            [ngClass]="{
+              'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400': stats.finance.collectionRate >= 70,
+              'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400': stats.finance.collectionRate < 70
+            }"
+          >
+            {{ stats.finance.collectionRate | number: '1.0-0' }}% Collected
+          </span>
+        </div>
+
+        <p class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight truncate">
           KES {{ stats.finance.collected | number }}
         </p>
-        <p class="text-sm text-gray-500 dark:text-gray-400">Fees Collected</p>
-        <div class="flex gap-3 mt-2 text-xs text-gray-500 dark:text-gray-400">
-          <span>Outstanding: KES {{ stats.finance.outstanding | number }}</span>
+        <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-0.5">Fees Collected</p>
+
+        <!-- Progress meter -->
+        <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-700/60">
+          <div class="w-full bg-slate-100 dark:bg-slate-700 h-2 rounded-full overflow-hidden mb-1.5">
+            <div
+              class="h-full rounded-full transition-all duration-700"
+              [style.background-color]="themeService.accent"
+              [style.width.%]="stats.finance.collectionRate > 100 ? 100 : stats.finance.collectionRate"
+            ></div>
+          </div>
+          <div class="flex justify-between text-[11px] font-medium text-slate-500 dark:text-slate-400">
+            <span>Outstanding</span>
+            <span class="font-bold text-amber-600 dark:text-amber-400">KES {{ stats.finance.outstanding | number }}</span>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Second Row -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      <!-- Attendance -->
+    <!-- ── 4. Middle Insights Grid (Attendance, Financial Health, Community) ── -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+      <!-- Attendance Overview Card -->
       <div
-        class="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-5"
+        class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 p-5 shadow-2xs flex flex-col justify-between"
       >
-        <h3 class="text-sm font-semibold text-gray-800 dark:text-gray-100 mb-4">
-          <i
-            class="fas fa-clipboard-check mr-2"
-            [style.color]="themeService.accent"
-          ></i
-          >Attendance Overview
-        </h3>
-        <div class="space-y-3">
-          <div class="flex justify-between text-sm">
-            <span class="text-gray-500 dark:text-gray-400">Today's Rate</span>
-            <span class="font-medium text-green-600 dark:text-green-400"
-              >{{ stats.attendance.todayRate | number: "1.0-1" }}%</span
-            >
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400">
+                <i class="fas fa-clipboard-check text-sm"></i>
+              </div>
+              <h2 class="text-sm font-bold text-slate-800 dark:text-slate-100">
+                Attendance Pulse
+              </h2>
+            </div>
+            <a routerLink="/attendance" class="text-xs font-semibold text-accent-600 hover:text-accent-700 hover:underline">
+              View Records →
+            </a>
           </div>
-          <div class="flex justify-between text-sm">
-            <span class="text-gray-500 dark:text-gray-400">Weekly Average</span>
-            <span class="font-medium text-blue-600 dark:text-blue-400"
-              >{{ stats.attendance.weeklyRate | number: "1.0-1" }}%</span
-            >
+
+          <!-- Main Today Percentage Gauge -->
+          <div class="bg-slate-50 dark:bg-slate-900/60 rounded-xl p-4 mb-4 border border-slate-100 dark:border-slate-800">
+            <div class="flex items-baseline justify-between mb-2">
+              <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Today's Attendance</span>
+              <span class="text-2xl font-black text-emerald-600 dark:text-emerald-400">
+                {{ stats.attendance.todayRate | number: '1.0-1' }}%
+              </span>
+            </div>
+            <div class="w-full bg-slate-200 dark:bg-slate-700 h-2.5 rounded-full overflow-hidden">
+              <div
+                class="bg-emerald-500 h-full rounded-full transition-all duration-700"
+                [style.width.%]="stats.attendance.todayRate"
+              ></div>
+            </div>
           </div>
+
+          <!-- Weekly Average Pill -->
+          <div class="flex items-center justify-between px-3 py-2.5 rounded-xl border border-slate-100 dark:border-slate-700/80 text-xs">
+            <span class="text-slate-500 dark:text-slate-400 font-medium flex items-center gap-1.5">
+              <i class="fas fa-calendar-week text-slate-400"></i>
+              Weekly Average
+            </span>
+            <span class="font-bold text-slate-800 dark:text-slate-200">
+              {{ stats.attendance.weeklyRate | number: '1.0-1' }}%
+            </span>
+          </div>
+        </div>
+
+        <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-700/80">
+          <p class="text-[11px] text-slate-400 dark:text-slate-500 flex items-center gap-1.5">
+            <i class="fas fa-info-circle text-xs"></i>
+            Attendance is compiled from class daily rolls.
+          </p>
         </div>
       </div>
 
-      <!-- Guardians -->
+      <!-- Financial Target & Collection Summary -->
       <div
-        class="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-5"
+        class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 p-5 shadow-2xs flex flex-col justify-between"
       >
-        <h3 class="text-sm font-semibold text-gray-800 dark:text-gray-100 mb-4">
-          <i class="fas fa-users mr-2" [style.color]="themeService.accent"></i
-          >Guardians
-        </h3>
-        <div class="space-y-3">
-          <div class="flex justify-between text-sm">
-            <span class="text-gray-500 dark:text-gray-400"
-              >Total Registered</span
-            >
-            <span class="font-bold text-gray-800 dark:text-gray-100">{{
-              stats.guardians.total
-            }}</span>
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400">
+                <i class="fas fa-chart-pie text-sm"></i>
+              </div>
+              <h2 class="text-sm font-bold text-slate-800 dark:text-slate-100">
+                Fee Billing Summary
+              </h2>
+            </div>
+            <a routerLink="/finance" class="text-xs font-semibold text-accent-600 hover:text-accent-700 hover:underline">
+              Finance Hub →
+            </a>
           </div>
+
+          <div class="space-y-3">
+            <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800 text-xs">
+              <span class="text-slate-500 dark:text-slate-400">Total Invoiced / Expected</span>
+              <span class="font-bold text-slate-900 dark:text-white">KES {{ stats.finance.totalFees | number }}</span>
+            </div>
+
+            <div class="flex items-center justify-between p-3 rounded-xl bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/40 text-xs">
+              <span class="text-emerald-700 dark:text-emerald-400 font-medium">Total Paid / Collected</span>
+              <span class="font-bold text-emerald-700 dark:text-emerald-400">KES {{ stats.finance.collected | number }}</span>
+            </div>
+
+            <div class="flex items-center justify-between p-3 rounded-xl bg-amber-50/60 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900/40 text-xs">
+              <span class="text-amber-700 dark:text-amber-400 font-medium">Pending Balance</span>
+              <span class="font-bold text-amber-700 dark:text-amber-400">KES {{ stats.finance.outstanding | number }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-700/80">
+          <p class="text-[11px] text-slate-400 dark:text-slate-500 flex items-center gap-1.5">
+            <i class="fas fa-shield-alt text-xs"></i>
+            Integrated with M-Pesa Daraja and Bank feeds.
+          </p>
         </div>
       </div>
 
-      <!-- Quick Actions -->
+      <!-- Guardians & Community Card -->
       <div
-        class="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-5"
+        class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 p-5 shadow-2xs flex flex-col justify-between"
       >
-        <h3 class="text-sm font-semibold text-gray-800 dark:text-gray-100 mb-4">
-          <i class="fas fa-bolt mr-2" [style.color]="themeService.accent"></i
-          >Quick Actions
-        </h3>
-        <div class="space-y-2">
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400">
+                <i class="fas fa-users text-sm"></i>
+              </div>
+              <h2 class="text-sm font-bold text-slate-800 dark:text-slate-100">
+                Parent & Guardian Portal
+              </h2>
+            </div>
+            <a routerLink="/guardians" class="text-xs font-semibold text-accent-600 hover:text-accent-700 hover:underline">
+              Directory →
+            </a>
+          </div>
+
+          <div class="bg-gradient-to-br from-indigo-50/60 to-purple-50/60 dark:from-slate-900/60 dark:to-slate-800/60 rounded-xl p-4 border border-indigo-100/60 dark:border-slate-700 mb-4">
+            <div class="flex items-baseline justify-between mb-1">
+              <span class="text-xs font-semibold text-slate-600 dark:text-slate-400">Verified Contacts</span>
+              <span class="text-2xl font-black text-indigo-600 dark:text-indigo-400">
+                {{ stats.guardians.total | number }}
+              </span>
+            </div>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400">
+              Parents registered for SMS notifications and report access.
+            </p>
+          </div>
+
+          <div class="p-3 rounded-xl border border-slate-100 dark:border-slate-700/80 flex items-center justify-between text-xs">
+            <span class="text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+              <i class="fas fa-sms text-slate-400"></i> SMS Delivery Channel
+            </span>
+            <span class="font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+              Active (AT Sandbox)
+            </span>
+          </div>
+        </div>
+
+        <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-700/80">
           <a
-            routerLink="/students"
-            class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-300 transition-colors"
+            routerLink="/communication"
+            class="flex items-center justify-center gap-2 w-full py-2 rounded-xl text-xs font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 hover:bg-indigo-100 dark:hover:bg-indigo-900/40 transition-colors"
           >
-            <i
-              class="fas fa-user-graduate text-xs"
-              [style.color]="themeService.accent"
-            ></i>
-            View Students
-          </a>
-          <a
-            routerLink="/attendance"
-            class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-300 transition-colors"
-          >
-            <i
-              class="fas fa-clipboard-check text-xs"
-              [style.color]="themeService.accent"
-            ></i>
-            Mark Attendance
-          </a>
-          <a
-            routerLink="/finance"
-            class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-300 transition-colors"
-          >
-            <i
-              class="fas fa-money-bill text-xs"
-              [style.color]="themeService.accent"
-            ></i>
-            View Finance
-          </a>
-          <a
-            routerLink="/reports"
-            class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-300 transition-colors"
-          >
-            <i
-              class="fas fa-chart-bar text-xs"
-              [style.color]="themeService.accent"
-            ></i>
-            View Reports
+            <i class="fas fa-bullhorn text-xs"></i>
+            Broadcast Message to Parents
           </a>
         </div>
+      </div>
+    </div>
+
+    <!-- ── 5. Quick Operations & Shortcuts Grid ── -->
+    <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 p-5 sm:p-6 shadow-2xs">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h2 class="text-sm font-bold text-slate-900 dark:text-white">
+            Quick Operations
+          </h2>
+          <p class="text-xs text-slate-400 dark:text-slate-500">
+            Frequently accessed school management workflows
+          </p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+        <!-- Quick Action 1: Students -->
+        <a
+          routerLink="/students"
+          class="group p-3.5 rounded-2xl border border-slate-100 dark:border-slate-700/70 hover:border-slate-300 dark:hover:border-slate-600 bg-slate-50/60 dark:bg-slate-900/40 hover:bg-white dark:hover:bg-slate-800 hover:shadow-xs transition-all duration-200 flex flex-col items-center text-center cursor-pointer"
+        >
+          <div class="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-2.5 group-hover:scale-110 transition-transform">
+            <i class="fas fa-user-graduate text-sm"></i>
+          </div>
+          <span class="text-xs font-bold text-slate-800 dark:text-slate-200 leading-tight">Students</span>
+          <span class="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">Admissions</span>
+        </a>
+
+        <!-- Quick Action 2: CBC Academics -->
+        <a
+          routerLink="/academics"
+          class="group p-3.5 rounded-2xl border border-slate-100 dark:border-slate-700/70 hover:border-slate-300 dark:hover:border-slate-600 bg-slate-50/60 dark:bg-slate-900/40 hover:bg-white dark:hover:bg-slate-800 hover:shadow-xs transition-all duration-200 flex flex-col items-center text-center cursor-pointer"
+        >
+          <div class="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-2.5 group-hover:scale-110 transition-transform">
+            <i class="fas fa-book-open text-sm"></i>
+          </div>
+          <span class="text-xs font-bold text-slate-800 dark:text-slate-200 leading-tight">Academics</span>
+          <span class="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">CBC Subjects</span>
+        </a>
+
+        <!-- Quick Action 3: Exams -->
+        <a
+          routerLink="/exams"
+          class="group p-3.5 rounded-2xl border border-slate-100 dark:border-slate-700/70 hover:border-slate-300 dark:hover:border-slate-600 bg-slate-50/60 dark:bg-slate-900/40 hover:bg-white dark:hover:bg-slate-800 hover:shadow-xs transition-all duration-200 flex flex-col items-center text-center cursor-pointer"
+        >
+          <div class="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 flex items-center justify-center mb-2.5 group-hover:scale-110 transition-transform">
+            <i class="fas fa-file-signature text-sm"></i>
+          </div>
+          <span class="text-xs font-bold text-slate-800 dark:text-slate-200 leading-tight">Exams</span>
+          <span class="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">Report Cards</span>
+        </a>
+
+        <!-- Quick Action 4: Attendance -->
+        <a
+          routerLink="/attendance"
+          class="group p-3.5 rounded-2xl border border-slate-100 dark:border-slate-700/70 hover:border-slate-300 dark:hover:border-slate-600 bg-slate-50/60 dark:bg-slate-900/40 hover:bg-white dark:hover:bg-slate-800 hover:shadow-xs transition-all duration-200 flex flex-col items-center text-center cursor-pointer"
+        >
+          <div class="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400 flex items-center justify-center mb-2.5 group-hover:scale-110 transition-transform">
+            <i class="fas fa-clipboard-check text-sm"></i>
+          </div>
+          <span class="text-xs font-bold text-slate-800 dark:text-slate-200 leading-tight">Attendance</span>
+          <span class="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">Daily Roll</span>
+        </a>
+
+        <!-- Quick Action 5: Fees & Finance -->
+        <a
+          routerLink="/finance"
+          class="group p-3.5 rounded-2xl border border-slate-100 dark:border-slate-700/70 hover:border-slate-300 dark:hover:border-slate-600 bg-slate-50/60 dark:bg-slate-900/40 hover:bg-white dark:hover:bg-slate-800 hover:shadow-xs transition-all duration-200 flex flex-col items-center text-center cursor-pointer"
+        >
+          <div class="w-10 h-10 rounded-xl bg-teal-100 dark:bg-teal-900/40 text-teal-600 dark:text-teal-400 flex items-center justify-center mb-2.5 group-hover:scale-110 transition-transform">
+            <i class="fas fa-receipt text-sm"></i>
+          </div>
+          <span class="text-xs font-bold text-slate-800 dark:text-slate-200 leading-tight">Finance</span>
+          <span class="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">Fee Billing</span>
+        </a>
+
+        <!-- Quick Action 6: Communication -->
+        <a
+          routerLink="/communication"
+          class="group p-3.5 rounded-2xl border border-slate-100 dark:border-slate-700/70 hover:border-slate-300 dark:hover:border-slate-600 bg-slate-50/60 dark:bg-slate-900/40 hover:bg-white dark:hover:bg-slate-800 hover:shadow-xs transition-all duration-200 flex flex-col items-center text-center cursor-pointer"
+        >
+          <div class="w-10 h-10 rounded-xl bg-rose-100 dark:bg-rose-900/40 text-rose-600 dark:text-rose-400 flex items-center justify-center mb-2.5 group-hover:scale-110 transition-transform">
+            <i class="fas fa-bullhorn text-sm"></i>
+          </div>
+          <span class="text-xs font-bold text-slate-800 dark:text-slate-200 leading-tight">Messages</span>
+          <span class="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">SMS Alerts</span>
+        </a>
       </div>
     </div>
   </div>
