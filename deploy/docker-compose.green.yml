@@ -1,4 +1,3 @@
-version: "3.8"
 
 # ─────────────────────────────────────────────
 # GREEN stack  (backend: host:9002 → container:3400)

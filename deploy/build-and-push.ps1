@@ -24,7 +24,8 @@ param (
     [string]$Tag = "latest"
 )
 
-$ErrorActionPreference = "Stop"
+# Do not stop on native tool progress messages (docker outputs progress to stderr)
+$ErrorActionPreference = "Continue"
 
 function Write-Step {
     param([string]$Message)
@@ -45,15 +46,16 @@ function Write-Err {
 $RepoRoot = Split-Path -Parent $PSScriptRoot
 Set-Location $RepoRoot
 
-# Verify Docker daemon is running
-try {
-    docker info > $null 2>&1
-    if ($LASTEXITCODE -ne 0) {
-        Write-Err "Docker Desktop / daemon is not running! Please start Docker Desktop first."
-        exit 1
-    }
-} catch {
-    Write-Err "Docker is not installed or not in PATH."
+# 1. Check if Docker CLI is in PATH
+if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
+    Write-Err "Docker is not installed or not found in PATH."
+    exit 1
+}
+
+# 2. Check if Docker daemon / engine is responding
+$serverVersion = docker version --format "{{.Server.Version}}" 2>$null
+if (-not $serverVersion) {
+    Write-Err "Docker Desktop is starting or the Linux Engine is not ready. Please ensure Docker Desktop shows 'Engine running' in green."
     exit 1
 }
 
@@ -69,6 +71,7 @@ $FrontendLatest = "${FrontendRepo}:latest"
 
 Write-Host "==========================================================" -ForegroundColor Magenta
 Write-Host "  LumiSchool Local Build & Push to GHCR" -ForegroundColor Magenta
+Write-Host "  Docker : v$serverVersion" -ForegroundColor Green
 Write-Host "  Target : $Target"
 Write-Host "  Org    : $OrgLower"
 Write-Host "  Tag    : $Tag"
@@ -78,21 +81,16 @@ Write-Host "==========================================================" -Foregro
 # ── 1. Backend ─────────────────────────────────────────────────────────────
 if ($Target -eq "both" -or $Target -eq "backend") {
     Write-Step "Building Backend image ($BackendTagged) for linux/amd64..."
-    
+
     $tags = @("-t", $BackendTagged)
     if ($Tag -ne "latest") {
         $tags += @("-t", $BackendLatest)
     }
 
-    $buildArgs = @(
-        "build",
-        "--platform", "linux/amd64"
-    ) + $tags + @(
-        "-f", "$RepoRoot\LumiSchool-backend\Dockerfile",
-        "$RepoRoot\LumiSchool-backend"
-    )
+    $dockerfile = Join-Path $RepoRoot "LumiSchool-backend\Dockerfile"
+    $context = Join-Path $RepoRoot "LumiSchool-backend"
 
-    & docker $buildArgs
+    docker build --platform linux/amd64 @tags -f $dockerfile $context
     if ($LASTEXITCODE -ne 0) {
         Write-Err "Backend build failed!"
         exit 1
@@ -100,14 +98,14 @@ if ($Target -eq "both" -or $Target -eq "backend") {
     Write-Success "Backend built successfully."
 
     Write-Step "Pushing Backend image to GitHub Container Registry ($BackendTagged)..."
-    & docker push $BackendTagged
+    docker push $BackendTagged
     if ($LASTEXITCODE -ne 0) {
         Write-Err "Failed to push $BackendTagged. Did you run 'docker login ghcr.io'?"
         exit 1
     }
 
     if ($Tag -ne "latest") {
-        & docker push $BackendLatest
+        docker push $BackendLatest
     }
     Write-Success "Backend pushed to GHCR."
 }
@@ -121,15 +119,10 @@ if ($Target -eq "both" -or $Target -eq "frontend") {
         $tags += @("-t", $FrontendLatest)
     }
 
-    $buildArgs = @(
-        "build",
-        "--platform", "linux/amd64"
-    ) + $tags + @(
-        "-f", "$RepoRoot\LumiSchool-frontend\Dockerfile",
-        "$RepoRoot\LumiSchool-frontend"
-    )
+    $dockerfile = Join-Path $RepoRoot "LumiSchool-frontend\Dockerfile"
+    $context = Join-Path $RepoRoot "LumiSchool-frontend"
 
-    & docker $buildArgs
+    docker build --platform linux/amd64 @tags -f $dockerfile $context
     if ($LASTEXITCODE -ne 0) {
         Write-Err "Frontend build failed!"
         exit 1
@@ -137,21 +130,21 @@ if ($Target -eq "both" -or $Target -eq "frontend") {
     Write-Success "Frontend built successfully."
 
     Write-Step "Pushing Frontend image to GitHub Container Registry ($FrontendTagged)..."
-    & docker push $FrontendTagged
+    docker push $FrontendTagged
     if ($LASTEXITCODE -ne 0) {
         Write-Err "Failed to push $FrontendTagged. Did you run 'docker login ghcr.io'?"
         exit 1
     }
 
     if ($Tag -ne "latest") {
-        & docker push $FrontendLatest
+        docker push $FrontendLatest
     }
     Write-Success "Frontend pushed to GHCR."
 }
 
 Write-Host "`n==========================================================" -ForegroundColor Green
 Write-Success "All target images built and pushed to GitHub Container Registry!"
-Write-Host "Now to deploy on your VPS with zero build stress, run:" -ForegroundColor Yellow
+Write-Host "Now deploy on your VPS with zero build stress:" -ForegroundColor Yellow
 Write-Host "  ssh root@your-vps-ip" -ForegroundColor Yellow
 Write-Host "  cd /opt/lumischool && bash deploy/deploy.sh $Target" -ForegroundColor Yellow
 Write-Host "==========================================================" -ForegroundColor Green

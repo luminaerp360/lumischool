@@ -135,6 +135,15 @@ do_deploy() {
     nb_port=$(backend_port  "$new_b")
     nf_port=$(frontend_port "$new_f")
 
+    # ── Ensure shared network & Redis infra ─────────────────
+    docker network inspect lumischool-net >/dev/null 2>&1 || {
+        log "Creating docker network lumischool-net..."
+        docker network create lumischool-net
+    }
+
+    log "Ensuring shared infrastructure (Redis) is running..."
+    docker compose -f "$DEPLOY_DIR/docker-compose.infra.yml" up -d
+
     # ── Deploy backend ──────────────────────────────────────
     if [ "$TARGET" = "both" ] || [ "$TARGET" = "backend" ]; then
         log "Pulling pre-built backend image for backend-$new_b..."

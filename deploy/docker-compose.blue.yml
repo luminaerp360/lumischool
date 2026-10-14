@@ -1,4 +1,3 @@
-version: "3.8"
 
 # ─────────────────────────────────────────────
 # BLUE stack  (backend: host:9001 → container:3400)
