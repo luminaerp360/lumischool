@@ -123,8 +123,7 @@ export class TeacherFormComponent implements OnInit {
     };
     if (val.phone?.trim()) payload["phone"] = val.phone.trim();
     if (val.password?.trim()) payload["password"] = val.password.trim();
-    // isActive only valid on update
-    if (this.isEdit) payload["isActive"] = val.isActive;
+    if (val.isActive !== undefined) payload["isActive"] = val.isActive;
 
     const id = this.route.snapshot.paramMap.get("id");
     const req$ = this.isEdit
