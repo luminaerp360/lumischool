@@ -1,12 +1,12 @@
-<div class="flex h-screen overflow-hidden bg-gray-50 dark:bg-slate-900 transition-colors duration-200">
-  <!-- Mobile backdrop -->
+<div class="flex h-screen overflow-hidden bg-slate-50 dark:bg-slate-900 transition-colors duration-200">
+  <!-- Mobile Backdrop Overlay -->
   <div
     *ngIf="isMobile && !mobileSidebarHidden"
-    class="fixed inset-0 bg-black/50 z-30 lg:hidden"
+    class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-30 lg:hidden transition-opacity duration-300"
     (click)="closeMobileSidebar()"
   ></div>
 
-  <!-- Sidebar -->
+  <!-- Modern Sidebar -->
   <app-sidebar
     [collapsed]="sidebarCollapsed"
     [mobileHidden]="mobileSidebarHidden"
@@ -15,15 +15,16 @@
     (navigate)="onNavigate()"
   ></app-sidebar>
 
-  <!-- Main Content -->
-  <div class="flex-1 flex flex-col overflow-hidden transition-all duration-300"
+  <!-- Main Content Region -->
+  <div
+    class="flex-1 flex flex-col min-w-0 h-screen overflow-hidden transition-all duration-300 ease-in-out"
     [ngClass]="getMainContentClass()"
   >
-    <!-- Header -->
+    <!-- Modern Header -->
     <app-header (toggleSidebar)="toggleSidebar()"></app-header>
 
-    <!-- Page Content -->
-    <main class="flex-1 overflow-y-auto p-2 sm:p-4 md:p-6">
+    <!-- Page Content Router Outlet -->
+    <main class="flex-1 overflow-y-auto p-3 sm:p-5 md:p-6 lg:p-8 bg-slate-50/60 dark:bg-slate-900/40">
       <router-outlet></router-outlet>
     </main>
   </div>

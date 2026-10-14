@@ -1,84 +1,113 @@
 <header
-  class="h-14 sm:h-16 bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 flex items-center justify-between px-3 sm:px-6 transition-colors duration-200"
+  class="h-16 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800/80 flex items-center justify-between px-3 sm:px-6 sticky top-0 z-30 transition-colors duration-200"
 >
-  <div class="flex items-center gap-2 sm:gap-4 min-w-0">
+  <!-- Left Side: Mobile Menu Button & Breadcrumb Title -->
+  <div class="flex items-center gap-3 sm:gap-4 min-w-0">
     <button
       (click)="toggleSidebar.emit()"
-      class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 lg:hidden flex-shrink-0"
+      class="w-9 h-9 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 lg:hidden flex-shrink-0 transition-colors shadow-2xs"
+      title="Toggle sidebar"
     >
-      <i class="fas fa-bars text-lg"></i>
+      <i class="fas fa-bars text-sm"></i>
     </button>
-    <h2
-      class="text-sm sm:text-lg font-semibold text-gray-800 dark:text-gray-100 truncate"
-    >
-      School Management
-    </h2>
+
+    <div class="flex items-center gap-2 min-w-0">
+      <span class="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hidden sm:inline-block border border-slate-200/60 dark:border-slate-700/60">
+        Portal
+      </span>
+      <i class="fas fa-chevron-right text-[9px] text-slate-300 dark:text-slate-600 hidden sm:inline-block"></i>
+      <h1 class="text-sm sm:text-base md:text-lg font-bold text-slate-800 dark:text-slate-100 truncate tracking-tight">
+        {{ getPageTitle() }}
+      </h1>
+    </div>
   </div>
 
-  <div class="flex items-center gap-1 sm:gap-2 flex-shrink-0">
-    <!-- Tenant/Org Switcher -->
+  <!-- Center: Quick Search Bar (Tablet / Desktop) -->
+  <div class="hidden md:flex items-center flex-1 max-w-sm lg:max-w-md mx-4 lg:mx-8">
+    <div class="relative w-full">
+      <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+      <input
+        type="text"
+        placeholder="Quick search students, classes, records..."
+        class="w-full pl-9 pr-12 py-1.5 bg-slate-100/70 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 rounded-xl text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-accent-500/20 focus:border-accent-500 transition-all"
+      />
+      <kbd class="absolute right-2.5 top-1/2 -translate-y-1/2 px-1.5 py-0.5 text-[9px] font-mono text-slate-400 bg-white dark:bg-slate-700 rounded border border-slate-200 dark:border-slate-600 shadow-2xs select-none">
+        ⌘K
+      </kbd>
+    </div>
+  </div>
+
+  <!-- Right Side Actions & User Menu -->
+  <div class="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+    <!-- Academic Term / Year Status Pill -->
+    <span
+      class="hidden xl:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/40 select-none shadow-2xs"
+    >
+      <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+      Term 1 • 2026
+    </span>
+
+    <!-- Organization / Tenant Switcher -->
     <ng-container *ngIf="authService.tenantList$ | async as tenants">
       <div
-        class="relative"
+        class="relative tenant-menu-wrapper"
         *ngIf="canSwitchTenants(tenants); else activeOrganizationBadge"
       >
         <button
-          (click)="
-            showTenantMenu = !showTenantMenu;
-            showUserMenu = false;
-            showColorPicker = false
-          "
-          class="flex items-center gap-1.5 px-2 sm:px-3 py-1.5 rounded-lg text-sm hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors border border-gray-200 dark:border-slate-600"
+          (click)="toggleTenantMenu($event)"
+          class="flex items-center gap-2 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-semibold border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 bg-white dark:bg-slate-800/80 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all shadow-2xs"
           [class.opacity-50]="switchingTenant"
           [disabled]="switchingTenant"
+          title="Switch Organization"
         >
-          <i
-            class="fas fa-building text-xs"
-            [style.color]="themeService.accent"
-          ></i>
-          <span
-            class="text-gray-700 dark:text-gray-300 hidden sm:block max-w-[120px] truncate"
-            >{{ getActiveTenantName() }}</span
+          <div
+            class="w-5 h-5 rounded-md flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0 shadow-2xs"
+            [style.background-color]="themeService.accent"
           >
-          <i class="fas fa-chevron-down text-xs text-gray-400"></i>
+            <i class="fas fa-school text-[9px]"></i>
+          </div>
+          <span class="text-slate-700 dark:text-slate-300 hidden sm:inline-block max-w-[120px] truncate">
+            {{ getActiveTenantName() }}
+          </span>
+          <i
+            class="fas fa-chevron-down text-[10px] text-slate-400 transition-transform duration-200"
+            [class.rotate-180]="showTenantMenu"
+          ></i>
         </button>
 
+        <!-- Organization Dropdown -->
         <div
           *ngIf="showTenantMenu"
-          class="absolute right-0 top-full mt-2 w-56 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-gray-200 dark:border-slate-700 py-1 z-50"
+          class="absolute right-0 top-full mt-2 w-64 bg-white/95 dark:bg-slate-800/95 backdrop-blur-md rounded-2xl shadow-xl border border-slate-200/80 dark:border-slate-700/80 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150"
         >
-          <div class="px-3 py-2 border-b border-gray-100 dark:border-slate-700">
-            <p
-              class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider"
-            >
+          <div class="px-3.5 py-2 border-b border-slate-100 dark:border-slate-700/80">
+            <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
               Switch Organization
             </p>
           </div>
+
           <div
             *ngIf="tenantSwitchError"
-            class="mx-3 mt-2 rounded-md border border-red-200 bg-red-50 px-2.5 py-2 text-xs text-red-700 dark:border-red-800/50 dark:bg-red-900/20 dark:text-red-300"
+            class="mx-3 mt-2 rounded-xl border border-red-200 bg-red-50 p-2.5 text-xs text-red-700 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-300"
           >
             {{ tenantSwitchError }}
           </div>
-          <div class="max-h-48 overflow-y-auto">
+
+          <div class="max-h-56 overflow-y-auto p-1.5 space-y-1">
             <button
               *ngFor="let tenant of tenants"
               (click)="switchTenant(tenant)"
-              class="w-full text-left px-3 py-2 text-sm transition-colors flex items-center gap-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-700"
-              [class.bg-gray-50]="
-                tenant._id === (authService.currentTenantId$ | async)
-              "
-              [class.dark:bg-slate-700]="
-                tenant._id === (authService.currentTenantId$ | async)
-              "
+              class="w-full text-left px-3 py-2 rounded-xl text-xs font-medium transition-all flex items-center gap-2.5 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/80 cursor-pointer"
+              [class.bg-slate-100]="tenant._id === (authService.currentTenantId$ | async)"
+              [class.dark:bg-slate-700]="tenant._id === (authService.currentTenantId$ | async)"
             >
               <span
-                class="w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
+                class="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold text-white flex-shrink-0 shadow-2xs"
                 [style.background-color]="themeService.accent"
               >
                 {{ tenant.name.charAt(0).toUpperCase() }}
               </span>
-              <span class="truncate">{{ tenant.name }}</span>
+              <span class="truncate font-semibold flex-1">{{ tenant.name }}</span>
               <i
                 *ngIf="tenant._id === (authService.currentTenantId$ | async)"
                 class="fas fa-check text-xs ml-auto"
@@ -89,46 +118,46 @@
         </div>
       </div>
 
+      <!-- Static Active Organization Badge when only 1 tenant -->
       <ng-template #activeOrganizationBadge>
         <div
           *ngIf="tenants.length === 1"
-          class="hidden sm:flex items-center gap-2 rounded-lg border border-gray-200 px-3 py-1.5 text-sm text-gray-700 dark:border-slate-600 dark:text-gray-300"
+          class="hidden sm:flex items-center gap-2 rounded-xl border border-slate-200/80 dark:border-slate-700/80 px-2.5 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 bg-slate-50/60 dark:bg-slate-800/60 shadow-2xs"
         >
-          <i
-            class="fas fa-building text-xs"
-            [style.color]="themeService.accent"
-          ></i>
-          <span class="max-w-[140px] truncate">{{ tenants[0].name }}</span>
+          <div
+            class="w-5 h-5 rounded-md flex items-center justify-center text-[10px] text-white flex-shrink-0"
+            [style.background-color]="themeService.accent"
+          >
+            <i class="fas fa-school text-[9px]"></i>
+          </div>
+          <span class="max-w-[130px] truncate">{{ tenants[0].name }}</span>
         </div>
       </ng-template>
     </ng-container>
 
-    <!-- Theme toggle -->
+    <!-- Theme Switcher (Dark / Light Mode) -->
     <button
       (click)="themeService.toggleTheme()"
-      class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
-      [title]="
-        (themeService.isDark$ | async)
-          ? 'Switch to light mode'
-          : 'Switch to dark mode'
-      "
+      class="w-9 h-9 rounded-xl border border-slate-200/80 dark:border-slate-700/80 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all shadow-2xs"
+      [title]="(themeService.isDark$ | async) ? 'Switch to light mode' : 'Switch to dark mode'"
     >
       <i
-        class="fas"
+        class="fas text-sm transition-transform duration-300"
         [class.fa-moon]="!(themeService.isDark$ | async)"
         [class.fa-sun]="themeService.isDark$ | async"
+        [class.rotate-90]="themeService.isDark$ | async"
       ></i>
     </button>
 
-    <!-- Accent color button -->
-    <div class="relative">
+    <!-- Accent Color Picker -->
+    <div class="relative color-picker-wrapper">
       <button
-        (click)="showColorPicker = !showColorPicker; showUserMenu = false"
-        class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
-        title="Accent color"
+        (click)="toggleColorPicker($event)"
+        class="w-9 h-9 rounded-xl border border-slate-200/80 dark:border-slate-700/80 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shadow-2xs"
+        title="Custom accent theme color"
       >
         <span
-          class="w-5 h-5 rounded-full border-2 border-gray-300 dark:border-gray-500"
+          class="w-4 h-4 rounded-full ring-2 ring-white dark:ring-slate-900 shadow-2xs transition-transform hover:scale-110"
           [style.background-color]="themeService.accent"
         ></span>
       </button>
@@ -141,55 +170,92 @@
       ></app-color-picker>
     </div>
 
-    <!-- User Menu -->
-    <div class="relative">
+    <!-- User Profile Dropdown Menu -->
+    <div class="relative user-menu-wrapper ml-1">
       <button
-        (click)="showUserMenu = !showUserMenu; showColorPicker = false"
-        class="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
+        (click)="toggleUserMenu($event)"
+        class="flex items-center gap-2.5 pl-1.5 pr-2.5 py-1 rounded-xl border border-slate-200/80 dark:border-slate-700/80 hover:border-slate-300 dark:hover:border-slate-600 bg-white dark:bg-slate-800/80 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all shadow-2xs"
       >
+        <!-- User Avatar with Initials -->
         <div
-          class="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center"
+          class="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs text-white flex-shrink-0 shadow-2xs"
           [style.background-color]="themeService.accent"
         >
-          <span class="text-white text-sm font-medium">
-            {{
-              (authService.user$ | async)?.name?.charAt(0)?.toUpperCase() || "U"
-            }}
-          </span>
+          {{ getUserInitials() }}
         </div>
-        <span
-          class="text-sm font-medium text-gray-700 dark:text-gray-300 hidden sm:block"
-        >
-          {{ (authService.user$ | async)?.name || "User" }}
-        </span>
-        <i class="fas fa-chevron-down text-xs text-gray-400"></i>
+
+        <!-- Name & Role -->
+        <div class="text-left hidden md:block">
+          <p class="text-xs font-bold text-slate-800 dark:text-slate-100 leading-tight truncate max-w-[120px]">
+            {{ getUserDisplayName() }}
+          </p>
+          <p class="text-[10px] font-semibold text-slate-400 dark:text-slate-500 leading-tight">
+            {{ getUserRoleName() }}
+          </p>
+        </div>
+
+        <i
+          class="fas fa-chevron-down text-[10px] text-slate-400 transition-transform duration-200"
+          [class.rotate-180]="showUserMenu"
+        ></i>
       </button>
 
+      <!-- User Menu Popover -->
       <div
         *ngIf="showUserMenu"
-        class="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-gray-200 dark:border-slate-700 py-2 z-50"
+        class="absolute right-0 top-full mt-2 w-60 bg-white/95 dark:bg-slate-800/95 backdrop-blur-md rounded-2xl shadow-xl border border-slate-200/80 dark:border-slate-700/80 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150"
       >
-        <div class="px-3 py-2 border-b border-gray-100 dark:border-slate-700">
-          <p class="text-sm font-medium text-gray-800 dark:text-gray-200">
-            {{ (authService.user$ | async)?.name }}
-          </p>
-          <p class="text-xs text-gray-500 dark:text-gray-400">
-            {{ (authService.user$ | async)?.email }}
-          </p>
+        <!-- User Summary Card -->
+        <div class="px-3.5 py-2.5 border-b border-slate-100 dark:border-slate-700/80">
+          <div class="flex items-center gap-3">
+            <div
+              class="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-sm text-white flex-shrink-0 shadow-2xs"
+              [style.background-color]="themeService.accent"
+            >
+              {{ getUserInitials() }}
+            </div>
+            <div class="min-w-0 flex-1">
+              <p class="text-xs font-bold text-slate-800 dark:text-slate-100 truncate">
+                {{ getUserDisplayName() }}
+              </p>
+              <p class="text-[11px] text-slate-400 dark:text-slate-500 truncate">
+                {{ (authService.user$ | async)?.email }}
+              </p>
+            </div>
+          </div>
+          <div class="mt-2.5">
+            <span
+              class="inline-block px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-slate-100 dark:bg-slate-700/80 text-slate-600 dark:text-slate-300"
+            >
+              {{ getUserRoleName() }}
+            </span>
+          </div>
         </div>
-        <a
-          routerLink="/settings"
-          (click)="showUserMenu = false"
-          class="block px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700"
-        >
-          <i class="fas fa-cog mr-2"></i> Settings
-        </a>
-        <button
-          (click)="logout(); showUserMenu = false"
-          class="w-full text-left px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-slate-700"
-        >
-          <i class="fas fa-sign-out-alt mr-2"></i> Logout
-        </button>
+
+        <!-- Links -->
+        <div class="p-1.5 space-y-1">
+          <a
+            routerLink="/settings"
+            (click)="showUserMenu = false"
+            class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/80 transition-colors cursor-pointer"
+          >
+            <i class="fas fa-sliders-h text-slate-400 text-xs w-4 text-center"></i>
+            Account Settings
+          </a>
+        </div>
+
+        <div class="my-1 border-t border-slate-100 dark:border-slate-700/80"></div>
+
+        <!-- Logout Button -->
+        <div class="p-1.5">
+          <button
+            (click)="logout(); showUserMenu = false"
+            class="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors text-left cursor-pointer"
+          >
+            <i class="fas fa-sign-out-alt text-xs w-4 text-center"></i>
+            Sign Out
+          </button>
+        </div>
       </div>
     </div>
   </div>

@@ -48,6 +48,6 @@ export class MainLayoutComponent implements OnInit {
 
   getMainContentClass(): string {
     if (this.isMobile) return 'ml-0';
-    return this.sidebarCollapsed ? 'ml-16' : 'ml-64';
+    return this.sidebarCollapsed ? 'ml-20' : 'ml-64';
   }
 }
