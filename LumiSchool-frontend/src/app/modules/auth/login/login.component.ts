@@ -15,12 +15,19 @@ export class LoginComponent implements OnInit {
   loading = false;
   error = "";
 
+  showPassword = false;
+  rememberMe = true;
+
   constructor(
     private authService: AuthService,
     public themeService: ThemeService,
     private router: Router,
     private tenantsService: TenantsService,
   ) {}
+
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
+  }
 
   ngOnInit(): void {
     if (this.authService.isLoggedIn()) {

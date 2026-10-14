@@ -1,76 +1,244 @@
+<!-- Modern Lumina ERP School Management Login Page -->
 <div
-  class="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-900 px-4 transition-colors duration-200"
+  class="min-h-screen bg-slate-50 dark:bg-slate-950 relative overflow-hidden flex flex-col justify-center py-8 sm:py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-200 select-none"
 >
-  <div class="w-full max-w-md">
-    <div class="text-center mb-8">
-      <div
-        class="inline-flex w-14 h-14 rounded-2xl items-center justify-center mb-4"
-        [style.background-color]="themeService.accent"
-      >
-        <i class="fas fa-graduation-cap text-white text-2xl"></i>
-      </div>
-      <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-100">
-        LumiSchool
-      </h1>
-      <p class="text-gray-500 dark:text-gray-400 mt-1">
-        School Management System
-      </p>
-    </div>
-
+  <!-- Ambient Background Glows -->
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
     <div
-      class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-gray-200 dark:border-slate-700 p-6 sm:p-8"
+      class="absolute -top-36 -right-36 w-80 sm:w-[480px] h-80 sm:h-[480px] bg-purple-500/15 dark:bg-purple-600/20 rounded-full blur-3xl animate-blob"
+    ></div>
+    <div
+      class="absolute -bottom-36 -left-36 w-80 sm:w-[480px] h-80 sm:h-[480px] bg-emerald-500/15 dark:bg-emerald-600/15 rounded-full blur-3xl animate-blob animation-delay-2000"
+    ></div>
+    <div
+      class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-indigo-500/10 dark:bg-indigo-600/15 rounded-full blur-3xl animate-blob animation-delay-4000 hidden sm:block"
+    ></div>
+  </div>
+
+  <!-- Top Navigation Utility (Theme Switcher) -->
+  <div class="absolute top-4 right-4 sm:top-6 sm:right-6 z-20">
+    <button
+      (click)="themeService.toggleTheme()"
+      class="w-10 h-10 rounded-xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-md border border-slate-200 dark:border-slate-700/80 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white flex items-center justify-center shadow-xs transition-transform hover:scale-105 active:scale-95"
+      [title]="themeService.isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'"
     >
-      <div
-        *ngIf="error"
-        class="mb-4 p-3 rounded-lg bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-sm"
-      >
-        {{ error }}
+      <i [class]="themeService.isDark ? 'fas fa-sun text-amber-400' : 'fas fa-moon text-indigo-500'"></i>
+    </button>
+  </div>
+
+  <!-- Main Container -->
+  <div class="relative w-full max-w-6xl mx-auto my-auto z-10">
+    <div class="grid lg:grid-cols-12 gap-8 lg:gap-14 items-center">
+      
+      <!-- Left Column - Branding & Value Proposition (Desktop Only) -->
+      <div class="hidden lg:block lg:col-span-6 space-y-6 text-slate-900 dark:text-white pr-4">
+        <!-- Tagline Badge -->
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-purple-100/90 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-200/80 dark:border-purple-800/80 shadow-2xs">
+          <i class="fas fa-sparkles text-purple-500"></i>
+          <span>Lumina ERP • Intelligent School Cloud</span>
+        </div>
+
+        <!-- Headline -->
+        <div class="space-y-3">
+          <h1 class="text-3xl xl:text-4xl font-black tracking-tight leading-tight">
+            Manage your entire school in
+            <span class="bg-gradient-to-r from-purple-600 via-indigo-600 to-emerald-500 dark:from-purple-400 dark:via-indigo-400 dark:to-emerald-400 bg-clip-text text-transparent">
+              one unified flow.
+            </span>
+          </h1>
+          <p class="text-sm xl:text-base text-slate-600 dark:text-slate-300 leading-relaxed font-normal">
+            Complete Kenyan CBC curriculum grading, automated M-Pesa fee reconciliation, student attendance, and comprehensive exam analytics — built for modern institutions.
+          </p>
+        </div>
+
+        <!-- Feature Highlight Cards -->
+        <div class="grid grid-cols-2 gap-3.5 pt-2">
+          <!-- Card 1 -->
+          <div class="bg-white/80 dark:bg-slate-900/60 backdrop-blur-md rounded-2xl p-4 border border-slate-200/80 dark:border-slate-800 shadow-xs hover:border-purple-300 dark:hover:border-purple-700/60 transition-all">
+            <div class="w-9 h-9 rounded-xl bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400 flex items-center justify-center mb-2.5">
+              <i class="fas fa-award text-sm"></i>
+            </div>
+            <div class="font-bold text-xs text-slate-900 dark:text-white">Kenyan CBC &amp; 8-4-4</div>
+            <div class="text-[11px] text-slate-500 dark:text-slate-400 mt-1 leading-snug">Strand rubrics, formative assessments &amp; NEMIS ready</div>
+          </div>
+
+          <!-- Card 2 -->
+          <div class="bg-white/80 dark:bg-slate-900/60 backdrop-blur-md rounded-2xl p-4 border border-slate-200/80 dark:border-slate-800 shadow-xs hover:border-emerald-300 dark:hover:border-emerald-700/60 transition-all">
+            <div class="w-9 h-9 rounded-xl bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-2.5">
+              <i class="fas fa-receipt text-sm"></i>
+            </div>
+            <div class="font-bold text-xs text-slate-900 dark:text-white">M-Pesa Fee Automation</div>
+            <div class="text-[11px] text-slate-500 dark:text-slate-400 mt-1 leading-snug">Instant C2B reconciliation, SMS alerts &amp; audit trails</div>
+          </div>
+        </div>
+
+        <!-- Trust Badges -->
+        <div class="pt-3 flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
+          <div class="flex -space-x-2 overflow-hidden">
+            <div class="inline-flex h-7 w-7 rounded-full bg-purple-600 ring-2 ring-white dark:ring-slate-900 items-center justify-center text-[10px] text-white font-bold">L</div>
+            <div class="inline-flex h-7 w-7 rounded-full bg-indigo-600 ring-2 ring-white dark:ring-slate-900 items-center justify-center text-[10px] text-white font-bold">E</div>
+            <div class="inline-flex h-7 w-7 rounded-full bg-emerald-600 ring-2 ring-white dark:ring-slate-900 items-center justify-center text-[10px] text-white font-bold">R</div>
+            <div class="inline-flex h-7 w-7 rounded-full bg-teal-600 ring-2 ring-white dark:ring-slate-900 items-center justify-center text-[10px] text-white font-bold">P</div>
+          </div>
+          <span class="font-medium">Powering progressive schools &amp; academies across East Africa</span>
+        </div>
       </div>
 
-      <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-6">
-        Sign in to your account
-      </h2>
-
-      <div class="space-y-4">
-        <div>
-          <label
-            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-            >Email</label
-          >
-          <input
-            type="email"
-            [(ngModel)]="email"
-            (keyup.enter)="login()"
-            class="w-full px-3 py-2.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 outline-none transition-colors"
-            placeholder="your@email.com"
-          />
-        </div>
-        <div>
-          <label
-            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-            >Password</label
-          >
-          <input
-            type="password"
-            [(ngModel)]="password"
-            (keyup.enter)="login()"
-            class="w-full px-3 py-2.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 outline-none transition-colors"
-            placeholder=""
-          />
-        </div>
-        <button
-          (click)="login()"
-          [disabled]="loading"
-          class="w-full py-2.5 rounded-lg text-white font-medium transition-opacity"
-          [style.background-color]="themeService.accent"
-          [class.opacity-50]="loading"
+      <!-- Right Column - Login Card -->
+      <div class="w-full lg:col-span-6 max-w-md mx-auto">
+        <div
+          class="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-3xl shadow-xl sm:shadow-2xl border border-slate-200/90 dark:border-slate-800/90 p-6 sm:p-9 relative"
         >
-          <span *ngIf="!loading">Sign In</span>
-          <span *ngIf="loading"
-            ><i class="fas fa-spinner fa-spin mr-2"></i>Signing in...</span
+          <!-- Lumina ERP Brand Logo Header -->
+          <div class="text-center mb-6">
+            <img
+              src="assets/images/logo-clean.png"
+              alt="Lumina ERP"
+              class="h-12 sm:h-14 max-w-[240px] w-auto object-contain mx-auto drop-shadow-xs transition-transform duration-200 hover:scale-105"
+            />
+            <div class="flex items-center justify-center gap-2 mt-3">
+              <span class="text-xs font-black uppercase tracking-wider text-purple-600 dark:text-purple-400">LumiSchool Portal</span>
+              <span class="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-700"></span>
+              <span class="text-[11px] font-semibold text-slate-500 dark:text-slate-400">School ERP Edition</span>
+            </div>
+          </div>
+
+          <!-- Welcome Subheading -->
+          <div class="text-center mb-6">
+            <h2 class="text-xl sm:text-2xl font-black tracking-tight text-slate-800 dark:text-slate-100">
+              Welcome Back
+            </h2>
+            <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">
+              Sign in to manage classes, students &amp; institutional records
+            </p>
+          </div>
+
+          <!-- Error Alert Banner -->
+          <div
+            *ngIf="error"
+            class="mb-5 p-3.5 rounded-2xl bg-red-50/90 dark:bg-red-950/40 border border-red-200 dark:border-red-800/80 text-red-700 dark:text-red-300 text-xs flex items-start gap-2.5 animate-fadeIn"
           >
-        </button>
+            <i class="fas fa-exclamation-circle text-red-500 text-sm mt-0.5 flex-shrink-0"></i>
+            <div class="flex-1 font-medium leading-relaxed">{{ error }}</div>
+          </div>
+
+          <!-- Login Form -->
+          <form (ngSubmit)="login()" class="space-y-4">
+            <!-- Email Input -->
+            <div>
+              <label
+                class="block text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5"
+              >
+                Institutional Email
+              </label>
+              <div class="relative">
+                <div
+                  class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-purple-600 dark:text-purple-400"
+                >
+                  <i class="fas fa-envelope text-xs"></i>
+                </div>
+                <input
+                  type="email"
+                  name="email"
+                  [(ngModel)]="email"
+                  class="w-full pl-10 pr-3.5 py-2.5 sm:py-3 text-xs sm:text-sm bg-slate-50/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 focus:bg-white dark:focus:bg-slate-900 transition-all font-medium"
+                  placeholder="admin@school.ac.ke"
+                  autocomplete="email"
+                  required
+                />
+              </div>
+            </div>
+
+            <!-- Password Input -->
+            <div>
+              <label
+                class="block text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5"
+              >
+                Password
+              </label>
+              <div class="relative">
+                <div
+                  class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-purple-600 dark:text-purple-400"
+                >
+                  <i class="fas fa-lock text-xs"></i>
+                </div>
+                <input
+                  [type]="showPassword ? 'text' : 'password'"
+                  name="password"
+                  [(ngModel)]="password"
+                  class="w-full pl-10 pr-10 py-2.5 sm:py-3 text-xs sm:text-sm bg-slate-50/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 focus:bg-white dark:focus:bg-slate-900 transition-all font-medium"
+                  placeholder="Enter your security password"
+                  autocomplete="current-password"
+                  required
+                />
+                <button
+                  type="button"
+                  (click)="togglePasswordVisibility()"
+                  class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors cursor-pointer"
+                  tabindex="-1"
+                  [title]="showPassword ? 'Hide password' : 'Show password'"
+                >
+                  <i [class]="showPassword ? 'fas fa-eye-slash text-xs' : 'fas fa-eye text-xs'"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Remember me & Help Link -->
+            <div class="flex items-center justify-between text-xs pt-1">
+              <label class="flex items-center gap-2 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  name="rememberMe"
+                  [(ngModel)]="rememberMe"
+                  class="w-4 h-4 rounded border-slate-300 dark:border-slate-700 text-purple-600 focus:ring-purple-500 focus:ring-offset-0 bg-white dark:bg-slate-800 transition-colors"
+                />
+                <span class="text-slate-600 dark:text-slate-400 font-medium text-[11px]">Remember me</span>
+              </label>
+              <a
+                href="javascript:void(0)"
+                class="font-bold text-[11px] text-purple-600 dark:text-purple-400 hover:underline transition-colors"
+              >
+                Forgot password?
+              </a>
+            </div>
+
+            <!-- Submit Button -->
+            <button
+              type="submit"
+              [disabled]="loading"
+              class="relative w-full py-3 px-4 text-xs sm:text-sm font-bold text-white bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-600 hover:from-purple-700 hover:to-indigo-700 rounded-xl shadow-lg shadow-purple-500/25 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer active:scale-[0.99] mt-2"
+            >
+              <span
+                [class.opacity-0]="loading"
+                class="flex items-center justify-center gap-2"
+              >
+                <span>Sign In to School Portal</span>
+                <i class="fas fa-arrow-right text-xs"></i>
+              </span>
+
+              <!-- Loading Spinner -->
+              <div
+                *ngIf="loading"
+                class="absolute inset-0 flex items-center justify-center gap-2"
+              >
+                <i class="fas fa-spinner fa-spin text-sm"></i>
+                <span class="text-xs">Authenticating...</span>
+              </div>
+            </button>
+          </form>
+
+          <!-- Footer Copyright & Support -->
+          <div class="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800/80 text-center space-y-1">
+            <p class="text-[11px] text-slate-400 dark:text-slate-500">
+              &copy; 2026 Lumina ERP &bull; LumiSchool Platform
+            </p>
+            <p class="text-[10px] text-slate-400/80 dark:text-slate-600">
+              Protected by multi-tenant bank-grade encryption
+            </p>
+          </div>
+        </div>
       </div>
+
     </div>
   </div>
 </div>
