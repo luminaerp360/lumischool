@@ -137,13 +137,14 @@ do_deploy() {
 
     # ── Deploy backend ──────────────────────────────────────
     if [ "$TARGET" = "both" ] || [ "$TARGET" = "backend" ]; then
-        log "Building backend-$new_b..."
+        log "Pulling pre-built backend image for backend-$new_b..."
+        docker compose -f "$(compose_file "$new_b")" pull "backend-$new_b"
 
         # Clean up any leftover containers from a previous failed attempt
         docker compose -f "$(compose_file "$new_b")" rm -sf "backend-$new_b" 2>/dev/null || true
 
-        docker compose -f "$(compose_file "$new_b")" build "backend-$new_b"
-        docker compose -f "$(compose_file "$new_b")" up -d  "backend-$new_b"
+        log "Starting backend-$new_b..."
+        docker compose -f "$(compose_file "$new_b")" up -d --no-build "backend-$new_b"
 
         if ! wait_healthy "http://localhost:$nb_port/" "backend-$new_b"; then
             docker compose -f "$(compose_file "$new_b")" stop "backend-$new_b" 2>/dev/null || true
@@ -153,12 +154,13 @@ do_deploy() {
 
     # ── Deploy frontend ─────────────────────────────────────
     if [ "$TARGET" = "both" ] || [ "$TARGET" = "frontend" ]; then
-        log "Building frontend-$new_f..."
+        log "Pulling pre-built frontend image for frontend-$new_f..."
+        docker compose -f "$(compose_file "$new_f")" pull "frontend-$new_f"
 
         docker compose -f "$(compose_file "$new_f")" rm -sf "frontend-$new_f" 2>/dev/null || true
 
-        docker compose -f "$(compose_file "$new_f")" build "frontend-$new_f"
-        docker compose -f "$(compose_file "$new_f")" up -d  "frontend-$new_f"
+        log "Starting frontend-$new_f..."
+        docker compose -f "$(compose_file "$new_f")" up -d --no-build "frontend-$new_f"
 
         if ! wait_healthy "http://localhost:$nf_port/" "frontend-$new_f"; then
             docker compose -f "$(compose_file "$new_f")" stop "frontend-$new_f" 2>/dev/null || true

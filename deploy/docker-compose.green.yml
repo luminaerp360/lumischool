@@ -10,7 +10,7 @@ services:
     build:
       context: ../LumiSchool-backend
       dockerfile: Dockerfile
-    image: lumischool-backend:green
+    image: ${BACKEND_IMAGE:-ghcr.io/luminaerp360/lumischool-backend:latest}
     container_name: lumischool-backend-green
     ports:
       - "127.0.0.1:9002:3400"
@@ -40,7 +40,7 @@ services:
     build:
       context: ../LumiSchool-frontend
       dockerfile: Dockerfile
-    image: lumischool-frontend:green
+    image: ${FRONTEND_IMAGE:-ghcr.io/luminaerp360/lumischool-frontend:latest}
     container_name: lumischool-frontend-green
     ports:
       - "127.0.0.1:9022:80"
